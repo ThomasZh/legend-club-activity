@@ -1,0 +1,12 @@
+
+pidfile
+
+nohup.out
+
+*.pyc
+
+foo/*.pyc
+
+foo/ui/*.pyc
+
+log/*.log

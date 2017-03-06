@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<title>{{article["title"]}}</title>
+
+<!-- Bootstrap Core CSS -->
+<link rel="stylesheet"
+	href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<link type="text/css" rel="stylesheet"
+	href="//cdn.bootcss.com/SyntaxHighlighter/3.0.83/styles/shCoreDefault.min.css" />
+<link type="text/css" rel="stylesheet"
+	href="//cdn.bootcss.com/SyntaxHighlighter/3.0.83/styles/shThemeDefault.min.css" />
+
+<!-- Custom CSS -->
+<link href="{{static_url("css/clean-blog.min.css")}}" rel="stylesheet">
+
+<!-- Custom Fonts -->
+<link
+	href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css"
+	rel="stylesheet" type="text/css">
+<link
+	href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic'
+	rel='stylesheet' type='text/css'>
+<link
+	href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800'
+	rel='stylesheet' type='text/css'>
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+<style type="text/css">
+	.text-shadow {text-shadow:1px 1px 1px #000; padding:10px 0; color:#FFF;}
+	.img-responsive { margin: 5px 0px 5px 0px;} 
+	.syntaxhighlighter table .container:before { display: none !important; }
+	.container:before, .container:after { display: table; content: ""; line-height: 0;}
+</style>
+</head>
+
+<body>
+	<!-- Navigation -->
+	<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+		<div class="container-fluid">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header page-scroll">
+				<button type="button" class="navbar-toggle" data-toggle="collapse"
+					data-target="#bs-example-navbar-collapse-1">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="/">Time&sup2;box</a>
+			</div>
+
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse"
+				id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav navbar-right">
+					<li><a href="/">Home</a></li>
+					<li><a href="/about">About</a></li>
+					<li><a href="/demo-center">Demo Center</a></li>
+					<li><a href="/contact">Contact</a></li>
+				</ul>
+			</div>
+			<!-- /.navbar-collapse -->
+		</div>
+		<!-- /.container -->
+	</nav>
+
+	<!-- Page Header -->
+	<!-- Set your background image for this header on the line below. -->
+	<header class="intro-header"
+		style="background-image: url('{{bgImgRandom}}')">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+					<div class="post-heading">
+						<h1 class="text-shadow">{{article["title"]}}</h1>
+						<span class="meta text-shadow">Posted by <a href="#">{{article["accountNickname"]}}</a> {{article["timestamp"]}}
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<!-- Post Content -->
+	<article>
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+					<!--MOB SHARE BEGIN-->
+					<!-- 
+					<div class="-mob-share-ui-button -mob-share-open">分享</div>
+					<div class="-mob-share-ui" style="display: none">
+						<ul class="-mob-share-list">
+							<li class="-mob-share-weibo"><p>新浪微博</p></li>
+							<li class="-mob-share-tencentweibo"><p>腾讯微博</p></li>
+							<li class="-mob-share-qzone"><p>QQ空间</p></li>
+							<li class="-mob-share-qq"><p>QQ好友</p></li>
+							<li class="-mob-share-renren"><p>人人网</p></li>
+							<li class="-mob-share-kaixin"><p>开心网</p></li>
+							<li class="-mob-share-douban"><p>豆瓣</p></li>
+							<li class="-mob-share-facebook"><p>Facebook</p></li>
+							<li class="-mob-share-twitter"><p>Twitter</p></li>
+						</ul>
+						<div class="-mob-share-close">取消</div>
+					</div>
+					<div class="-mob-share-ui-bg"></div>
+					<script id="-mob-share"
+						src="http://f1.webshare.mob.com/code/mob-share.js?appkey=f96b6d9f63ed"></script>
+					 -->
+					<!--MOB SHARE END-->
+					
+					<!-- JiaThis Button BEGIN -->
+					<div id="ckepop">
+						<span class="jiathis_txt">分享到：</span> <a
+							class="jiathis_button_weixin">微信</a> <a
+							href="http://www.jiathis.com/share"
+							class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis"
+							target="_blank">更多</a> <a class="jiathis_counter_style"></a>
+					</div>
+					<script type="text/javascript"
+						src="http://v3.jiathis.com/code/jia.js?uid=1" charset="utf-8"></script>
+					<!-- JiaThis Button END -->
+				</div>
+				<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+					<p><img class="img-responsive" src="{{article['imgUrl']}}"/></p>
+					<p>{{article["content"]}}</p>
+					{% for paragraph in paragraphs %} 
+						{% module Template("blog/paragraph-block.html", article=article, paragraph=paragraph) %} 
+					{% end %}
+				</div>
+			</div>
+		</div>
+	</article>
+
+	<hr>
+
+	<!-- Footer -->
+	<footer>
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+					<ul class="list-inline text-center">
+						<li><a href="mailto:thomas@time2box.com"> 
+							<span class="fa-stack fa-lg"> 
+								<i class="fa fa-circle fa-stack-2x"></i> 
+								<i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+							</span>
+						</a></li>
+						<li><a href="http://weibo.com/sedums"> 
+							<span class="fa-stack fa-lg"> 
+								<i class="fa fa-circle fa-stack-2x"></i> 
+								<i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+							</span>
+						</a></li>
+						<li><a href="https://www.linkedin.com/in/璟天-张-33a65a102"> 
+							<span class="fa-stack fa-lg"> 
+								<i class="fa fa-circle fa-stack-2x"></i> 
+								<i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+							</span>
+						</a></li>
+						<li><a href="https://github.com/ThomasZh"> 
+							<span class="fa-stack fa-lg"> 
+								<i class="fa fa-circle fa-stack-2x"></i> 
+								<i class="fa fa-github fa-stack-1x fa-inverse"></i>
+							</span>
+						</a></li>
+					</ul>
+					<p class="copyright text-muted">Copyright &copy; time2box.com 2016</p>
+				</div>
+			</div>
+		</div>
+	</footer>
+
+	<!-- jQuery -->
+	<script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+
+	<!-- Bootstrap Core JavaScript -->
+	<script src="//cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+	<!-- Custom Theme JavaScript -->
+	<script src="{{static_url("js/clean-blog.min.js")}}"></script>
+
+	<script type="text/javascript"
+		src="//cdn.bootcss.com/SyntaxHighlighter/3.0.83/scripts/shCore.min.js"></script>
+	<script type="text/javascript"
+		src="//cdn.bootcss.com/SyntaxHighlighter/3.0.83/scripts/shBrushJScript.min.js"></script>
+
+	<script type="text/javascript">
+		SyntaxHighlighter.config.bloggerMode = true;
+		SyntaxHighlighter.defaults['toolbar'] = false;
+		SyntaxHighlighter.defaults['gutter'] = true;
+		SyntaxHighlighter.defaults['smart-tabs'] = true;
+		SyntaxHighlighter.defaults['tab-size'] = 4;
+		SyntaxHighlighter.all();
+	</script>
+</body>
+
+</html>

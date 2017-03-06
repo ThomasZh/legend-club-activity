@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Meta, title, CSS, favicons, etc. -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>骑无止境</title>
+
+  <!-- Bootstrap core CSS -->
+
+  <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
+
+  <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
+
+  <!-- Custom styling plus plugins -->
+  <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
+
+
+  <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
+
+  <!-- Custom styling plus plugins -->
+  <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/datatables/tools/css/dataTables.tableTools.css') }}" rel="stylesheet">
+
+
+  <!--[if lt IE 9]>
+        <script src="../assets/js/ie8-responsive-file-warning.js"></script>
+        <![endif]-->
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+</head>
+
+
+<body class="nav-md">
+
+  <div class="container body">
+
+
+    <div class="main_container">
+
+      <div class="col-md-3 left_col">
+        <div class="left_col scroll-view">
+
+          <!-- navigation title -->
+          {% module Template("vendor/nav-title-block.html") %}
+          <!-- /navigation title -->
+          <div class="clearfix"></div>
+
+          <!-- menu prile quick info -->
+          {% module Template("vendor/menu-prile-quick-info-block.html", my_account=my_account) %}
+          <!-- /menu prile quick info -->
+
+          <br />
+
+          <!-- sidebar menu -->
+          {% module Template("vendor/sidebar-menu-block.html", vendor_id=vendor_id, budge_num=budge_num) %}
+          <!-- /sidebar menu -->
+
+        </div>
+      </div>
+
+      <!-- top navigation -->
+      {% module Template("vendor/top-nav-block.html", my_account=my_account) %}
+      <!-- /top navigation -->
+
+      <!-- page content -->
+      <div class="right_col" role="main">
+        <div class="">
+          <div class="page-title">
+            <div class="title_left">
+              <h3>
+                    订单
+                    <small>
+                      代金券订单
+                    </small>
+                </h3>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+
+          <div class="row">
+
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>代金券 <small>订单</small></h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a href="#"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li><a href="#"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                  <table id="example" class="table table-striped responsive-utilities jambo_table">
+                    <thead>
+                      <tr class="headings">
+                        <th>审核</th>
+                        <th>会员</th>
+                        <th>昵称</th>
+                        <th>代金券面值</th>
+                        <th>代金券金额</th>
+                        <th>创建时间</th>
+                        <th>状态</th>
+                        <!-- <th>操作</th> -->
+                      </tr>
+                    </thead>
+
+                    <tbody id="tbody">
+                    </tbody>
+
+                  </table>
+                </div>
+
+                <!-- <div class="ln_solid"></div> -->
+                <div class="form-group">
+                  <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                    <!-- Pager -->
+                    <ul class="pager">
+                      <li class="next"><a id="OnGetMore">加载更多 &rarr;</a></li>
+                    </ul>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <br />
+            <br />
+            <br />
+
+          </div>
+        </div>
+
+        <!-- footer content -->
+        {% module Template("vendor/footer-block.html") %}
+        <!-- /footer content -->
+
+      </div>
+      <!-- /page content -->
+    </div>
+
+  </div>
+
+  <div id="custom_notifications" class="custom-notifications dsp_none">
+    <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
+    </ul>
+    <div class="clearfix"></div>
+    <div id="notif-group" class="tabbed_notifications"></div>
+  </div>
+
+  <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
+
+  <!-- bootstrap progress js -->
+  <script src="{{ static_url('admin/js/progressbar/bootstrap-progressbar.min.js') }}"></script>
+  <!-- icheck -->
+  <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
+
+  <script src="{{ static_url('admin/js/custom.js') }}"></script>
+  <!-- pace -->
+  <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
+
+  <!-- daterangepicker -->
+  <script type="text/javascript" src="{{ static_url('admin/js/moment/moment.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('admin/js/datepicker/daterangepicker.js') }}"></script>
+
+  <!-- form validation -->
+  <script src="{{ static_url('admin/js/validator/validator.js') }}"></script>
+
+
+  <script type="text/javascript">
+		preAllow = true;   // when ajax not completed, cannot do the next request
+		lastTimestamp = "";
+
+		function query() {
+			$.get("/bf/api/vendors/{{ vendor_id }}/voucher-orders?before="+lastTimestamp,function(data,status){
+        console.log(lastTimestamp);
+				var ajaxobj = eval("("+data+")");
+
+				for (var i in ajaxobj) {
+          console.log(ajaxobj[i]._id);
+          var inner_html = '<tr class="even pointer">';
+            inner_html += '<td class="a-center">';
+              if (ajaxobj[i].review == true)
+                inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
+              else
+                inner_html += '<input type="checkbox" class="tableflat" value="'+ajaxobj[i]._id+'" onclick="OnReviewVoucherOrder(this);">';
+            inner_html += '</td>';
+
+            inner_html += '<td class=" ">';
+                inner_html += '<img src="'+ajaxobj[i].account_avatar+'" class="avatar" alt="Avatar">';
+            inner_html += '</td>';
+
+            inner_html += '<td class=" ">';
+              inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ajaxobj[i].account_id+'">'+ajaxobj[i].account_nickname+'</a>';
+            inner_html += '</td>';
+
+            inner_html += '<td class=" ">';
+              inner_html += ajaxobj[i].voucher_amount;
+            inner_html += '</td>';
+
+            inner_html += '<td class=" ">';
+              inner_html += ajaxobj[i].voucher_price;
+            inner_html += '</td>';
+
+            inner_html += '<td class=" ">';
+              inner_html += ajaxobj[i].create_time;
+            inner_html += '</td>';
+
+            inner_html += '<td class=" ">';
+              if (ajaxobj[i].status == 20)
+                inner_html += '<a href="#" class="btn btn-warning btn-xs"> 待付款 </a>';
+              else if (ajaxobj[i].status == 30)
+                inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付成功 </a>';
+              else if (ajaxobj[i].status == 31)
+                inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a>';
+              else if (ajaxobj[i].status == 10)
+                inner_html += '<a href="#" class="btn btn-warning btn-xs"> 初始化成功 </a>';
+              else if (ajaxobj[i].status == 21)
+                inner_html += '<a href="#" class="btn btn-info btn-xs"> 下单失败 </a>';
+              else
+                inner_html += '<a href="#" class="btn btn-info btn-xs">'+ajaxobj[i].status+'</a>';
+
+            inner_html += '</td>';
+
+          inner_html += '</tr>';
+          $('#tbody').append(inner_html);
+          lastTimestamp = ajaxobj[i].create_time;
+				}
+
+				preAllow = true;
+			});
+		}
+
+
+		$("#OnGetMore").click(function(){ // This event fires when a button is clicked
+			if(preAllow){
+			    preAllow = false;
+			    query();
+			}
+		});
+
+		$(document).ready(function(){ // init after open this page
+			if(preAllow){
+			  preAllow = false;
+				query();
+			}
+		});
+	</script>
+
+  <script type="text/javascript">
+    function OnReviewVoucherOrder(e){
+    	voucherOrderId = e.value;
+      console.log(voucherOrderId);
+    	$.get("/bf/api/vendors/{{ vendor_id }}/voucher-orders/"+voucherOrderId+"/review",function(data,status){
+        console.log(data);
+			  ajaxobj = eval("("+data+")");
+			  e.disabled="true";
+		  });
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Meta, title, CSS, favicons, etc. -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>骑无止境 - 创建任务</title>
+
+  <!-- Bootstrap core CSS -->
+
+  <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
+
+  <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
+
+  <!-- Custom styling plus plugins -->
+  <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
+
+
+  <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
+  <!-- fileinput -->
+  <link rel="stylesheet" href="{{ static_url("css/fileinput.min.css")}}">
+
+  <!--[if lt IE 9]>
+        <script src="../assets/js/ie8-responsive-file-warning.js"></script>
+        <![endif]-->
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+</head>
+
+
+<body class="nav-md">
+
+  <div class="container body">
+
+
+    <div class="main_container">
+
+      <div class="col-md-3 left_col">
+        <div class="left_col scroll-view">
+
+          <!-- navigation title -->
+          {% module Template("vendor/nav-title-block.html") %}
+          <!-- /navigation title -->
+          <div class="clearfix"></div>
+
+          <!-- menu prile quick info -->
+          {% module Template("vendor/menu-prile-quick-info-block.html", my_account=my_account) %}
+          <!-- /menu prile quick info -->
+
+          <br />
+
+          <!-- sidebar menu -->
+          {% module Template("vendor/sidebar-menu-block.html", vendor_id=vendor_id, budge_num=budge_num) %}
+          <!-- /sidebar menu -->
+
+        </div>
+      </div>
+
+      <!-- top navigation -->
+      {% module Template("vendor/top-nav-block.html", my_account=my_account) %}
+      <!-- /top navigation -->
+
+      <!-- page content -->
+      <div class="right_col" role="main">
+
+        <div class="">
+          <div class="page-title">
+            <div class="title_left">
+              <h3> <small> 创建任务</small></h3>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+
+          <div class="row">
+
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>线路列表 <small>注：已经设置过任务的线路不显示</small></h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                  <br />
+                  <div class="triprouterscfg">
+                  {% for triprouter in triprouters %}
+                    <label class="ui-checkbox" >
+                      <input type="checkbox" name="triprouter" value="{{triprouter['_id']}}">{{triprouter['title']}}
+                    </label>
+                    <br/>
+                  {% end %}
+                  </div>
+                  <br/><br/>
+                  <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left"
+                    action="/vendors/{{ vendor_id }}/setup/task/create" method="POST">
+  					        {% raw xsrf_form_html() %}
+
+                    <input type="hidden" id="triprouters" name="triprouters">
+                  </form>
+                  <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                    <button type="submit" id="task-create-btn" class="btn btn-success">设置任务</button>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- footer content -->
+        {% module Template("vendor/footer-block.html") %}
+        <!-- /footer content -->
+
+      </div>
+      <!-- /page content -->
+    </div>
+
+  </div>
+
+  <div id="custom_notifications" class="custom-notifications dsp_none">
+    <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
+    </ul>
+    <div class="clearfix"></div>
+    <div id="notif-group" class="tabbed_notifications"></div>
+  </div>
+
+  <script>
+      $('#task-create-btn').click(function(){
+        // 代金券选项
+        var triproutersArray = [];
+        $('.triprouterscfg input[type="checkbox"]:checked').each(function(){
+          triproutersArray.push($(this).val());
+        });
+        $('#triprouters').val(JSON.stringify(triproutersArray))
+
+        // 现在可以提交了
+        $('#demo-form2').submit();
+
+        return false;//防止自动提交
+      });
+
+  </script>
+
+  <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
+
+  <!-- bootstrap progress js -->
+  <script src="{{ static_url('admin/js/progressbar/bootstrap-progressbar.min.js') }}"></script>
+  <!-- icheck -->
+  <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
+
+  <script src="{{ static_url('admin/js/custom.js') }}"></script>
+  <!-- pace -->
+  <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
+
+  <!-- form validation -->
+  <script src="{{ static_url('admin/js/validator/validator.js') }}"></script>
+
+</body>
+
+</html>

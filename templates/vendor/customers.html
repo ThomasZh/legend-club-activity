@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Meta, title, CSS, favicons, etc. -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>骑无止境 ｜ 会员</title>
+
+  <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
+
+  <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
+
+  <!-- Custom styling plus plugins -->
+  <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
+
+
+  <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+
+<body class="nav-md">
+
+  <div class="container body">
+
+
+    <div class="main_container">
+
+      <div class="col-md-3 left_col">
+        <div class="left_col scroll-view">
+
+          <!-- navigation title -->
+          {% module Template("vendor/nav-title-block.html") %}
+          <!-- /navigation title -->
+          <div class="clearfix"></div>
+
+          <!-- menu prile quick info -->
+          {% module Template("vendor/menu-prile-quick-info-block.html", my_account=my_account) %}
+          <!-- /menu prile quick info -->
+
+          <br />
+
+          <!-- sidebar menu -->
+          {% module Template("vendor/sidebar-menu-block.html", vendor_id=vendor_id, budge_num=budge_num) %}
+          <!-- /sidebar menu -->
+
+        </div>
+      </div>
+
+      <!-- top navigation -->
+      {% module Template("vendor/top-nav-block.html", my_account=my_account) %}
+      <!-- /top navigation -->
+
+      <!-- page content -->
+      <div class="right_col" role="main">
+
+        <div class="">
+          <div class="page-title">
+            <div class="title_left">
+              <h3>会员</h3>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+
+        <div class="x_content">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <form id="form1" method="post" action="/vendors/{{ vendor_id }}/customer/search">
+                      {% raw xsrf_form_html() %}
+                    <ul class="nav navbar-right panel_toolbox">
+                      <li class="next">
+                        <input type="text" id="search_keys" name="search_keys" value="{{ keys_value }}" >
+                        <button type="submit" class="btn btn-search">搜索</button>
+                      </li>
+                    </ul>
+                  </from>
+                  <div class="clearfix"></div>
+                </div>
+
+                <div class="x_content">
+                  <div class="row" id="customerList">
+                    {% for customer in customers %}
+                    <div class="col-md-4 col-sm-4 col-xs-12 animated fadeInDown">
+                      <div class="well profile_view">
+                        <div class="col-sm-12">
+                          <div class="left col-xs-7">
+                            <h2>
+                              {% if customer['account_nickname'] %}
+                                {{customer['account_nickname']}}
+                              {% else %}
+                                anonymous
+                              {% end %}
+                            </h2>
+                            <p> {{customer['comment']}} </p>
+                            <ul class="list-unstyled">
+                              <li><i class="fa fa-phone"></i> 1234567890 </li>
+                            </ul>
+                          </div>
+                          <div class="right col-xs-5 text-center">
+                            {% if customer['account_avatar'] %}
+                              <img src="{{customer['account_avatar']}}" alt="" class="img-circle img-responsive">
+                            {% else %}
+                              <img src="/static/admin/images/user.png" alt="" class="img-circle img-responsive">
+                            {% end %}
+                          </div>
+                        </div>
+                        <div class="col-xs-12 bottom text-center">
+                          <div class="col-xs-12 col-sm-6 emphasis">
+                            <p class="">L{{customer['rank']}}会员</p>
+                          </div>
+                          <div class="col-xs-12 col-sm-6 emphasis">
+                            <button type="button" class="btn btn-success btn-xs">
+                              <i class="fa fa-tags"> 领队 会员 非会员 </i> </button>
+                            <a href="/vendors/{{ vendor_id }}/customers/{{customer['account_id']}}" type="button" class="btn btn-primary btn-xs" >
+                            	<i class="fa fa-user"></i> 查看详情 </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {% end %}
+
+                </div>
+
+                <div class="ln_solid"></div>
+                <div class="form-group">
+                  <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                    {% if len(customers) == 0 %}
+                      <input type="hidden" id="new_timestamp" value="">
+                    {% else %}
+                      <input type="hidden" id="new_timestamp" value="{{ customer['create_time'] }}">
+                      <ul class="pager">
+                        <li class="next"><a id="OnGetMore">加载更多 &rarr;</a></li>
+                      </ul>
+                    {% end %}
+
+                   </div>
+                </div>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+
+        <!-- footer content -->
+        {% module Template("vendor/footer-block.html") %}
+        <!-- /footer content -->
+
+      </div>
+      <!-- /page content -->
+    </div>
+
+  </div>
+
+  <div id="custom_notifications" class="custom-notifications dsp_none">
+    <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
+    </ul>
+    <div class="clearfix"></div>
+    <div id="notif-group" class="tabbed_notifications"></div>
+  </div>
+  <script type="text/javascript">
+    var preAllow = true;   // when ajax not completed, cannot do the next request
+    var lastTimestamp = $('#new_timestamp').val();
+    console.log(lastTimestamp);
+    function query() {
+      $.get("/bf/api/vendors/{{ vendor_id }}/customer-profile/customers?before="+lastTimestamp,function(data,status){
+        var ajaxobj = eval("("+data+")");
+        for (var i in ajaxobj) {
+          var inner_html = '<div class="col-md-4 col-sm-4 col-xs-12 animated fadeInDown">';
+          inner_html += '<div class="well profile_view">';
+          inner_html += '<div class="col-sm-12">';
+          inner_html += '<div class="left col-xs-7">';
+          inner_html += '<h2>';
+          if(ajaxobj[i].account_nickname != ""){
+            inner_html += ajaxobj[i].account_nickname;
+          }else{
+            inner_html += 'anonymous';
+          }
+          inner_html += '</h2>';
+          inner_html += '<p>'+ajaxobj[i].comment+'</p>';
+          inner_html += '<ul class="list-unstyled">';
+          inner_html += '<li><i class="fa fa-phone"></i> 1234567890 </li>';
+          inner_html += '</ul></div>'
+          inner_html += '<div class="right col-xs-5 text-center">';
+          if (ajaxobj[i].account_avatar != ""){
+              inner_html += '<img src="'+ajaxobj[i].account_avatar+'" alt="" class="img-circle img-responsive">';
+          }else{
+              inner_html += '<img src="/static/admin/images/user.png" alt="" class="img-circle img-responsive">';
+          }
+          inner_html += '</div></div>';
+          inner_html += '<div class="col-xs-12 bottom text-center">';
+          inner_html += '<div class="col-xs-12 col-sm-6 emphasis">';
+          inner_html += '<p class="">L'+ajaxobj[i].rank+'</p></div>';
+          inner_html += '<div class="col-xs-12 col-sm-6 emphasis">';
+          inner_html += '<button type="button" class="btn btn-success btn-xs">';
+          inner_html += '<i class="fa fa-tags"> 领队 会员 非会员 </i> </button>';
+          inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ajaxobj[i].account_id+'" type="button" class="btn btn-primary btn-xs" >';
+          inner_html += '<i class="fa fa-user"></i> 查看详情 </a>';
+          inner_html += '</div></div></div></div>';
+
+          $('#customerList').append(inner_html);
+          $('#new_timestamp').val('');
+          lastTimestamp = ajaxobj[i].create_time;
+        }
+        preAllow = true;
+      });
+    }
+
+    $("#OnGetMore").click(function(){ // This event fires when a button is clicked
+      if(preAllow){
+          preAllow = false;
+          query();
+      }
+    });
+    </script>
+  <!-- icheck -->
+  <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
+
+  <script src="{{ static_url('admin/js/custom.js') }}"></script>
+  <!-- pace -->
+  <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
+
+</body>
+
+</html>

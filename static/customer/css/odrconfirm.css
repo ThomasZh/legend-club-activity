@@ -1,0 +1,11 @@
+.top-pane {
+  background-color: orange;
+  color: white;
+  font-size: 36px;
+  height: 150px;
+}
+
+.total_fees {
+  color: red;
+  font-size: 24px;
+}

@@ -1,0 +1,34 @@
+/* 我的订单样式 @2016/06/07 */
+.top-pane {
+  /*background-color: #130c0e;*/
+  background-color: #293047;
+  /*background-color: #0088cc;*/
+  color: white;
+  font-size: 36px;
+  height: 150px;
+}
+
+.img-avatar {
+  width: 64px;
+  height: auto;
+}
+
+.ui-list-one > li {
+  line-height: 24px;
+}
+
+/* 订单列表 */
+.ui-list-info.none-box {
+  display:block;
+  padding-bottom: 0;
+  padding-top: 6px;
+}
+
+.ui-list-link > li.active::after {
+  color: #0088cc;
+}
+
+.flt-right-30 {
+  position: absolute;
+  right: 30px;
+}

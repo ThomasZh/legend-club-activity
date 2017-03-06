@@ -1,0 +1,259 @@
+/*
+  用户移动web端样式
+  @2016/05/19
+ */
+ body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, input, textarea, p, blockquote, th, td, header, hgroup, nav, section, article, aside, footer, figure, figcaption, menu, button {
+   margin: 0;
+   padding: 0;
+ }
+ h1, h2, h3, h4, h5, h6 {
+   font-size: 100%;
+   font-weight: normal;
+ }
+
+ li {
+   list-style: none;
+ }
+
+img {
+ 	display: block;
+ 	border: 0;
+ 	width: 100%;
+}
+
+.slider-footer {
+  background: rgba(0,0,0,0.4);
+  color: #FFF;
+  padding: 4px 10px 4px 10px;
+  position: absolute;
+  /* 父容器是300%宽度，所以这里要缩小 */
+  width: 100%;
+  height: 28px;
+  bottom: 0px;
+}
+
+.hidden {
+  display: none;;
+}
+
+.card-footer{
+  color: #777777;
+	background: #fff;
+  overflow: hidden;
+  /*height: 40px;*/
+  padding: 10px;
+}
+
+.card-footer-title {
+  color: #333333;
+  font-size:16px;
+  /*margin-top:5px;*/
+}
+
+.card-footer-desc {
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.card-footer-desc .right {
+  position: absolute;
+  right: 10px;
+}
+
+.card-footer-title.right {
+  position: absolute;
+  right: 10px;
+}
+
+.customer-banner-height {
+  height: 50px;/* 实际的slider高度貌似是这个值乘以3倍 */
+}
+
+.mod-recommend {
+    position: relative;
+    width: 100%;
+    /*height: 112px;*/
+    background-color: #fff;
+    padding-bottom: 10px;
+    margin-top: 10px;
+    /*margin-bottom: 10px;*/
+}
+
+.common-header {
+    position: relative;
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+    padding: 0px 15px;
+    box-sizing: border-box;
+}
+
+.mod-recommend ul {
+    display: -webkit-box;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+}
+
+.mod-recommend li {
+    -webkit-box-flex: 1;
+    text-align: center;
+}
+
+.mod-recommend img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
+    overflow: hidden;
+    margin: 10px auto;
+}
+
+.mod-recommend li {
+    -webkit-box-flex: 1;
+    text-align: center;
+}
+
+.recommend-info {
+  display: block;
+  font-size: 14px;
+  color: #777777;
+}
+
+.bot_con{
+	width: 100%;
+	margin-top: 10px;
+  margin-bottom: 10px;
+	position: relative;
+	overflow: hidden;
+}
+.bot_con .imger{
+	width:100%;
+	margin: 0 auto;
+	/*border-radius: 10px 10px 0 0;*/
+	overflow: hidden;
+  position: relative; /* 这个属性好使，立马让里面的 元素绝对定位准确了 @2016/06/08 */
+}
+
+
+.bot_con .imger img{
+	width: 100%;
+  max-height: 180px;
+	/*border-radius: 5px 5px 0 0;*/
+	/*height: 80%;*/
+}
+.bot_con .imger span{
+	font-size: 16px;
+	text-align: right;
+	display: block;
+	color:#fff;
+	font-weight: bold;
+	position: absolute;
+	bottom: 10px;
+	right: 20px;
+}
+
+.shadow-black {
+  text-shadow: 2px 2px 4px #333333;
+}
+
+.member .member-img{
+	margin: 2% auto 0;
+	overflow: hidden;
+}
+.member .member-img img{
+	width: 40px;
+	border-radius: 50px;
+	border: 1px #ebebeb solid;
+}
+.member-span{
+	width:45%;
+	/*height: 40px;*/
+	float: right;
+	padding-top: 5px;
+}
+
+.member-span img{
+	display: inline;
+	float: left;
+	margin: 4px 0 0 0;
+	width: 13px;
+	height: 13px;
+}
+.swiper-slide-next{
+	width: 70px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* 卡片书签 */
+.bookmarks{
+  position:absolute;
+  right:0;
+  top:24px;
+  padding:6px 10px 6px 8px;
+  font-size:16px;
+  color:#fff;
+  line-height: 1.0;
+}
+/* 卡片书签的颜色 */
+.green {
+  background:#8cdd6f;
+}
+.green::after {
+  border: 9px solid #8cdd6f;
+  border-color: #8cdd6f #8cdd6f transparent transparent;
+}
+.green::before {
+  border: 9px solid #8cdd6f;
+  border-color:  transparent #8cdd6f #8cdd6f transparent ;
+}
+.orange {
+  background:#f58220;
+}
+.orange::after {
+  border: 9px solid #f58220;
+  border-color: #f58220 #f58220 transparent transparent;
+}
+.orange::before {
+  border: 9px solid #f58220;
+  border-color:  transparent #f58220 #f58220 transparent ;
+}
+.red {
+  background:#ef4136;
+}
+.red::after {
+  border: 9px solid #ef4136;
+  border-color: #ef4136 #ef4136 transparent transparent;
+}
+.red::before {
+  border: 9px solid #ef4136;
+  border-color:  transparent #ef4136 #ef4136 transparent ;
+}
+.gray {
+  background:#3e4145;
+}
+.gray::after {
+  border: 9px solid #3e4145;
+  border-color: #3e4145 #3e4145 transparent transparent;
+}
+.gray::before {
+  border: 9px solid #3e4145;
+  border-color:  transparent #3e4145 #3e4145 transparent ;
+}
+
+.bookmarks::after {
+  position: absolute;
+  top: 0px;
+  left: -18px;
+  content: '';
+  /*border-top-left-radius: 4px;*/
+}
+
+.bookmarks::before {
+  position: absolute;
+  bottom: 0px;
+  left: -18px;
+  content: '';
+  /*border-bottom-left-radius: 4px;*/
+}

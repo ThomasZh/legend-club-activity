@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Meta, title, CSS, favicons, etc. -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>报名</title>
+  <link rel="stylesheet" href="{{ static_url('frozenui-1.3.0/css/frozen.css') }}">
+  <link href="{{ static_url('customer/css/common.css') }}" rel="stylesheet" type="text/css">
+  <link href="{{ static_url('customer/css/actapply.css') }}" rel="stylesheet" type="text/css">
+</head>
+<body ontouchstart class="padding-bottom-70">
+  <!-- 顶部导航返回条 -->
+  <!-- <header class="ui-header ui-header-skyblue ">
+      <i class="ui-icon-return" onclick="history.back()"></i>
+      <h1>第三步：加入群</h1>
+  </header> -->
+  <div class="ui-whitespace padding-10">
+    <p class="ui-txt-info center">报名成功</p>
+  </div>
+  <div class="ui-dialog-bd">
+      <!-- <h4></h4> -->
+      <div class="center">分享活动获得{{bonus_template['activity_shared']}}个积分！</div>
+  </div>
+  <div class="ui-whitespace padding-10">
+    <p class="ui-txt-info center">您可以在公众号的“我的”菜单中查看订单信息</p>
+  </div>
+  <form>
+    <div class="ui-form maring-top-40 padding-10 ">
+      <div class="ui-flex ui-flex-pack-center">
+        <img src="{{activity['wx_qrcode_url']}}" width="200" height="200">
+      </div>
+    </div>
+  </form>
+  <div class="ui-whitespace padding-10">
+    <p class="ui-txt-info center">长按二维码加入活动微信群</p>
+  </div>
+  <!-- javascript submit -->
+  <div class="fixbtn">
+    <a id="complete-btn" class="ui-btn-lg ui-btn-primary round-corner no-border in-footer"
+      onclick="OnClose();">
+      完 成
+    </a>
+  </div>
+
+  <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+  <script src="{{ static_url('frozenui-1.3.0/lib/zepto.min.js') }}"></script>
+
+  <script>
+  	function OnClose() {
+      // alert("关闭窗口!");
+      if (typeof WeixinJSBridge == "undefined"){
+          if( document.addEventListener ) {
+              document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+          } else if (document.attachEvent) {
+              document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+              document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+          }
+      } else {
+        // alert("关闭窗口!");
+        WeixinJSBridge.call('closeWindow');
+        // window.opener=null;
+        // window.open('','_self');
+        // window.close();
+      }
+  	}
+  </script>
+
+</body>
+</html>

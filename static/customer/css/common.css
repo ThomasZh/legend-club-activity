@@ -1,0 +1,265 @@
+/* 公共样式属性每个页面都可以用 */
+/* @2016/05/26 */
+
+/* 绝对居中 */
+/* ui-flex ui-flex-pack-center ui-flex-align-center */
+
+.red {
+  color: red;
+}
+
+.center {
+  text-align: center;
+}
+
+.relative {
+  position: relative;
+}
+
+.flt-right {
+  position: absolute;
+  right: 10px;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* 不然挤出去了 */
+.near-full-width {
+  width: 90%;
+}
+
+.line-hight-nml {
+  line-height: 1.0;
+}
+
+.normal-font {
+  font-size: 14px;
+}
+
+.small-font {
+  font-size: 12px;
+}
+
+.white-bg {
+  background-color: #FFFFFF;
+}
+
+.word-wrap {
+  white-space: normal;
+}
+
+.font-normal {
+  font-size: 14px;
+}
+
+
+.maring-top-4 {
+  margin-top: 4px;
+}
+
+.maring-top-10 {
+  margin-top: 10px;
+}
+
+.margin-right-4 {
+  margin-right: 4px;
+}
+
+.padding-top-10 {
+  padding-top: 10px;
+}
+
+.padding-bottom-70 {
+  padding-bottom: 70px;
+}
+
+.margin-top-20 {
+  margin-top: 20px;
+}
+/* 这个不该了，写错就错了下次统一改 */
+.maring-top-40 {
+  margin-top: 40px;
+}
+
+.margin-left-10 {
+  margin-left: 10px;
+}
+
+.margin-right-10 {
+  margin-right: 10px;
+}
+
+.margin-bottom-10 {
+  margin-bottom: 10px;
+}
+
+.margin-top-10 {
+  margin-top: 10px;
+}
+
+.padding-10 {
+  padding: 10px;
+}
+
+.padding-left-10 {
+  padding-left: 10px;
+}
+
+.padding-right-10 {
+  padding-right: 10px;
+}
+
+.padding-right-30 {
+  padding-right: 30px;
+}
+
+.padding-top-10 {
+  padding-top: 10px;
+}
+
+.padding-bottom-10 {
+  padding-bottom: 10px;
+}
+
+.padding-bottom-20 {
+  padding-bottom: 20px;
+}
+
+.padding-bottom-50 {
+  padding-bottom: 50px;
+}
+
+.padding-bottom-70 {
+  padding-bottom: 70px;
+}
+
+.padding-top-45 {
+  padding-top: 45px;
+}
+
+.thumbnail {
+  width: 80px;
+  height: auto;
+}
+
+.green {
+  background :#1d953f;
+}
+/* 按下的效果 */
+.green.deep {
+  background: #007d65;
+}
+
+.ui-btn-success {
+  background-color: #1d953f;
+  border-color: #1d953f;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0.5, #1d953f), to(#1d953f));
+  color: white;
+  background-clip: padding-box;
+}
+
+.hidden {
+  display: none;;
+}
+
+.unclickable {
+  pointer-events: none;
+}
+
+.ui-footer-stable.white {
+  background-color: #FCFCFC;
+}
+
+.ui-btn-lg.round-corner {
+  border-radius: 0px;
+}
+
+.ui-btn-lg.in-footer {
+  height: 56px;
+}
+
+.ui-btn-group.no-gap button:first-child {
+    margin-left: 0px;
+}
+
+.ui-btn-group.no-gap button {
+  margin-right: 0px;
+}
+
+.ui-badge.green {
+  background: #1d953f;
+}
+.ui-badge.red {
+  background: red;
+}
+.ui-badge.orange {
+  background: orange;
+}
+.ui-badge.gray {
+  background: gray;
+}
+
+.ui-txt-default.higher {
+  line-height: 2.0;
+}
+
+.perfect-center {
+  /* Firefox */
+  display:-moz-box;
+  -moz-box-pack:center;
+  -moz-box-align:center;
+
+  /* Safari、Opera 以及 Chrome */
+  display:-webkit-box;
+  -webkit-box-pack:center;
+  -webkit-box-align:center;
+
+  /* W3C */
+  display:box;
+  box-pack:center;
+  box-align:center;
+}
+
+.round-corner {
+  border-radius:50%;
+  overflow:hidden;
+}
+
+.gray-transparent-border {
+  border: 1px solid rgba(119,136,153, .5);
+}
+
+img.avatar {
+  max-height: 64px;
+  max-width: 64px;
+/*
+  min-height: 64px;
+  min-width: 64px;
+*/
+  display: block;/*necessary in round corner*/
+}
+
+/* 让条目内容占满右边空间 @2016/06/08*/
+/* 要配合父容器 使用 ui-flex 才可以 */
+.right-item-info {
+  -webkit-box-flex: 1;
+  padding-left: 10px;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio: 2){
+
+  .ui-btn-lg.round-corner:before {
+    border-radius: 0px;
+  }
+
+  .ui-btn.no-border:before, .ui-btn-lg.no-border:before, .ui-btn-s.no-border:before{
+    border: none;
+  }
+
+}

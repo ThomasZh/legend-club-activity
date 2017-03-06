@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Meta, title, CSS, favicons, etc. -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>骑无止境 ｜ 线路列表</title>
+
+  <!-- Bootstrap core CSS -->
+
+  <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
+
+  <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
+
+  <!-- Custom styling plus plugins -->
+  <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
+
+  <link href="{{ static_url('admin/css/star/starScore.css') }}" rel="stylesheet">
+
+  <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
+  <script src="{{ static_url('admin/js/star/startScore.js') }}"></script>
+
+  <!--[if lt IE 9]>
+        <script src="../assets/js/ie8-responsive-file-warning.js"></script>
+        <![endif]-->
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+</head>
+
+
+<body class="nav-md">
+
+  <div class="container body">
+
+
+    <div class="main_container">
+
+      <div class="col-md-3 left_col">
+        <div class="left_col scroll-view">
+
+          <!-- navigation title -->
+          {% module Template("vendor/nav-title-block.html") %}
+          <!-- /navigation title -->
+          <div class="clearfix"></div>
+
+          <!-- menu prile quick info -->
+          {% module Template("vendor/menu-prile-quick-info-block.html", my_account=my_account) %}
+          <!-- /menu prile quick info -->
+
+          <br />
+
+          <!-- sidebar menu -->
+          {% module Template("vendor/sidebar-menu-block.html", vendor_id=vendor_id, budge_num=budge_num) %}
+          <!-- /sidebar menu -->
+
+        </div>
+      </div>
+
+      <!-- top navigation -->
+      {% module Template("vendor/top-nav-block.html", my_account=my_account) %}
+      <!-- /top navigation -->
+
+      <!-- page content -->
+      <div class="right_col" role="main">
+
+        <div class="">
+          <div class="page-title">
+            <div class="title_left">
+              <h3> 线路 <small> 列表</small> </h3>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>线路 <small> </small></h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a href="/vendors/{{ vendor_id }}/trip_router/create" class="btn btn-success btn-xs">
+                      <i class="fa fa-plus"></i> 添加 </a>
+                    </li>
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+
+                  <div class="clearfix"></div>
+                </div>
+
+                    {% for triprouter in triprouters %}
+                    <div class="col-md-3 col-xs-12 widget widget_tally_box">
+                      <div class="x_panel ui-ribbon-container fixed_height_360">
+                        {% if triprouter['open'] %}
+                        <div class="ui-ribbon-wrapper">
+                          <div class="ui-ribbon">
+                          开放
+                          </div>
+                        </div>
+                        {% end %}
+                        <div class="x_title">
+                          <h2>{{triprouter['category']}}</h2>
+                          <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                          <div class="thumbnail">
+                            <div class="image view view-first">
+                              <a href="/vendors/{{ vendor_id }}/trip_router/{{triprouter['_id']}}/edit/step1">
+                                <img style="width: 100%; display: block;" src="{{triprouter['bk_img_url']}}" alt="image" />
+                              </a>
+                            </div>
+                          </div>
+                          <p>{{triprouter['title']}}</p>
+                          <ul class="show_number clearfix">
+                            <div class="atar_Show">
+                              <p tip="{{ triprouter['score'] }}"></p>
+                            </div>
+                          </ul>
+                          <div class="divider"></div>
+                            <a href="/vendors/{{ vendor_id }}/trip_router/{{triprouter['_id']}}/edit/step1" class="btn btn-success btn-xs">
+                              <i class="fa fa-pencil"></i> 编辑 </a>
+                            <a href="/vendors/{{ vendor_id }}/trip_router/{{triprouter['_id']}}/delete" class="btn btn-danger btn-xs">
+                              <i class="fa fa-trash-o"></i> 删除 </a>
+                            <a href="/vendors/{{ vendor_id }}/trip_router/{{triprouter['_id']}}/clone" class="btn btn-primary btn-xs">
+                              <i class="fa fa-copy"></i> 复制 </a>
+                            {% if not triprouter['open'] %}
+                              <a href="/vendors/{{ vendor_id }}/trip_router/{{triprouter['_id']}}/open/set" class="btn btn-success btn-xs">
+                                <i class="fa fa-pencil"></i> 开放</a>
+                            {% else %}
+                              <a href="/vendors/{{ vendor_id }}/trip_router/{{triprouter['_id']}}/open/cancel" class="btn btn-success btn-xs">
+                                <i class="fa fa-trash-o"></i> 取消开放 </a>
+                            {% end %}
+                        </div>
+                      </div>
+                    </div>
+                    {% end %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+        <!-- footer content -->
+        {% module Template("vendor/footer-block.html") %}
+        <!-- /footer content -->
+      </div>
+      <!-- /page content -->
+    </div>
+  </div>
+
+  <div id="custom_notifications" class="custom-notifications dsp_none">
+    <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
+    </ul>
+    <div class="clearfix"></div>
+    <div id="notif-group" class="tabbed_notifications"></div>
+  </div>
+
+  <script>
+    //显示分数
+    $(".show_number p").each(function(index, element) {
+      var num=$(this).attr("tip");
+      var www=num*16;//
+      $(this).css("width",www);
+      $(this).parent(".atar_Show").siblings(".score_apan").text(num+"分");
+    });
+  </script>
+
+  <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
+
+  <!-- bootstrap progress js -->
+  <script src="{{ static_url('admin/js/progressbar/bootstrap-progressbar.min.js') }}"></script>
+  <!-- icheck -->
+  <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
+
+  <script src="{{ static_url('admin/js/custom.js') }}"></script>
+  <!-- pace -->
+  <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
+
+  <!-- form validation -->
+  <script src="{{ static_url('admin/js/validator/validator.js') }}"></script>
+
+</body>
+
+</html>

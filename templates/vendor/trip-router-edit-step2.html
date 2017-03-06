@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Meta, title, CSS, favicons, etc. -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>骑无止境</title>
+
+  <!-- Bootstrap core CSS -->
+
+  <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
+
+  <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
+
+  <!-- Custom styling plus plugins -->
+  <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
+
+
+  <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
+
+  <!-- fileinput -->
+  <link rel="stylesheet" href="{{ static_url("css/fileinput.min.css")}}">
+
+  <!-- fileinput -->
+  <script src="{{ static_url("js/fileinput.min.js")}}"></script>
+	<script src="{{ static_url("js/spark-md5.min.js")}}"></script>
+	<script src="{{ static_url("js/async.js")}}"></script>
+	<script src="{{ static_url("js/upyun-mu.js")}}"></script>
+
+  <!--[if lt IE 9]>
+        <script src="../assets/js/ie8-responsive-file-warning.js"></script>
+        <![endif]-->
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+        <style type="text/css">
+            .text-shadow
+            {
+                text-shadow: 1px 1px 1px #000;
+                padding: 10px 0;
+                color: #FFF;
+            }
+
+            .pager li > a, .pager li > span
+            {
+                padding: 5px 10px;
+            }
+
+            .img-responsive
+            {
+                margin: 5px 0px 5px 0px;
+            }
+
+            .syntaxhighlighter table .container:before
+            {
+                display: none !important;
+            }
+
+            .container:before, .container:after
+            {
+                display: table;
+                content: "";
+                line-height: 0;
+            }
+            #hp_wrap
+            {
+                margin-top: 60px;
+            }
+            .paragraphBox
+            {
+                position: relative;
+                padding:10px 0;
+            }
+            .paragraphBox .pager
+            {
+                display: none;
+                position: absolute;
+                right: 0;
+                top:0;
+            }
+            .pager li > a, .pager li > span
+            {
+                padding:5px;
+                border-radius:5px;
+            }
+            .pager
+            {
+                margin:0;
+            }
+            .container
+            {
+                width:auto;
+                padding:0 5px;
+            }
+
+            .main{
+                margin-top:5px;
+                font-size: 14px;
+                line-height: 22px;
+                padding-bottom: 90px;
+            }
+            .main .bm{
+                position:relative;
+                padding:6px 12px 6px 12px;
+                background:#F5A623 ;
+                color:#fff;
+                display:inline-block;
+                margin-top:15px;
+                font-size: 16px;
+            }
+            .main .bm::after {
+                position: absolute;
+                top: 0px;
+                right: -18px;
+                content: '';
+                border: 9px solid #F5A623;
+                border-color: #F5A623 transparent transparent #F5A623 ;
+                /*border-top-right-radius: 4px;*/
+            }
+            .main .bm::before {
+                position: absolute;
+                bottom: 0px;
+                right: -18px;
+                content: '';
+                border: 9px solid #F5A623;
+                border-color: transparent transparent #F5A623 #F5A623 ;
+                /*border-bottom-right-radius: 4px;*/
+            }
+        </style>
+</head>
+
+
+<body class="nav-md">
+
+  <div class="container body">
+
+
+    <div class="main_container">
+
+      <div class="col-md-3 left_col">
+        <div class="left_col scroll-view">
+
+          <!-- navigation title -->
+          {% module Template("vendor/nav-title-block.html") %}
+          <!-- /navigation title -->
+          <div class="clearfix"></div>
+
+          <!-- menu prile quick info -->
+          {% module Template("vendor/menu-prile-quick-info-block.html", my_account=my_account) %}
+          <!-- /menu prile quick info -->
+
+          <br />
+
+          <!-- sidebar menu -->
+          {% module Template("vendor/sidebar-menu-block.html", vendor_id=vendor_id, budge_num=budge_num) %}
+          <!-- /sidebar menu -->
+
+        </div>
+      </div>
+
+      <!-- top navigation -->
+      {% module Template("vendor/top-nav-block.html", my_account=my_account) %}
+      <!-- /top navigation -->
+
+      <!-- page content -->
+      <div class="right_col" role="main">
+
+        <!-- top tiles -->
+        <div class="row tile_count">
+          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
+            <div class="left"></div>
+            <div class="right">
+              <a href="/vendors/{{ vendor_id }}/trip_router/{{ triprouter['_id'] }}/edit/step1">
+              <span class="count_top"><i class="fa fa-info-circle"></i> 线路信息</span>
+              <div class="count"><i class="glyphicon glyphicon-pencil"></i></div>
+              <span class="count_bottom"><i class="green">Step1 </i> 基本信息</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
+            <div class="left"></div>
+            <div class="right">
+              <a href="/vendors/{{ vendor_id }}/trip_router/{{ triprouter['_id'] }}/edit/step2">
+              <span class="count_top"><i class="fa fa-calendar"></i> 详细介绍</span>
+              <div class="count"><i class="glyphicon glyphicon-pencil"></i></div>
+              <span class="count_bottom"><i class="red">Step2 </i> 编辑</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
+            <div class="left"></div>
+            <div class="right">
+              <a href="/vendors/{{ vendor_id }}/trip_router/{{ triprouter['_id'] }}/activitylist">
+              <span class="count_top"><i class="fa fa-tasks"></i> 活动列表</span>
+              <div class="count"><i class="fa fa-tag"></i></div>
+              <span class="count_bottom"><i class="green">Step3 </i> 查看</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
+            <div class="left"></div>
+            <div class="right">
+              <a href="/vendors/{{ vendor_id }}/trip_router/{{ triprouter['_id'] }}/evallist">
+              <span class="count_top"><i class="fa fa-tasks"></i> 评价列表</span>
+              <div class="count"><i class="fa fa-star"></i></div>
+              <span class="count_bottom"><i class="green">Step4 </i> 查看</span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <!-- /top tiles -->
+
+        <div class="">
+          <div class="page-title">
+            <div class="title_left">
+              <h3>线路 <small> 编辑</small></h3>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>详细介绍 <small>可以直接编辑</small></h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a href="/vendors/{{ vendor_id }}/blog/add-paragraph?travel_id={{triprouter['_id']}}&article_id={{article_id}}&travel_type=triprouter"
+                      class="btn btn-success btn-xs"><i class="fa fa-pencil"></i> 标题+</a>
+                    <li><a href="/vendors/{{ vendor_id }}/blog/add-paragraph-img?travel_id={{triprouter['_id']}}&article_id={{article_id}}&travel_type=triprouter"
+                      class="btn btn-success btn-xs"><i class="fa fa-image"></i> 图片+</a>
+                    <li><a href="/vendors/{{ vendor_id }}/blog/add-paragraph-raw?travel_id={{triprouter['_id']}}&article_id={{article_id}}&travel_type=triprouter"
+                      class="btn btn-success btn-xs"><i class="fa fa-file-text-o"></i> 文本+</a>
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+
+                  <div class="main">
+                      {% for paragraph in paragraphs %}
+                      <div class="paragraphBox" id="{{paragraph["id"]}}">
+                          {% module Template("blog/edit-triprouter-block.html",vendor_id=vendor_id,travel_id=travel_id,travel_type=triprouter,article_id=article_id,paragraph=paragraph) %}
+                          <!-- Pager -->
+                          <ul class="pager">
+                              <li class="previous">
+                                  <a onclick='downRow("{{article_id}}", "{{paragraph["id"]}}");'>
+                                      <span class="glyphicon glyphicon-chevron-down"></span>
+                                  </a>
+                              </li>
+                              <li class="previous">
+                                  <a onclick='upRow("{{article_id}}", "{{paragraph["id"]}}");'>
+                                      <span class="glyphicon glyphicon-chevron-up"></span>
+                                  </a>
+                              </li>
+                              <li class="previous">
+                                  <a onclick='delRow("{{article_id}}", "{{paragraph["id"]}}");'>
+                                      <span class="glyphicon glyphicon-trash"></span>
+                                  </a>
+                              </li>
+
+                              <li class="next">
+                                  <a href="/vendors/{{ vendor_id }}/blog/add-paragraph/after?travel_id={{triprouter['_id']}}&article_id={{article_id}}&brother_id={{paragraph["id"]}}&travel_type=triprouter">
+                                      <span class="glyphicon glyphicon-pencil"></span>+
+                                  </a>
+                              </li>
+                              <li class="next">
+                                  <a href="/vendors/{{ vendor_id }}/blog/add-paragraph-img/after?travel_id={{triprouter['_id']}}&article_id={{article_id}}&brother_id={{paragraph["id"]}}&travel_type=triprouter">
+                                      <span class="glyphicon glyphicon-picture"></span>+
+                                  </a>
+                              </li>
+                              <li class="next">
+                                  <a href="/vendors/{{ vendor_id }}/blog/add-paragraph-raw/after?travel_id={{triprouter['_id']}}&article_id={{article_id}}&brother_id={{paragraph["id"]}}&travel_type=triprouter">
+                                      <span class="glyphicon glyphicon-text-size"></span>+
+                                  </a>
+                              </li>
+                          </ul>
+                      </div>
+
+                      {% end %}
+                  </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+
+        <!-- footer content -->
+        {% module Template("vendor/footer-block.html") %}
+        <!-- /footer content -->
+
+      </div>
+      <!-- /page content -->
+    </div>
+
+  </div>
+
+  <div id="custom_notifications" class="custom-notifications dsp_none">
+    <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
+    </ul>
+    <div class="clearfix"></div>
+    <div id="notif-group" class="tabbed_notifications"></div>
+  </div>
+
+  <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
+
+  <!-- bootstrap progress js -->
+  <script src="{{ static_url('admin/js/progressbar/bootstrap-progressbar.min.js') }}"></script>
+  <!-- icheck -->
+  <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
+
+  <script src="{{ static_url('admin/js/custom.js') }}"></script>
+  <!-- pace -->
+  <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
+
+  <!-- form validation -->
+  <script src="{{ static_url('admin/js/validator/validator.js') }}"></script>
+
+  <script src="{{ static_url('admin/js/validator/validator.js') }}"></script>
+
+  <script type="text/javascript"
+          src="//cdn.bootcss.com/SyntaxHighlighter/3.0.83/scripts/shCore.min.js"></script>
+  <script type="text/javascript"
+          src="//cdn.bootcss.com/SyntaxHighlighter/3.0.83/scripts/shBrushJScript.min.js"></script>
+
+  <script type="text/javascript">
+
+      SyntaxHighlighter.config.bloggerMode = true;
+      SyntaxHighlighter.defaults['toolbar'] = false;
+      SyntaxHighlighter.defaults['gutter'] = true;
+      SyntaxHighlighter.defaults['smart-tabs'] = true;
+      SyntaxHighlighter.defaults['tab-size'] = 4;
+      SyntaxHighlighter.all();
+
+      function downRow(articleId, paragraphId) {
+          $.get("/vendors/{{ vendor_id }}/blog/paragraph/down?articleId=" + articleId + "&id=" + paragraphId, function(data,status){
+              var c = $("#"+paragraphId);
+              var n = c.next();
+              c.insertAfter(n);
+          });
+      }
+
+      function upRow(articleId, paragraphId) {
+          $.get("/vendors/{{ vendor_id }}/blog/paragraph/up?articleId=" + articleId + "&id=" + paragraphId, function(data,status){
+              var c = $("#"+paragraphId);
+              var p = c.prev();
+              c.insertBefore(p);
+          });
+      }
+
+      function delRow(articleId, paragraphId) {
+          var msg = "Are you sure you want to delete this item?";
+          if (confirm(msg) == true) {
+              $.get("/vendors/{{ vendor_id }}/blog/paragraph/del?articleId=" + articleId + "&id=" + paragraphId, function(data,status){
+                  var c = $("#"+paragraphId);
+                  var p = $("#ptable");
+                  c.empty();
+              });
+              return true;
+          } else {
+              return false;
+          }
+      }
+
+      function ScrollToParagraph(id){
+          if (id == null || id == undefined || id == '') {
+          } else {
+              var url = window.location.toString();
+              var t = $('#'+id).offset().top;
+              $(window).scrollTop(t);
+          }
+      }
+
+      function redrict(ele){
+          var url = ele.getAttribute("data-redirect");
+          window.location.href=url;
+      }
+
+      $(function(){
+          $(".paragraphBox").hover(function(){ $("ul.pager", $(this)).show(200,"linear");$(this).css({background:"#efefef"});}, function(){$("ul.pager", $(this)).hide(200,"linear");$(this).css({background:"#fff"});});
+      });
+  </script>
+  <script defer="defer">
+      // action after page loaded
+      ScrollToParagraph('{{ scroll_to }}');
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Meta, title, CSS, favicons, etc. -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>骑无止境</title>
+
+  <!-- Bootstrap core CSS -->
+
+  <link href="/static/admin/css/bootstrap.min.css" rel="stylesheet">
+
+  <link href="/static/admin/fonts/css/font-awesome.min.css" rel="stylesheet">
+  <link href="/static/admin/css/animate.min.css" rel="stylesheet">
+
+  <!-- Custom styling plus plugins -->
+  <link href="/static/admin/css/custom.css" rel="stylesheet">
+  <link href="/static/admin/css/icheck/flat/green.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="{{static_url("froala_editor_2/css/froala_editor.css")}}">
+  <link rel="stylesheet" href="{{static_url("froala_editor_2/css/froala_style.css")}}">
+  <link rel="stylesheet" href="{{static_url("froala_editor_2/css/plugins/code_view.css")}}">
+  <link rel="stylesheet" href="{{static_url("froala_editor_2/css/plugins/colors.css")}}">
+  <link rel="stylesheet" href="{{static_url("froala_editor_2/css/plugins/emoticons.css")}}">
+  <link rel="stylesheet" href="{{static_url("froala_editor_2/css/plugins/line_breaker.css")}}">
+  <link rel="stylesheet" href="{{static_url("froala_editor_2/css/plugins/table.css")}}">
+  <link rel="stylesheet" href="{{static_url("froala_editor_2/css/plugins/char_counter.css")}}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.3.0/codemirror.min.css">
+
+  <script src="/static/admin/js/jquery.min.js"></script>
+
+  <!--[if lt IE 9]>
+        <script src="../assets/js/ie8-responsive-file-warning.js"></script>
+        <![endif]-->
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <style>
+          body {
+            text-align: left;
+          }
+
+          div#editor {
+            width: 100%;
+            margin: auto;
+            text-align: left;
+          }
+        </style>
+
+</head>
+
+
+<body class="nav-md">
+
+  <div class="container body">
+
+
+    <div class="main_container">
+
+      <div class="col-md-3 left_col">
+        <div class="left_col scroll-view">
+
+          <!-- navigation title -->
+          {% module Template("vendor/nav-title-block.html") %}
+          <!-- /navigation title -->
+          <div class="clearfix"></div>
+
+          <!-- menu prile quick info -->
+          {% module Template("vendor/menu-prile-quick-info-block.html", my_account=my_account) %}
+          <!-- /menu prile quick info -->
+
+          <br />
+
+          <!-- sidebar menu -->
+          {% module Template("vendor/sidebar-menu-block.html", vendor_id=vendor_id, budge_num=budge_num) %}
+          <!-- /sidebar menu -->
+
+        </div>
+      </div>
+
+      <!-- top navigation -->
+      {% module Template("vendor/top-nav-block.html", my_account=my_account) %}
+      <!-- /top navigation -->
+
+      <!-- page content -->
+      <div class="right_col" role="main">
+        <!-- /top tiles -->
+
+        <div class="">
+          <div class="page-title">
+            <div class="title_left">
+              <h3>配置 <small> 编辑</small></h3>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+
+          <div class="row">
+
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>免责声明 <small>添加文本内容</small></h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+								<div class="x_content">
+                  <br />
+                  <form id="form1" data-parsley-validate class="form-horizontal form-label-left"
+                    method="POST" action="/vendors/{{ vendor_id }}/setup/hha">
+                    {% raw xsrf_form_html() %}
+                    <input type="hidden" name="content" id="content" >
+
+                    <div class="form-group">
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="content">文本内容<span class="required">*</span>
+                      </label>
+                      <textarea id='edit' style="margin-top: 30px;" placeholder="Type some text">
+                        {{vendor_hha['content']}}
+                      </textarea>
+                    </div>
+
+                    <div class="ln_solid"></div>
+                    <div class="form-group">
+                      <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                        <button type="submit" class="btn btn-primary">重置</button>
+                        <button type="submit" class="btn btn-success">提交</button>
+                      </div>
+                    </div>
+
+                  </form>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- footer content -->
+        {% module Template("vendor/footer-block.html") %}
+        <!-- /footer content -->
+
+      </div>
+      <!-- /page content -->
+    </div>
+
+  </div>
+
+  <div id="custom_notifications" class="custom-notifications dsp_none">
+    <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
+    </ul>
+    <div class="clearfix"></div>
+    <div id="notif-group" class="tabbed_notifications"></div>
+  </div>
+
+  <script src="/static/admin/js/bootstrap.min.js"></script>
+
+  <!-- icheck -->
+  <script src="/static/admin/js/icheck/icheck.min.js"></script>
+  <!-- pace -->
+  <script src="/static/admin/js/pace/pace.min.js"></script>
+  <script src="/static/admin/js/custom.js"></script>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.3.0/codemirror.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.3.0/mode/xml/xml.min.js"></script>
+  <script type="text/javascript" src="{{static_url("froala_editor_2/js/froala_editor.min.js")}}"></script>
+  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/align.min.js")}}"></script>
+  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/code_beautifier.min.js")}}"></script>
+  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/code_view.min.js")}}"></script>
+  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/colors.min.js")}}"></script>
+  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/emoticons.min.js")}}"></script>
+  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/font_size.min.js")}}"></script>
+  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/font_family.min.js")}}"></script>
+  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/line_breaker.min.js")}}"></script>
+  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/link.min.js")}}"></script>
+  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/lists.min.js")}}"></script>
+  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/paragraph_format.min.js")}}"></script>
+  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/paragraph_style.min.js")}}"></script>
+  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/table.min.js")}}"></script>
+  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/url.min.js")}}"></script>
+  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/entities.min.js")}}"></script>
+  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/char_counter.min.js")}}"></script>
+  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/inline_style.min.js")}}"></script>
+  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/save.min.js")}}"></script>
+  <script type="text/javascript" src="{{static_url("froala_editor_2/js/languages/zh_cn.js")}}"></script>
+
+  <script>
+      $(function(){
+        $('#edit')
+          .on('froalaEditor.initialized', function (e, editor) {
+            $('#edit').parents('form').on('submit', function () {
+              var html = $('#edit').val()
+              console.log(html);
+
+              if (html == null || html == undefined || html == '') {
+            	  return false;
+              } else {
+  			    document.getElementById("content").value = html;
+  			    document.getElementById("form1").submit();
+
+                return true;
+              }
+            })
+          })
+          .froalaEditor({
+			toolbarButtons : [ 'bold', 'italic', 'underline', 'strikeThrough', 'fontFamily', 'fontSize', 'subscript', 'superscript',
+			                    '|', 'color', 'emoticons', 'paragraphFormat', 'paragraphStyle',
+			                    '|', 'align', 'formatOL', 'formatUL', 'outdent', 'indent',
+			                    '|', 'insertLink', 'insertTable', 'insertHR',
+			                    '|', 'undo', 'redo', 'clearFormatting', 'html'],
+			toolbarButtonsMD: [ 'bold', 'italic', 'underline', 'strikeThrough', 'fontFamily', 'fontSize',
+			                    '|', 'color', 'emoticons', 'paragraphFormat', 'paragraphStyle',
+			                    '|', 'align', 'formatOL', 'formatUL', 'outdent', 'indent',
+			                    '|', 'insertLink', 'insertHR',
+			                    '|', 'undo', 'redo', 'html'],
+			toolbarButtonsSM: [ 'bold', 'italic', 'underline', 'fontFamily', 'fontSize',
+			                    '|', 'color', 'paragraphFormat', 'align', 'formatOL', 'formatUL',
+			                    '|', 'insertLink',
+			                    '|', 'undo', 'redo', 'html'],
+			toolbarButtonsXS: [ 'bold', 'fontFamily', 'fontSize', '|',
+			                    'color', 'paragraphFormat', 'align', 'formatUL'],
+			enter: $.FroalaEditor.ENTER_P,
+			// Set the language code.
+		    language: 'zh_cn',
+		    toolbarSticky: true,
+        heightMax: 300
+          })
+      });
+  </script>
+</body>
+</html>

@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Meta, title, CSS, favicons, etc. -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>骑无止境</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
+
+  <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
+
+  <!-- Custom styling plus plugins -->
+  <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
+
+
+  <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
+
+  <!--[if lt IE 9]>
+        <script src="../assets/js/ie8-responsive-file-warning.js"></script>
+        <![endif]-->
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+</head>
+
+
+<body class="nav-md">
+
+  <div class="container body">
+
+
+    <div class="main_container">
+
+      <div class="col-md-3 left_col">
+        <div class="left_col scroll-view">
+
+          <!-- navigation title -->
+          {% module Template("vendor/nav-title-block.html") %}
+          <!-- /navigation title -->
+          <div class="clearfix"></div>
+
+          <!-- menu prile quick info -->
+          {% module Template("vendor/menu-prile-quick-info-block.html", my_account=my_account) %}
+          <!-- /menu prile quick info -->
+
+          <br />
+
+          <!-- sidebar menu -->
+          {% module Template("vendor/sidebar-menu-block.html", vendor_id=vendor_id, budge_num=budge_num) %}
+          <!-- /sidebar menu -->
+
+        </div>
+      </div>
+
+      <!-- top navigation -->
+      {% module Template("vendor/top-nav-block.html", my_account=my_account) %}
+      <!-- /top navigation -->
+
+      <!-- page content -->
+      <div class="right_col" role="main">
+
+        <div class="">
+          <div class="page-title">
+            <div class="title_left">
+              <h3>会员信息</h3>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>会员基本信息 <small>vendor member profile</small></h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a href="#"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li><a href="#"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+
+                  <br />
+                  <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left"
+                    action="/vendors/{{ vendor_id }}/customers/{{profile['account_id']}}" method="POST">
+  					        {% raw xsrf_form_html() %}
+
+                    <div class="item form-group">
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="bk_img_url">头像
+                      </label>
+                      <div class="col-md-6 col-sm-6 col-xs-12">
+                        <img src="{{profile['account_avatar']}}" width="50" height="50" alt="Avatar">
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">昵称
+                      </label>
+                      <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input type="text" readonly="readonly"
+                          value="{{profile['account_nickname']}}" class="form-control col-md-7 col-xs-12">
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="comment">评语(仅管理员可见)
+                      </label>
+                      <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input type="text" id="comment" name="comment" value="{{profile['comment']}}"
+                          class="form-control col-md-7 col-xs-12">
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="comment">当前积分 <span class="required">*</span>
+                      </label>
+                      <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input type="number" id="bonus" name="bonus" value="{{profile['bonus']}}"
+                          class="form-control col-md-7 col-xs-12">
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="comment">历史累计积分 <span class="required">*</span>
+                      </label>
+                      <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input type="number" id="history_bonus" name="history_bonus" value="{{profile['history_bonus']}}"
+                          class="form-control col-md-7 col-xs-12">
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="comment">代金券总额(元) <span class="required">*</span>
+                      </label>
+                      <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input type="number" id="vouchers" name="vouchers" value="{{profile['vouchers']}}"
+                          class="form-control col-md-7 col-xs-12">
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="comment">历史累计里程(km) <span class="required">*</span>
+                      </label>
+                      <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input type="number" id="distance" name="distance" value="{{profile['distance']}}"
+                          class="form-control col-md-7 col-xs-12">
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="comment">等级(0-10) <span class="required">*</span>
+                      </label>
+                      <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input type="number" id="rank" name="rank" value="{{profile['rank']}}"
+                          class="form-control col-md-7 col-xs-12">
+                      </div>
+                    </div>
+
+                    <div class="ln_solid"></div>
+                    <div class="form-group">
+                      <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                        <button type="button" class="btn btn-danger">升级为领队</button>
+                        <button type="button" class="btn btn-primary" onclick="history.go(-1);">重置</button>
+                        <button type="submit" class="btn btn-success">提交</button>
+                      </div>
+                    </div>
+
+                  </form>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>常用联系方式</h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+
+                  <p>用户在过去参加的活动中填写的报名信息，不同活动中相同名字的信息只保留最后一份</p>
+
+                  <!-- start project list -->
+                  <table class="table table-striped projects">
+                    <thead>
+                      <tr>
+                        <th style="width: 1%">#</th>
+                        <th style="width: 20%">姓名</th>
+                        <th>性别</th>
+                        <th>身份证号码</th>
+                        <th style="width: 20%">电话号码</th>
+                        <th>身高cm</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <input type="hidden" value="{{ i=1 }}"></input>
+                      {% for contact in contacts %}
+                      <tr>
+                        <th scope="row">{{ i }}</th>
+                        <td>{{contact['name']}}</td>
+                        <td>{{contact['gender']}}</td>
+                        <td>{{contact['id_code']}}</td>
+                        <td>{{contact['phone']}}</td>
+                        <td>{{contact['height']}}</td>
+                      </tr>
+                      <input type="hidden" value="{{ i=i+1 }}"></input>
+                      {% end %}
+                    </tbody>
+                  </table>
+                  <!-- end project list -->
+
+                </div>
+              </div>
+            </div>
+
+
+            <div class="col-md-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>历史活动</h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+
+                  <p>会员参加过的历史活动，可能一个会员给多人报名</p>
+
+                  <!-- start project list -->
+                  <table class="table table-striped projects">
+                    <thead>
+                      <tr>
+                        <th style="width: 1%">#</th>
+                        <th style="width: 20%">活动名称</th>
+                        <th>里程km</th>
+                        <th style="width: 20%">报名人数</th>
+                        <th style="width: 20%">报名日期</th>
+                        <th>#操作</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tbody">
+                      {% for order in orders %}
+                      <tr>
+                        <td>#</td>
+                        <td>
+                          <a href="/vendors/{{ vendor_id }}/activitys/{{order['activity_id']}}/detail/step1">{{order['activity_title']}}</a>
+                          <br />
+                          <small>{{order['activity_begin_time']}}</small>
+                        </td>
+                        <td>{{order['activity_distance']}}</td>
+                        <td>{{order['applicant_num']}}</td>
+                        <td>{{order['create_time']}}</td>
+                        <td>
+                          {% if order['cret_id'] %}
+                            <a href="/vendors/{{ vendor_id }}/crets/{{order['cret_id']}}" class="btn btn-primary btn-xs">
+                            <i class="fa fa-eye"></i> 证书 </a>
+                          {% end %}
+                          <a href="/vendors/{{ vendor_id }}/orders/{{order['_id']}}" class="btn btn-info btn-xs">
+                            <i class="fa fa-eye"></i> 订单 </a>
+                        </td>
+                      </tr>
+                      {% end %}
+                    </tbody>
+                  </table>
+                  <!-- end project list -->
+
+                </div>
+                <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                  <!-- Pager -->
+                  <ul class="pager">
+                    {% if len(orders) == 0 %}
+                      <input type="hidden" id="new_timestamp" value="">
+                    {% else %}
+                      <input type="hidden" id="new_timestamp" value="{{ order['create_time'] }}">
+                    {% end %}
+                    <li class="next"><a id="OnGetMore">加载更多 &rarr;</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="col-md-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>已完成任务</h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+
+                  <p>用户在过去参加的活动时完成的任务</p>
+
+                  <!-- start project list -->
+                  <table class="table table-striped projects">
+                    <thead>
+                      <tr>
+                        <th style="width: 1%">#</th>
+                        <th style="width: 20%">任务名称</th>
+                        <th>分类</th>
+                        <th style="width: 20%">报名日期</th>
+                        <th>#操作</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <input type="hidden" value="{{ i=1 }}"></input>
+                      {% for task in tasks %}
+                      <tr>
+                        <td scope="row">{{ i }}</td>
+                        <td>{{task['title']}}</td>
+                        <td>{{task['category']}}</td>
+                        <td>{{task['create_time']}}</td>
+                        <td></td>
+                      </tr>
+                      <input type="hidden" value="{{ i=i+1 }}"></input>
+                      {% end %}
+                    </tbody>
+                  </table>
+                  <!-- end project list -->
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- footer content -->
+        {% module Template("vendor/footer-block.html") %}
+        <!-- /footer content -->
+
+      </div>
+      <!-- /page content -->
+    </div>
+
+  </div>
+
+  <div id="custom_notifications" class="custom-notifications dsp_none">
+    <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
+    </ul>
+    <div class="clearfix"></div>
+    <div id="notif-group" class="tabbed_notifications"></div>
+  </div>
+
+  <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
+
+  <!-- bootstrap progress js -->
+  <script src="{{ static_url('admin/js/progressbar/bootstrap-progressbar.min.js') }}"></script>
+  <!-- icheck -->
+  <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
+
+  <script src="{{ static_url('admin/js/custom.js') }}"></script>
+  <!-- pace -->
+  <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
+
+  <!-- daterangepicker -->
+  <script type="text/javascript" src="{{ static_url('admin/js/moment/moment.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('admin/js/datepicker/daterangepicker.js') }}"></script>
+
+  <!-- form validation -->
+  <script src="{{ static_url('admin/js/validator/validator.js') }}"></script>
+
+
+  <!-- daterangepicker -->
+  <script type="text/javascript" src="{{ static_url('admin/js/moment.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('admin/js/datepicker/daterangepicker.js') }}"></script>
+  <!-- moris js -->
+  <script src="{{ static_url('admin/js/moris/raphael-min.js') }}"></script>
+  <script src="{{ static_url('admin/js/moris/morris.js') }}"></script>
+  <script type="text/javascript">
+    var preAllow = true;   // when ajax not completed, cannot do the next request
+    var lastTimestamp = $('#new_timestamp').val();
+    console.log(lastTimestamp);
+    function query() {
+      $.get("/bf/api/vendors/{{ vendor_id }}/customer-profile/orders?account_id={{ account_id }}&before="+lastTimestamp,function(data,status){
+        var ajaxobj = eval("("+data+")");
+        for (var i in ajaxobj) {
+          var inner_html = '<tr><td>#</td>';
+          inner_html += '<td>';
+          inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/'+ajaxobj[i].activity_id+'/detail/step1">'+ajaxobj[i].activity_title+'</a>';
+          inner_html += '<br/>';
+          inner_html += '<small>'+ajaxobj[i].activity_begin_time+'</small>';
+          inner_html += '</td>';
+          inner_html += '<td>'+ajaxobj[i].activity_distance+'</td>';
+          inner_html += '<td>'+ajaxobj[i].applicant_num+'</td>';
+          inner_html += '<td>'+ajaxobj[i].create_time+'</td>';
+          inner_html += '<td>';
+          if (ajaxobj[i].cret_id != null) {
+            inner_html += '  <a href="/vendors/{{ vendor_id }}/crets/'+ajaxobj[i].cret_id+'" class="btn btn-primary btn-xs">';
+            inner_html += '  <i class="fa fa-eye"></i> 证书 </a>';
+          }
+          inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+ajaxobj[i]._id+'" class="btn btn-info btn-xs">';
+          inner_html += '<i class="fa fa-eye"></i> 订单 </a>';
+          inner_html += '</td>';
+          inner_html += '</tr>';
+
+          $('#tbody').append(inner_html);
+          // $('#new_timestamp').val(ajaxobj[i].create_time);
+          lastTimestamp = ajaxobj[i].create_time;
+        }
+        preAllow = true;
+      });
+    }
+
+    $("#OnGetMore").click(function(){ // This event fires when a button is clicked
+      if(preAllow){
+          preAllow = false;
+          query();
+      }
+    });
+    </script>
+
+  <!-- datepicker -->
+  <script type="text/javascript">
+    $(document).ready(function() {
+
+      var cb = function(start, end, label) {
+        console.log(start.toISOString(), end.toISOString(), label);
+        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        //alert("Callback has fired: [" + start.format('MMMM D, YYYY') + " to " + end.format('MMMM D, YYYY') + ", label = " + label + "]");
+      }
+
+      var optionSet1 = {
+        startDate: moment().subtract(29, 'days'),
+        endDate: moment(),
+        minDate: '01/01/2012',
+        maxDate: '12/31/2015',
+        dateLimit: {
+          days: 60
+        },
+        showDropdowns: true,
+        showWeekNumbers: true,
+        timePicker: false,
+        timePickerIncrement: 1,
+        timePicker12Hour: true,
+        ranges: {
+          'Today': [moment(), moment()],
+          'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+          'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+          'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+          'This Month': [moment().startOf('month'), moment().endOf('month')],
+          'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        opens: 'left',
+        buttonClasses: ['btn btn-default'],
+        applyClass: 'btn-small btn-primary',
+        cancelClass: 'btn-small',
+        format: 'MM/DD/YYYY',
+        separator: ' to ',
+        locale: {
+          applyLabel: 'Submit',
+          cancelLabel: 'Clear',
+          fromLabel: 'From',
+          toLabel: 'To',
+          customRangeLabel: 'Custom',
+          daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+          monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+          firstDay: 1
+        }
+      };
+      $('#reportrange span').html(moment().subtract(29, 'days').format('MMMM D, YYYY') + ' - ' + moment().format('MMMM D, YYYY'));
+      $('#reportrange').daterangepicker(optionSet1, cb);
+      $('#reportrange').on('show.daterangepicker', function() {
+        console.log("show event fired");
+      });
+      $('#reportrange').on('hide.daterangepicker', function() {
+        console.log("hide event fired");
+      });
+      $('#reportrange').on('apply.daterangepicker', function(ev, picker) {
+        console.log("apply event fired, start/end dates are " + picker.startDate.format('MMMM D, YYYY') + " to " + picker.endDate.format('MMMM D, YYYY'));
+      });
+      $('#reportrange').on('cancel.daterangepicker', function(ev, picker) {
+        console.log("cancel event fired");
+      });
+      $('#options1').click(function() {
+        $('#reportrange').data('daterangepicker').setOptions(optionSet1, cb);
+      });
+      $('#options2').click(function() {
+        $('#reportrange').data('daterangepicker').setOptions(optionSet2, cb);
+      });
+      $('#destroy').click(function() {
+        $('#reportrange').data('daterangepicker').remove();
+      });
+    });
+  </script>
+  <!-- /datepicker -->
+</body>
+
+</html>

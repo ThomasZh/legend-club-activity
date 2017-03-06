@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Meta, title, CSS, favicons, etc. -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>骑无止境 - 添加备注</title>
+
+  <!-- Bootstrap core CSS -->
+
+  <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
+
+  <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
+
+  <!-- Custom styling plus plugins -->
+  <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
+
+  <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
+
+  <!--[if lt IE 9]>
+        <script src="../assets/js/ie8-responsive-file-warning.js"></script>
+        <![endif]-->
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+</head>
+
+
+<body class="nav-md">
+
+  <div class="container body">
+
+
+    <div class="main_container">
+
+      <div class="col-md-3 left_col">
+        <div class="left_col scroll-view">
+
+          <!-- navigation title -->
+          {% module Template("vendor/nav-title-block.html") %}
+          <!-- /navigation title -->
+          <div class="clearfix"></div>
+
+          <!-- menu prile quick info -->
+          {% module Template("vendor/menu-prile-quick-info-block.html", my_account=my_account) %}
+          <!-- /menu prile quick info -->
+
+          <br />
+
+          <!-- sidebar menu -->
+          {% module Template("vendor/sidebar-menu-block.html", vendor_id=vendor_id, budge_num=budge_num) %}
+          <!-- /sidebar menu -->
+
+        </div>
+      </div>
+
+      <!-- top navigation -->
+      {% module Template("vendor/top-nav-block.html", my_account=my_account) %}
+      <!-- /top navigation -->
+
+      <!-- page content -->
+      <div class="right_col" role="main">
+        <!-- top tiles -->
+        <div class="row tile_count">
+          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
+            <div class="left"></div>
+            <div class="right">
+              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step1">
+              <span class="count_top"><i class="fa fa-info-circle"></i> 活动信息</span>
+              <div class="count">{{activity['member_min']}}-{{activity['member_max']}}</div>
+              <span class="count_bottom"><i class="green">Step1 </i> 基本信息</span>
+              </a>
+            </div>
+          </div>
+          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
+            <div class="left"></div>
+            <div class="right">
+              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step2">
+              <span class="count_top"><i class="fa fa-info-circle"></i> 活动信息</span>
+              <div class="count"><i class="fa fa-wechat"></i></div>
+              <span class="count_bottom"><i class="green">Step2 </i> 二维码</span>
+              </a>
+            </div>
+          </div>
+          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
+            <div class="left"></div>
+            <div class="right">
+              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step3">
+              <span class="count_top"><i class="fa fa-info-circle"></i> 活动信息</span>
+              {% if cret_template %}
+              <div class="count">{{cret_template['distance']}}<small>km</small></div>
+              {% else %}
+              <div class="count">0<small>km</small></div>
+              {% end %}
+              <span class="count_bottom"><i class="green">Step3 </i> 证书</span>
+              </a>
+            </div>
+          </div>
+          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
+            <div class="left"></div>
+            <div class="right">
+              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step4">
+              <span class="count_top"><i class="fa fa-info-circle"></i> 活动信息</span>
+              <div class="count">{{ bonus }}<small>积分</small></div>
+              <span class="count_bottom"><i class="green">Step4 </i> 分享</span>
+              </a>
+            </div>
+          </div>
+          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
+            <div class="left"></div>
+            <div class="right">
+              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step5">
+              <span class="count_top"><i class="fa fa-money"></i> 订单</span>
+              <div class="count">{{len(orders)}}<small>笔</small></div>
+              <span class="count_bottom"><i class="green">Step5 </i> 付费信息</span>
+              </a>
+            </div>
+          </div>
+          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
+            <div class="left"></div>
+            <div class="right">
+              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step6">
+              <span class="count_top"><i class="fa fa-user"></i> 会员报名</span>
+              <div class="count green">{{len(applys)}}<small>人次</small></div>
+              <span class="count_bottom"><i class="green">Step6  </i> 报名信息</span>
+              </a>
+            </div>
+          </div>
+          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
+            <div class="left"></div>
+            <div class="right">
+              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step7">
+              <span class="count_top"><i class="fa fa-calendar"></i> 详细行程</span>
+              <div class="count"><i class="glyphicon glyphicon-pencil"></i></div>
+              <span class="count_bottom"><i class="green">Step7 </i> 编辑</span>
+              </a>
+            </div>
+          </div>
+          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
+            <div class="left"></div>
+            <div class="right">
+              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step8">
+              <span class="count_top"><i class="fa fa-money"></i> 费用说明</span>
+              <div class="count"><i class="glyphicon glyphicon-pencil"></i></div>
+              <span class="count_bottom"><i class="green">Step8 </i> 编辑</span>
+              </a>
+            </div>
+          </div>
+          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
+            <div class="left"></div>
+            <div class="right">
+              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step9">
+              <span class="count_top"><i class="fa fa-suitcase"></i> 备注描述</span>
+              <div class="count"><i class="glyphicon glyphicon-pencil"></i></div>
+              <span class="count_bottom"><i class="red">Step9 </i> 编辑</span>
+              </a>
+            </div>
+          </div>
+
+        </div>
+        <!-- /top tiles -->
+        <div class="">
+          <div class="page-title">
+            <div class="title_left">
+              <h3>活动 <small> 备注 </small></h3>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+
+          <div class="row">
+
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>活动备注 <small></small></h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                  <br />
+                  <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left"
+                    action="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step9" method="POST">
+                    {% raw xsrf_form_html() %}
+
+                    <div class="item form-group">
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">备注内容
+                      </label>
+                      <div class="col-md-6 col-sm-6 col-xs-12">
+                        <textarea id="notes" name="notes" class="form-control" rows="5">{{ activity['notes'] }}</textarea>                      </div>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                        <!-- <button type="button" class="btn btn-primary" onclick="history.go(-1);">重置</button> -->
+                        <button type="submit" class="btn btn-success">提交</button>
+                      </div>
+                    </div>
+
+                  </form>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- footer content -->
+        {% module Template("vendor/footer-block.html") %}
+        <!-- /footer content -->
+
+      </div>
+      <!-- /page content -->
+    </div>
+
+  </div>
+
+  <div id="custom_notifications" class="custom-notifications dsp_none">
+    <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
+    </ul>
+    <div class="clearfix"></div>
+    <div id="notif-group" class="tabbed_notifications"></div>
+  </div>
+
+  <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
+
+  <!-- bootstrap progress js -->
+  <script src="{{ static_url('admin/js/progressbar/bootstrap-progressbar.min.js') }}"></script>
+  <!-- icheck -->
+  <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
+
+  <script src="{{ static_url('admin/js/custom.js') }}"></script>
+  <!-- pace -->
+  <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
+
+  <!-- form validation -->
+  <script src="{{ static_url('admin/js/validator/validator.js') }}"></script>
+
+</body>
+
+</html>

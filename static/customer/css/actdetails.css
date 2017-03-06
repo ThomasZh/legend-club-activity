@@ -1,0 +1,245 @@
+/* 活动详情页面样式 */
+/* @2016/05/19 */
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, dl, dt, dd, ol, ul, li, fieldset, form, input, label, legend, table, caption, tbody, tfoot, thead, tr, th, td {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-weight: inherit;
+    font-style: inherit;
+    font-size: 100%;
+    font-family: inherit;
+    vertical-align: baseline;
+}
+
+body {
+  color: #505050;
+  font-size: 14px;
+  -webkit-text-size-adjust: none;
+  -moz-text-size-adjust: none;
+  -ms-text-size-adjust: none;
+  text-size-adjust: none;
+}
+
+
+.inline {
+  display: inline;
+}
+/* 为让图片后面的span居中设置，给图片加这个样式 */
+.img-vmiddle {
+  vertical-align: middle;
+}
+
+.location-icon-big {
+  font-size: 72px;
+  /*color: #45b97c;*/
+  /*color: #1d953f;*/
+}
+
+.li-closer {
+  line-height : 32px;
+}
+
+.act-title {
+  font-size: 18px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.act-price {
+  font-size: 22px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.ui-list.need-space {
+  margin-bottom: 60px;
+  /*margin-top: 10px;*/
+}
+
+.ui-header-skyblue {
+  background-color: #4a90e2;
+  color: #fff;
+}
+
+.ui-header-skyblue i {
+  color: #fff;
+}
+
+/* 顶部卡片样式 */
+.banner {
+  position: relative;
+  overflow: hidden;
+}
+
+.banner_tit {
+  position: absolute;
+  bottom: 0px;
+  font-size: 16px;
+  color: #fff;
+  padding-left: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  white-space: normal;
+  background: rgba(0,0,0,0.4);
+}
+
+.banner img {
+  display: block;
+  width: 100%;
+  max-height: 180px;
+}
+
+
+.top_main {
+    width: 100%;
+}
+
+.wrap {
+    min-width: 320px;
+    max-width: 640px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* 卡片书签 */
+.bookmarks{
+  position:absolute;
+  right:0;
+  top:24px;
+  padding:6px 10px 6px 8px;
+  font-size:16px;
+  color:#fff;
+  line-height: 1.0;
+}
+/* 卡片书签的颜色 */
+.green {
+  background:#8cdd6f;
+}
+.green::after {
+  border: 9px solid #8cdd6f;
+  border-color: #8cdd6f #8cdd6f transparent transparent;
+}
+.green::before {
+  border: 9px solid #8cdd6f;
+  border-color:  transparent #8cdd6f #8cdd6f transparent ;
+}
+.orange {
+  background:#f58220;
+}
+.orange::after {
+  border: 9px solid #f58220;
+  border-color: #f58220 #f58220 transparent transparent;
+}
+.orange::before {
+  border: 9px solid #f58220;
+  border-color:  transparent #f58220 #f58220 transparent ;
+}
+.red {
+  background:#ef4136;
+}
+.red::after {
+  border: 9px solid #ef4136;
+  border-color: #ef4136 #ef4136 transparent transparent;
+}
+.red::before {
+  border: 9px solid #ef4136;
+  border-color:  transparent #ef4136 #ef4136 transparent ;
+}
+.gray {
+  background:#3e4145;
+}
+.gray::after {
+  border: 9px solid #3e4145;
+  border-color: #3e4145 #3e4145 transparent transparent;
+}
+.gray::before {
+  border: 9px solid #3e4145;
+  border-color:  transparent #3e4145 #3e4145 transparent ;
+}
+
+.bookmarks::after {
+  position: absolute;
+  top: 0px;
+  left: -18px;
+  content: '';
+  /*border-top-left-radius: 4px;*/
+}
+
+.bookmarks::before {
+  position: absolute;
+  bottom: 0px;
+  left: -18px;
+  content: '';
+  /*border-bottom-left-radius: 4px;*/
+}
+
+.fixbtn {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+}
+
+a.defbtn {
+    display: inline-block;
+    width: 100%;
+    height: 44px;
+    background: #4a90e2;
+    text-align: center;
+    line-height: 48px;
+    color: #fff;
+    font-size: 16px;
+    text-decoration: none;
+}
+
+a.defbtn.green {
+  /*background:#8cdd6f;*/
+  background:#1d953f;
+}
+
+/* 行程飘带的样式 */
+.main{
+    margin-top:5px;
+    font-size: 14px;
+    line-height: 22px;
+    padding-bottom: 90px;
+}
+.main .bm{
+    position:relative;
+    padding:6px 12px 6px 12px;
+    background:#F5A623 ;
+    color:#fff;
+    display:inline-block;
+    margin-top:15px;
+    font-size: 16px;
+}
+.main .bm::after {
+    position: absolute;
+    top: 0px;
+    right: -18px;
+    content: '';
+    border: 9px solid #F5A623;
+    border-color: #F5A623 transparent transparent #F5A623 ;
+    /*border-top-right-radius: 4px;*/
+}
+.main .bm::before {
+    position: absolute;
+    bottom: 0px;
+    right: -18px;
+    content: '';
+    border: 9px solid #F5A623;
+    border-color: transparent transparent #F5A623 #F5A623 ;
+    /*border-bottom-right-radius: 4px;*/
+}
+
+.main img {
+  width: 100%;
+}
+
+.m1{
+    width:90%;
+    margin:15px auto 0;
+    line-height: 22px;
+}

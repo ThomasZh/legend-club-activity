@@ -1,0 +1,84 @@
+<!-- sidebar menu -->
+<div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+
+  <div class="menu_section">
+    <h3>管理员</h3>
+    <ul class="nav side-menu">
+      <li><a><i class="fa fa-bicycle"></i> 活动 <span class="fa fa-chevron-down"></span></a>
+        <ul class="nav child_menu" style="display: none">
+          <li><a href="/vendors/{{ vendor_id }}/categorys">分类</a></li>
+          <li><a href="/vendors/{{ vendor_id }}/activitys/pop">热门</a></li>
+          <li><a href="/vendors/{{ vendor_id }}/activitys/draft">草稿箱</a></li>
+          <li><a href="/vendors/{{ vendor_id }}/activitys/recruit">招募中</a></li>
+          <li><a href="/vendors/{{ vendor_id }}/activitys/doing">活动中</a></li>
+          <li><a href="/vendors/{{ vendor_id }}/activitys/completed">已完成</a></li>
+          <li><a href="/vendors/{{ vendor_id }}/activitys/canceled">已取消</a></li>
+        </ul>
+      </li>
+      <li><a><i class="fa fa-anchor"></i> 线路 <span class="fa fa-chevron-down"></span></a>
+        <ul class="nav child_menu" style="display: none">
+          <li><a href="/vendors/{{ vendor_id }}/trip_router">我俱乐部线路</a></li>
+          <li><a href="/vendors/{{ vendor_id }}/trip_router/share">其他俱乐部线路</a></li>
+          <li><a href="/vendors/{{ vendor_id }}/trip_router/use">我会员所见线路</a></li>
+        </ul>
+      </li>
+      {% if budge_num['total'] > 0 %}
+        <li><a><i class="fa fa-rmb"></i> 订单 <span class="badge bg-green">{{budge_num['total']}}</span>
+      {% else %}
+        <li><a><i class="fa fa-rmb"></i> 订单
+      {% end %}
+        <span class="fa fa-chevron-down"></span></a>
+        <ul class="nav child_menu" style="display: none">
+          {% if budge_num['order'] > 0 %}
+            <li><a href="/vendors/{{ vendor_id }}/orders"> 活动订单 <span class="badge bg-green">{{budge_num['order']}}</span></a>
+            </li>
+          {% else %}
+            <li><a href="/vendors/{{ vendor_id }}/orders"> 活动订单 </a>
+            </li>
+          {% end %}
+
+          {% if budge_num['application'] > 0 %}
+          <li><a href="/vendors/{{ vendor_id }}/applys">报名 <span class="badge bg-green">{{budge_num['application']}}</span></a>
+          </li>
+          {% else %}
+            <li><a href="/vendors/{{ vendor_id }}/applys">报名</a>
+            </li>
+          {% end %}
+
+          {% if budge_num['voucher_order'] > 0 %}
+            <li><a href="/vendors/{{ vendor_id }}/order/vouchers"> 代金券订单 <span class="badge bg-green">{{budge_num['voucher_order']}}</span></a>
+            </li>
+          {% else %}
+            <li><a href="/vendors/{{ vendor_id }}/order/vouchers"> 代金券订单 </a>
+            </li>
+          {% end %}
+        </ul>
+      </li>
+      <li><a><i class="fa fa-male"></i> 会员 <span class="fa fa-chevron-down"></span></a>
+        <ul class="nav child_menu" style="display: none">
+          <li><a href="/vendors/{{ vendor_id }}/customers">会员</a></li>
+          <li><a href="/vendors/{{ vendor_id }}/coleaders">领队</a></li>
+        </ul>
+      </li>
+      <li><a><i class="fa fa-rmb"></i> 代金券 <span class="fa fa-chevron-down"></span></a>
+        <ul class="nav child_menu" style="display: none">
+          <li><a href="/vendors/{{ vendor_id }}/vouchers?status=0">未分配</a></li>
+          <li><a href="/vendors/{{ vendor_id }}/vouchers?status=1">已分配, 未使用</a></li>
+          <li><a href="/vendors/{{ vendor_id }}/vouchers?status=2">已分配, 已使用</a></li>
+        </ul>
+      </li>
+      <li><a><i class="fa fa-gear"></i> 配置 <span class="fa fa-chevron-down"></span></a>
+        <ul class="nav child_menu" style="display: none">
+          <li><a href="/vendors/{{ vendor_id }}/setup/task">任务</a></li>
+          <li><a href="/vendors/{{ vendor_id }}/setup/administrators">管理员</a></li>
+          <li><a href="/vendors/{{ vendor_id }}/setup/hha">免责声明</a></li>
+          <li><a href="/vendors/{{ vendor_id }}/setup/insurances">保险</a></li>
+          <li><a href="/vendors/{{ vendor_id }}/setup/wx">微信</a></li>
+          <li><a href="/vendors/{{ vendor_id }}/setup/club">俱乐部信息</a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+</div>
+<!-- /sidebar menu -->
