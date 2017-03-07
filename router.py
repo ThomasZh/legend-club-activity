@@ -128,9 +128,7 @@ def map():
         (r"/vendors/([a-z0-9]*)/vouchers-pay/([a-z0-9]*)/edit", getattr(vendor_voucher, 'VendorVoucherPayEditHandler')),
 
         # setup
-        (r"/vendors/([a-z0-9]*)/setup/administrators", getattr(vendor_setup, 'VendorSetupAdministratorListHandler')),
-        (r"/vendors/([a-z0-9]*)/setup/administrators/create", getattr(vendor_setup, 'VendorSetupAdministratorCreateHandler')),
-        (r"/vendors/([a-z0-9]*)/setup/administrators/([a-z0-9]*)/delete", getattr(vendor_setup, 'VendorSetupAdministratorDeleteHandler')),
+        (r"/vendors/([a-z0-9]*)/setup/operators", getattr(vendor_setup, 'VendorSetupOperatorsHandler')),
         (r"/vendors/([a-z0-9]*)/setup/insurances", getattr(vendor_setup, 'VendorSetupInsuranceListHandler')),
         (r"/vendors/([a-z0-9]*)/setup/insurances/create", getattr(vendor_setup, 'VendorSetupInsuranceCreateHandler')),
         (r"/vendors/([a-z0-9]*)/setup/insurances/([a-z0-9]*)/edit", getattr(vendor_setup, 'VendorSetupInsuranceEditHandler')),

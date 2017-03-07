@@ -33,12 +33,7 @@ from tornado.escape import json_encode, json_decode
 from tornado.httpclient import HTTPClient
 from tornado.httputil import url_concat
 
-from comm import BaseHandler
-from comm import timestamp_datetime
-from comm import datetime_timestamp
-from comm import timestamp_date
-from comm import date_timestamp
-
+from comm import *
 from dao import budge_num_dao
 from dao import category_dao
 from dao import activity_dao
@@ -57,135 +52,29 @@ from dao import task_dao
 from dao import personal_task_dao
 from dao import trip_router_dao
 from dao import club_dao
-
-from global_const import VENDOR_ID
-from global_const import STP
-from global_const import PAGE_SIZE_LIMIT
+from global_const import *
 
 
-class VendorSetupAdministratorListHandler(BaseHandler):
+class VendorSetupOperatorsHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        _session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
-
-        params = {"X-Session-Id": _session_ticket}
-        url = url_concat("http://"+STP+"/vendor/ops", params)
-        http_client = HTTPClient()
-        response = http_client.fetch(url, method="GET")
-        logging.info("got response %r", response.body)
-        _account_ids = json_decode(response.body)
-
-        _array = []
-        for _account_id in _account_ids:
-            #url = "http://"+STP+"/talent/"+_account_id+"/profile"
-            url = "http://"+STP+"/accounts/"+_account_id+"/base"
-            http_client = HTTPClient()
-            response = http_client.fetch(url, method="GET")
-            logging.info("got response %r", response.body)
-            _account = json_decode(response.body)
-
-            url = "http://"+STP+"/accounts/"+_account_id+"/logins"
-            http_client = HTTPClient()
-            response = http_client.fetch(url, method="GET")
-            logging.info("got response %r", response.body)
-            _logins = json_decode(response.body)
-
-            _account['logins'] = _logins
-
-            _array.append(_account)
+        ops = self.get_myinfo_basic()
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
-        self.render('vendor/administrators.html',
+        self.render('vendor/operators.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
-                budge_num=budge_num, ops=_array)
-
-
-class VendorSetupAdministratorCreateHandler(BaseHandler):
-    @tornado.web.authenticated  # if no session, redirect to login page
-    def get(self, vendor_id):
-        logging.info("got vendor_id %r in uri", vendor_id)
-
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
-
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
-        self.render('vendor/administrator-create.html',
-                vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num)
 
-    def post(self, vendor_id):
-        logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
-
-        _tel = self.get_argument("tel", "")
-        logging.info("got _tel %r", _tel)
-        _nickname = self.get_argument("nickname", "")
-        logging.info("got _nickname %r", _nickname)
-        _session_ticket = self.get_secure_cookie("session_ticket")
-
-        params = {"X-Session-Id": _session_ticket}
-        url = url_concat("http://"+STP+"/accounts/search/tel/"+_tel, params)
-        http_client = HTTPClient()
-        response = http_client.fetch(url, method="GET")
-        logging.info("got response %r", response.body)
-
-        if not response.body:
-            _md5pwd = hashlib.md5("888888").hexdigest();
-            params = { "loginType" : 1602,
-                  "md5pwd" : _md5pwd,
-                  "nickname": _nickname,
-                  "loginName" : _tel}
-            _json = json_encode(params)
-            logging.info("got params %r", _json)
-            url = "http://"+STP+"/account/register"
-            http_client = HTTPClient()
-            response = http_client.fetch(url, method="POST", body=_json)
-            logging.info("got response %r", response.body)
-        else:
-            _account = json_decode(response.body)
-            params = {"X-Session-Id": _session_ticket}
-            url = url_concat("http://"+STP+"/vendor/ops/"+_account['accountId'], params)
-            http_client = HTTPClient()
-            data = {"_id":_account['accountId']}
-            _json = json_encode(data)
-            response = http_client.fetch(url, method="POST", body=_json)
-            logging.info("got response %r", response.body)
-
-        self.redirect('/vendors/' + vendor_id + '/setup/administrators')
-
-
-class VendorSetupAdministratorDeleteHandler(BaseHandler):
-    @tornado.web.authenticated  # if no session, redirect to login page
-    def get(self, vendor_id, account_id):
-        logging.info("got vendor_id %r in uri", vendor_id)
-        logging.info("got account_id %r in uri", account_id)
-
-        _session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
-
-        params = {"X-Session-Id": _session_ticket}
-        url = url_concat("http://"+STP+"/vendor/ops/"+account_id, params)
-        http_client = HTTPClient()
-        response = http_client.fetch(url, method="DELETE")
-        logging.info("got response %r", response.body)
-
-        self.redirect('/vendors/' + vendor_id + '/setup/administrators')
-
-
-class VendorSetupInsuranceListHandler(BaseHandler):
+class VendorSetupInsuranceListHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         _array = insurance_template_dao.insurance_template_dao().query_by_vendor(vendor_id)
         for _insurance in _array:
@@ -195,31 +84,29 @@ class VendorSetupInsuranceListHandler(BaseHandler):
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/insurances.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 insurances=_array)
 
 
-class VendorSetupInsuranceCreateHandler(BaseHandler):
+class VendorSetupInsuranceCreateHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/insurance-create.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num)
 
     @tornado.web.authenticated  # if no session, redirect to login page
     def post(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         _title = self.get_argument("title", "")
         _amount = self.get_argument("amount", "")
@@ -234,7 +121,7 @@ class VendorSetupInsuranceCreateHandler(BaseHandler):
         self.redirect('/vendors/' + vendor_id + '/setup/insurances')
 
 
-class VendorSetupInsuranceEditHandler(BaseHandler):
+class VendorSetupInsuranceEditHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, insurance_id):
         logging.info("got vendor_id %r in uri", vendor_id)
@@ -255,8 +142,7 @@ class VendorSetupInsuranceEditHandler(BaseHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got insurance_id %r in uri", insurance_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         _title = self.get_argument("title", "")
         _amount = self.get_argument("amount", "")
@@ -271,42 +157,39 @@ class VendorSetupInsuranceEditHandler(BaseHandler):
         self.redirect('/vendors/' + vendor_id + '/setup/insurances')
 
 
-class VendorSetupInsuranceDeleteHandler(BaseHandler):
+class VendorSetupInsuranceDeleteHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, insurance_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got insurance_id %r in uri", insurance_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         insurance_template_dao.insurance_template_dao().delete(insurance_id)
 
         self.redirect('/vendors/' + vendor_id + '/setup/insurances')
 
 
-class VendorSetupWxHandler(BaseHandler):
+class VendorSetupWxHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         vendor_wx = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/setup-wx.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 vendor_wx=vendor_wx)
 
     def post(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         wx_app_id = self.get_argument("wx_app_id", "")
         wx_app_secret = self.get_argument("wx_app_secret", "")
@@ -329,19 +212,18 @@ class VendorSetupWxHandler(BaseHandler):
         self.redirect('/vendors/' + vendor_id + '/setup/wx')
 
 
-class VendorSetupClubHandler(BaseHandler):
+class VendorSetupClubHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         club = club_dao.club_dao().query(vendor_id)
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/setup-club.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 club=club)
 
@@ -349,8 +231,7 @@ class VendorSetupClubHandler(BaseHandler):
     def post(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         _name = self.get_argument("club_name", "")
         _desc = self.get_argument("club_desc", "")
@@ -372,20 +253,19 @@ class VendorSetupClubHandler(BaseHandler):
         self.redirect('/vendors/' + vendor_id + '/setup/club')
 
 
-class VendorSetupHhaHandler(BaseHandler):
+class VendorSetupHhaHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         vendor_hha = vendor_hha_dao.vendor_hha_dao().query(vendor_id)
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/hold-harmless-agreements.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 vendor_hha=vendor_hha)
 
@@ -393,8 +273,7 @@ class VendorSetupHhaHandler(BaseHandler):
     def post(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         content = self.get_argument("content", "")
         logging.info("got content %r", content)
@@ -410,13 +289,12 @@ class VendorSetupHhaHandler(BaseHandler):
         self.redirect('/vendors/' + vendor_id + '/setup/hha')
 
 
-class VendorSetupTaskHandler(BaseHandler):
+class VendorSetupTaskHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         tasks = task_dao.task_dao().query_by_vendor(vendor_id)
@@ -436,19 +314,18 @@ class VendorSetupTaskHandler(BaseHandler):
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/task-list.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 tasks=tasks)
 
 
-class VendorSetupTaskDeleteHandler(BaseHandler):
+class VendorSetupTaskDeleteHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, task_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got task_id %r in uri", task_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         task_dao.task_dao().delete(task_id)
         personal_task_dao.personal_task_dao().delete_by_task(task_id)
@@ -456,16 +333,13 @@ class VendorSetupTaskDeleteHandler(BaseHandler):
         self.redirect('/vendors/' + vendor_id + '/setup/task')
 
 
-
 # VendorSetupTaskCreateHandler
-class VendorSetupTaskCreateHandler(BaseHandler):
+class VendorSetupTaskCreateHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
-
+        ops = self.get_myinfo_basic()
 
         tasks= task_dao.task_dao().query_by_vendor(vendor_id)
         trip_routers = trip_router_dao.trip_router_dao().query_by_vendor(vendor_id)
@@ -481,7 +355,7 @@ class VendorSetupTaskCreateHandler(BaseHandler):
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/task-create.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 triprouters=trip_routers)
 
@@ -506,14 +380,13 @@ class VendorSetupTaskCreateHandler(BaseHandler):
         self.redirect('/vendors/' + vendor_id + '/setup/task')
 
 # VendorSetupTaskAllocateHandler 已被分配过任务该任务的应该不显示在列表中
-class VendorSetupTaskAllocateHandler(BaseHandler):
+class VendorSetupTaskAllocateHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, task_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got task_id %r in uri", task_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         _task = task_dao.task_dao().query(task_id)
         _task['create_time'] = timestamp_datetime(_task['create_time'])
@@ -553,7 +426,7 @@ class VendorSetupTaskAllocateHandler(BaseHandler):
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/task-allocate.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 task=_task, customers=_customers)
 
@@ -561,8 +434,7 @@ class VendorSetupTaskAllocateHandler(BaseHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got voucher_id %r in uri", task_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         _account_id = self.get_argument("account_id", "")
         logging.info("got _account_id %r", _account_id)

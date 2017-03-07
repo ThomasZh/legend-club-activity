@@ -30,12 +30,7 @@ from tornado.escape import json_encode, json_decode
 from tornado.httpclient import HTTPClient
 from tornado.httputil import url_concat
 
-from comm import BaseHandler
-from comm import timestamp_datetime
-from comm import datetime_timestamp
-from comm import timestamp_date
-from comm import date_timestamp
-
+from comm import *
 from dao import budge_num_dao
 from dao import category_dao
 from dao import activity_dao
@@ -49,21 +44,15 @@ from dao import vendor_member_dao
 from dao import voucher_dao
 from dao import voucher_order_dao
 from dao import voucher_pay_dao
-
-from global_const import VENDOR_ID
-from global_const import STP
-from global_const import PAGE_SIZE_LIMIT
-from global_const import WX_NOTIFY_DOMAIN
-from global_const import QRCODE_CREATE_URL
+from global_const import *
 
 
-class VendorVoucherListHandler(BaseHandler):
+class VendorVoucherListHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         _status = self.get_argument("status", "")
         logging.info("got _status %r", _status)
@@ -104,31 +93,29 @@ class VendorVoucherListHandler(BaseHandler):
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/vouchers.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 status=_status,
                 vouchers=_vouchers)
 
 
-class VendorVoucherFreeCreateHandler(BaseHandler):
+class VendorVoucherFreeCreateHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/vouchers-free-create.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num)
 
     def post(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         _amount = self.get_argument("amount", "")
         logging.info("got _amount %r", _amount)
@@ -152,25 +139,23 @@ class VendorVoucherFreeCreateHandler(BaseHandler):
 
 
 # 有偿商品代金券创建
-class VendorVoucherPayCreateHandler(BaseHandler):
+class VendorVoucherPayCreateHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/vouchers-pay-create.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num)
 
     def post(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         _amount = self.get_argument("amount", "")
         logging.info("got _amount %r", _amount)
@@ -206,14 +191,13 @@ class VendorVoucherPayCreateHandler(BaseHandler):
         self.redirect('/vendors/' + vendor_id + '/vouchers?status=0')
 
 
-class VendorVoucherFreeEditHandler(BaseHandler):
+class VendorVoucherFreeEditHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, voucher_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got voucher_id %r in uri", voucher_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         _voucher = voucher_dao.voucher_dao().query_not_safe(voucher_id)
         # 转换成元
@@ -223,7 +207,7 @@ class VendorVoucherFreeEditHandler(BaseHandler):
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/vouchers-free-edit.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 voucher=_voucher)
 
@@ -231,8 +215,7 @@ class VendorVoucherFreeEditHandler(BaseHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got voucher_id %r in uri", voucher_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         _amount = self.get_argument("amount", "")
         logging.info("got _amount %r", _amount)
@@ -253,14 +236,13 @@ class VendorVoucherFreeEditHandler(BaseHandler):
         self.redirect('/vendors/' + vendor_id + '/vouchers?status=0')
 
 
-class VendorVoucherFreeAllocateHandler(BaseHandler):
+class VendorVoucherFreeAllocateHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, voucher_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got voucher_id %r in uri", voucher_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         _voucher = voucher_dao.voucher_dao().query_not_safe(voucher_id)
         # 转换成元
@@ -290,7 +272,7 @@ class VendorVoucherFreeAllocateHandler(BaseHandler):
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/vouchers-allocate.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 voucher=_voucher, customers=_customers)
 
@@ -298,8 +280,7 @@ class VendorVoucherFreeAllocateHandler(BaseHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got voucher_id %r in uri", voucher_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         _account_id = self.get_argument("account_id", "")
         logging.info("got _account_id %r", _account_id)
@@ -324,14 +305,13 @@ class VendorVoucherFreeAllocateHandler(BaseHandler):
         self.redirect('/vendors/' + vendor_id + '/vouchers?status=0')
 
 
-class VendorVoucherPayEditHandler(BaseHandler):
+class VendorVoucherPayEditHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, voucher_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got voucher_id %r in uri", voucher_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         _voucher = voucher_pay_dao.voucher_pay_dao().query_not_safe(voucher_id)
         # 转换成元
@@ -342,7 +322,7 @@ class VendorVoucherPayEditHandler(BaseHandler):
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/vouchers-pay-edit.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 voucher=_voucher)
 
@@ -350,8 +330,7 @@ class VendorVoucherPayEditHandler(BaseHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got voucher_id %r in uri", voucher_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         _amount = self.get_argument("amount", "")
         logging.info("got _amount %r", _amount)
@@ -376,14 +355,13 @@ class VendorVoucherPayEditHandler(BaseHandler):
         self.redirect('/vendors/' + vendor_id + '/vouchers?status=0')
 
 # 有偿代金券分配即生成代金券订单，目前可无限次
-class VendorVoucherPayAllocateHandler(BaseHandler):
+class VendorVoucherPayAllocateHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, voucher_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got voucher_id %r in uri", voucher_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         _voucher = voucher_pay_dao.voucher_pay_dao().query_not_safe(voucher_id)
         # 转换成元

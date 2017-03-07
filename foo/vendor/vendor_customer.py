@@ -30,12 +30,7 @@ from tornado.escape import json_encode, json_decode
 from tornado.httpclient import HTTPClient
 from tornado.httputil import url_concat
 
-from comm import BaseHandler
-from comm import timestamp_datetime
-from comm import datetime_timestamp
-from comm import timestamp_date
-from comm import date_timestamp
-
+from comm import *
 from dao import budge_num_dao
 from dao import category_dao
 from dao import activity_dao
@@ -53,20 +48,15 @@ from dao import task_dao
 from dao import personal_task_dao
 from dao import trip_router_dao
 from dao import category_dao
-
-from global_const import VENDOR_ID
-from global_const import STP
-from global_const import PAGE_SIZE_LIMIT
+from global_const import *
 
 
-
-class VendorCustomerListHandler(BaseHandler):
+class VendorCustomerListHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id,):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         customers = vendor_member_dao.vendor_member_dao().query_pagination(vendor_id, 0, PAGE_SIZE_LIMIT)
         for _customer_profile in customers:
@@ -116,20 +106,19 @@ class VendorCustomerListHandler(BaseHandler):
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/customers.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 customers=customers,
                 keys_value="")
 
 
 
-class VendorCustomerSearchHandler(BaseHandler):
+class VendorCustomerSearchHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def post(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         keys_value = self.get_argument("search_keys", "")
         customers = vendor_member_dao.vendor_member_dao().query_by_keys(vendor_id,keys_value)
@@ -180,20 +169,19 @@ class VendorCustomerSearchHandler(BaseHandler):
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/customers.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 customers=customers,
                 keys_value=keys_value)
 
 
-class VendorCustomerProfileHandler(BaseHandler):
+class VendorCustomerProfileHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, account_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got account_id %r in uri", account_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         _customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
         try:
@@ -293,19 +281,19 @@ class VendorCustomerProfileHandler(BaseHandler):
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/customer-profile.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 account_id=account_id,
                 budge_num=budge_num,
                 profile=_customer_profile,
                 contacts=_contacts, orders=_orders, tasks =personal_tasks)
+
 
     @tornado.web.authenticated  # if no session, redirect to login page
     def post(self, vendor_id, account_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got account_id %r in uri", account_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         _comment = self.get_argument("comment", "")
         logging.info("got _comment %r", _comment)
@@ -331,14 +319,13 @@ class VendorCustomerProfileHandler(BaseHandler):
 
 
 # 用户的某个证书信息
-class VendorCustomerCretInfoHandler(BaseHandler):
+class VendorCustomerCretInfoHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, cret_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got cret_id %r in uri", cret_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         _cret = cret_dao.cret_dao().query(cret_id)
 
@@ -355,18 +342,18 @@ class VendorCustomerCretInfoHandler(BaseHandler):
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/customer-cret-info.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 profile=_customer_profile,
                 cret=_cret)
+
 
     @tornado.web.authenticated  # if no session, redirect to login page
     def post(self, vendor_id, cret_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got cret_id %r in uri", cret_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         distance = self.get_argument("distance", "")
         hours = self.get_argument("hours", "")

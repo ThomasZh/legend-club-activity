@@ -23,11 +23,12 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../"))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../dao"))
-from comm import AuthorizationHandler
+from comm import *
 from dao import budge_num_dao
 from dao import category_dao
-from global_const import VENDOR_ID
+from global_const import *
 import uuid
+
 
 # 这里vendorid是应该动态得到并赋值
 class VendorIndexHandler(AuthorizationHandler):
@@ -44,8 +45,7 @@ class VendorCategoryDeleteHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got category_id %r in uri", category_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         category_dao.category_dao().delete(category_id)
 
@@ -75,21 +75,19 @@ class VendorCategoryCreateHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/category-create.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num)
 
     @tornado.web.authenticated  # if no session, redirect to login page
     def post(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         title = self.get_argument("title", "")
         desc = self.get_argument("desc", "")
@@ -114,14 +112,13 @@ class VendorCategoryEditHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got category_id %r in uri", category_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         category = category_dao.category_dao().query(category_id)
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/category-edit.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 category=category)
 
@@ -130,8 +127,7 @@ class VendorCategoryEditHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got category_id %r in uri", category_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         title = self.get_argument("title", "")
         desc = self.get_argument("desc", "")

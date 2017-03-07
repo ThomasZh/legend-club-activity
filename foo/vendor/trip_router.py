@@ -31,9 +31,7 @@ from tornado.escape import json_encode, json_decode
 from tornado.httpclient import HTTPClient
 from tornado.httputil import url_concat
 
-from comm import BaseHandler
-from comm import timestamp_date
-
+from comm import *
 from dao import budge_num_dao
 from dao import trip_router_dao
 from dao import category_dao
@@ -44,16 +42,11 @@ from dao import bonus_template_dao
 from dao import evaluation_dao
 from dao import triprouter_share_dao
 from dao import club_dao
-
-from global_const import VENDOR_ID
-from global_const import STP
-from global_const import ACTIVITY_STATUS_DRAFT
-from global_const import WX_NOTIFY_DOMAIN
-from global_const import QRCODE_CREATE_URL
+from global_const import *
 
 
 # /
-class TripRouterIndexHandler(BaseHandler):
+class TripRouterIndexHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self):
         self.set_secure_cookie("vendor_id", VENDOR_ID)
@@ -63,13 +56,12 @@ class TripRouterIndexHandler(BaseHandler):
 
 
 # /vendors/<string:vendor_id>/triprouters
-class VendorTriprouterListHandler(BaseHandler):
+class VendorTriprouterListHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         triprouters = trip_router_dao.trip_router_dao().query_by_vendor(vendor_id)
@@ -83,25 +75,24 @@ class VendorTriprouterListHandler(BaseHandler):
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/trip-router-list.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 triprouters=triprouters)
 
 
 # /vendors/<string:vendor_id>/trip_router/create
-class VendorTriprouterCreateHandler(BaseHandler):
+class VendorTriprouterCreateHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/trip-router-create.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 categorys=categorys)
 
@@ -109,8 +100,7 @@ class VendorTriprouterCreateHandler(BaseHandler):
     def post(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         _title = self.get_argument("title", "")
         _bk_img_url = self.get_argument("bk_img_url", "")
@@ -152,28 +142,26 @@ class VendorTriprouterCreateHandler(BaseHandler):
         self.redirect('/vendors/' + vendor_id + '/trip_router')
 
  #/vendors/<string:vendor_id>/trip_router/<string:trip_router_id>/delete
-class VendorTriprouterDeleteHandler(BaseHandler):
+class VendorTriprouterDeleteHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, trip_router_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got trip-router_id %r in uri", trip_router_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         trip_router_dao.trip_router_dao().delete(trip_router_id)
 
         self.redirect('/vendors/' + vendor_id + '/trip_router')
 
  #/vendors/<string:vendor_id>/trip_router/<string:trip_router_id>/edit/step1
-class VendorTriprouterEditStep1Handler(BaseHandler):
+class VendorTriprouterEditStep1Handler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, trip_router_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got trip-router_id %r in edit step1", trip_router_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         triprouter = trip_router_dao.trip_router_dao().query(trip_router_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
@@ -182,7 +170,7 @@ class VendorTriprouterEditStep1Handler(BaseHandler):
 
         self.render('vendor/trip-router-edit-step1.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 triprouter=triprouter, categorys=categorys)
 
@@ -191,8 +179,7 @@ class VendorTriprouterEditStep1Handler(BaseHandler):
         logging.info("got vendor_id %r ~~~~~~in uri", vendor_id)
         logging.info("got trip_router_id %r @@@@@@in uri", trip_router_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         _title = self.get_argument("title", "")
         _bk_img_url = self.get_argument("bk_img_url", "")
@@ -215,14 +202,13 @@ class VendorTriprouterEditStep1Handler(BaseHandler):
         self.redirect('/vendors/' + vendor_id + '/trip_router/' + trip_router_id + '/edit/step1')
 
  #/vendors/<string:vendor_id>/trip_router/<string:trip_router_id>/edit/step2
-class VendorTriprouterEditStep2Handler(BaseHandler):
+class VendorTriprouterEditStep2Handler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, trip_router_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got trip_router_id %r in edit step2", trip_router_id)
 
-        _session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         _scroll_to = self.get_argument("scroll_to", "")
 
@@ -238,7 +224,7 @@ class VendorTriprouterEditStep2Handler(BaseHandler):
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/trip-router-edit-step2.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 triprouter=triprouter,
                 travel_id=trip_router_id,
@@ -247,14 +233,13 @@ class VendorTriprouterEditStep2Handler(BaseHandler):
                 scroll_to=_scroll_to)
 
  #/vendors/<string:vendor_id>/trip_router/<string:trip_router_id>/clone
-class VendorTriprouterCloneHandler(BaseHandler):
+class VendorTriprouterCloneHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, trip_router_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got trip_router_id %r in uri", trip_router_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         triprouter = trip_router_dao.trip_router_dao().query(trip_router_id)
         article_id = triprouter['article_id']
@@ -336,13 +321,12 @@ class VendorTriprouterCloneHandler(BaseHandler):
 
 
  #/vendors/<string:vendor_id>/trip_router/<string:trip_router_id>/activitylist
-class VendorTriprouterActivityListHandler(BaseHandler):
+class VendorTriprouterActivityListHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, trip_router_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         activitys = activity_dao.activity_dao().query_by_triprouter(trip_router_id)
@@ -357,69 +341,66 @@ class VendorTriprouterActivityListHandler(BaseHandler):
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/trip-router-activitylist.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 triprouter=triprouter,
                 activitys=activitys)
 
 
 #/vendors/<string:vendor_id>/trip_router/<string:trip_router_id>/evallist
-class VendorTriprouterEvalListHandler(BaseHandler):
+class VendorTriprouterEvalListHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, trip_router_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         triprouter = trip_router_dao.trip_router_dao().query(trip_router_id)
         evaluations = evaluation_dao.evaluation_dao().query_by_triprouter(trip_router_id)
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/trip-router-evallist.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 triprouter=triprouter,
                 budge_num=budge_num,
                 evaluations=evaluations)
 
 
  #/vendors/<string:vendor_id>/trip_router/<string:trip_router_id>/share/set
-class VendorTriprouterOpenSetHandler(BaseHandler):
+class VendorTriprouterOpenSetHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, trip_router_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got trip-router_id %r in uri", trip_router_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         json = {"_id":trip_router_id, "open":True}
         trip_router_dao.trip_router_dao().updateOpenStatus(json)
 
         self.redirect('/vendors/' + vendor_id + '/trip_router')
 
-class VendorTriprouterOpenCancelHandler(BaseHandler):
+class VendorTriprouterOpenCancelHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, trip_router_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got trip-router_id %r in uri", trip_router_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         json = {"_id":trip_router_id, "open":False}
         trip_router_dao.trip_router_dao().updateOpenStatus(json)
 
         self.redirect('/vendors/' + vendor_id + '/trip_router')
 
+
 # 其他俱乐部开放的项目
-class VendorTriprouterShareListHandler(BaseHandler):
+class VendorTriprouterShareListHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         # categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         triprouters = trip_router_dao.trip_router_dao().query_by_open(vendor_id)
@@ -445,18 +426,18 @@ class VendorTriprouterShareListHandler(BaseHandler):
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/trip-router-share.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 triprouters=triprouters)
 
-class VendorTriprouterShareSetHandler(BaseHandler):
+
+class VendorTriprouterShareSetHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, trip_router_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got trip-router_id %r in uri", trip_router_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         # 设置别人开放的线路为自己所用
         triprouter = trip_router_dao.trip_router_dao().query(trip_router_id)
@@ -471,26 +452,26 @@ class VendorTriprouterShareSetHandler(BaseHandler):
 
         self.redirect('/vendors/' + vendor_id + '/trip_router/share')
 
-class VendorTriprouterShareCancelHandler(BaseHandler):
+class VendorTriprouterShareCancelHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, trip_router_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got trip_router_id %r in uri", trip_router_id)
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+
+        ops = self.get_myinfo_basic()
 
         triprouter_share = triprouter_share_dao.triprouter_share_dao().query_by_triprouter_vendor(trip_router_id,vendor_id)
         triprouter_share_dao.triprouter_share_dao().delete(triprouter_share['_id'])
 
         self.redirect('/vendors/' + vendor_id + '/trip_router/share')
 
-class VendorTriprouterUseListHandler(BaseHandler):
+
+class VendorTriprouterUseListHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         triprouters_me = trip_router_dao.trip_router_dao().query_by_vendor(vendor_id)
         triprouters_share = triprouter_share_dao.triprouter_share_dao().query_by_vendor(vendor_id)
@@ -506,6 +487,6 @@ class VendorTriprouterUseListHandler(BaseHandler):
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/trip-router-use.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 triprouters=triprouters)

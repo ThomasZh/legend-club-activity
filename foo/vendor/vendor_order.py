@@ -30,7 +30,7 @@ from tornado.escape import json_encode, json_decode
 from tornado.httpclient import HTTPClient
 from tornado.httputil import url_concat
 
-from comm import BaseHandler
+from comm import AuthorizationHandler
 from comm import timestamp_datetime
 from comm import datetime_timestamp
 from comm import timestamp_date
@@ -54,13 +54,12 @@ from global_const import STP
 from global_const import PAGE_SIZE_LIMIT
 
 
-class VendorOrderListHandler(BaseHandler):
+class VendorOrderListHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         before = time.time()
         _array = order_dao.order_dao().query_pagination_by_vendor(vendor_id, before, PAGE_SIZE_LIMIT);
@@ -116,18 +115,17 @@ class VendorOrderListHandler(BaseHandler):
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/orders.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 orders=_array)
 
 
-class VendorApplyListHandler(BaseHandler):
+class VendorApplyListHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         before = time.time()
         _array = apply_dao.apply_dao().query_pagination_by_vendor(vendor_id, before, PAGE_SIZE_LIMIT);
@@ -147,18 +145,17 @@ class VendorApplyListHandler(BaseHandler):
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/applys.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 applys=_array)
 
 
-class VendorVoucherOrderListHandler(BaseHandler):
+class VendorVoucherOrderListHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         before = time.time()
         _array = voucher_order_dao.voucher_order_dao().query_pagination_by_vendor(vendor_id, before, PAGE_SIZE_LIMIT);
@@ -170,19 +167,18 @@ class VendorVoucherOrderListHandler(BaseHandler):
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/voucher-orders.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 voucher_orders= _array)
 
 
-class VendorOrderInfoHandler(BaseHandler):
+class VendorOrderInfoHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, order_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got order_id %r in uri", order_id)
 
-        _session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         order = order_dao.order_dao().query(order_id)
         _activity = activity_dao.activity_dao().query(order['activity_id'])
@@ -257,6 +253,6 @@ class VendorOrderInfoHandler(BaseHandler):
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/order-detail.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 activity=_activity, order=order, applys=_applys)
