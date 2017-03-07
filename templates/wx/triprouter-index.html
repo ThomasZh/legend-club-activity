@@ -1,0 +1,63 @@
+<!-- 移动端线路首页 -->
+<!-- @2016/05/19 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="format-detection" content="telephone=no">
+  <title>沐雨骑行</title>
+  <!-- <script type="text/javascript" src="http://tajs.qq.com/stats?sId=37342703" charset="UTF-8"></script> -->
+  <link rel="stylesheet" href="{{ static_url('frozenui-1.3.0/css/frozen.css') }}">
+  <link rel="stylesheet" href="{{ static_url('customer/css/customer.css') }}">
+</head>
+<body ontouchstart>
+  <!-- 加载热门活动数据进度条 -->
+  <!-- <div class="ui-loading-wrap">
+    <p>正在加载中...</p>
+    <i class="ui-loading"></i>
+  </div> -->
+  <section id="slider">
+    <div class="ui-slider customer-banner-height hidden">
+      <ul class="ui-slider-content ">
+        <li class="">
+          <span style="background-image:url({{ static_url('customer/img/muyuqixing.jpg') }})"></span>
+          <div class="slider-footer">
+            沐雨骑行
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    {% for triprouter in triprouters %}
+    <a href="/bf/wx/vendors/{{ vendor_id }}/triprouters/{{triprouter['_id']}}">
+      <div class="bot_con"><!--start of card-->
+        <div class="imger">
+          <img src="{{triprouter['bk_img_url']}}">
+          <div class="bookmarks">{{triprouter['club']}}</div>
+          <span class="shadow-black"></span>
+        </div>
+        <div class="card-footer">
+          <span class="card-footer-title">{{triprouter['title']}}</span>
+          <span class="card-footer-title right"></span>
+          <div class="card-footer-desc">
+            <span>
+              {{triprouter['location']}}
+            </span>
+            <span class="right">{{triprouter['distance']}}公里</span>
+          </div>
+        </div>
+      </div><!--end of card-->
+    </a>
+    {% end %}
+  </section>
+
+  <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+  <script src="{{ static_url('frozenui-1.3.0/lib/zepto.min.js') }}"></script>
+  <script src="{{ static_url('frozenui-1.3.0/js/frozen.js') }}"></script>
+
+</body>
+
+</html>

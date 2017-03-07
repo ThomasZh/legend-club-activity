@@ -187,6 +187,50 @@ def map():
         (r"/bf/api/vendors/([a-z0-9]*)/customer-profile/orders", getattr(api_customer_profile, 'ApiCustomerProfileHistoryActivityXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/customer-profile/customers", getattr(api_customer_profile, 'ApiCustomerListXHR')),
 
+
+        # bike-forever wexin activity
+        (r"/bf/wx/activitys", getattr(wx_activity, 'WxActivityIndexHandler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/activitys", getattr(wx_activity, 'WxActivityListHandler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)", getattr(wx_activity, 'WxActivityInfoHandler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/qrcode", getattr(wx_activity, 'WxActivityQrcodeHandler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/apply/step1", getattr(wx_activity, 'WxActivityApplyStep1Handler')),
+        (r"/bf/wxpay", getattr(wx_activity, 'WxActivityApplyStep2Handler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/apply/step3", getattr(wx_activity, 'WxActivityApplyStep3Handler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/hha", getattr(wx_activity, 'WxHhaHandler')),
+
+        # 开放线路市场
+        (r"/bf/wx/triprouters", getattr(wx_activity, 'WxTriprouterIndexHandler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/triprouters", getattr(wx_activity, 'WxTriprouterMarketHandler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/triprouters/([a-z0-9]*)", getattr(wx_activity, 'WxTriprouterInfoHandler')),
+
+        # 由俱乐部分享出的有偿代金券
+        (r"/bf/wx/vendors/([a-z0-9]*)/vouchers/([a-z0-9]*)", getattr(wx_activity, 'WxVoucherShareHandler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/vouchers/([a-z0-9]*)/buy/step1", getattr(wx_activity, 'WxVoucherBuyStep1Handler')),
+        (r"/bf/voucher-pay", getattr(wx_activity, 'WxVoucherBuyStep2Handler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/vouchers/([a-z0-9]*)/buy/step3", getattr(wx_activity, 'WxVoucherBuyStep3Handler')),
+
+        # bike-forever wexin order
+        # 微信支付结果通用通知
+        # 该链接是通过【统一下单API】中提交的参数notify_url设置，如果链接无法访问，商户将无法接收到微信通知。
+        # 通知url必须为直接可访问的url，不能携带参数。示例：notify_url：“https://pay.weixin.qq.com/wxpay/pay.action”
+        (r"/bf/wx/orders/notify", getattr(wx_activity, 'WxOrderNotifyHandler')),
+        (r"/bf/wx/voucher-orders/notify", getattr(wx_activity, 'WxVoucherOrderNotifyHandler')),
+
+        # bike-forever wexin personal-center
+        (r"/bf/wx/pc", getattr(wx_personal_center, 'WxPcHandler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/pc", getattr(wx_personal_center, 'WxPersonalCenterHandler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/pc/orders", getattr(wx_personal_center, 'WxPcOrderListHandler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/pc/orders/([a-z0-9]*)", getattr(wx_personal_center, 'WxPcOrderInfoHandler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/pc/orders/([a-z0-9]*)/applys", getattr(wx_personal_center, 'WxPcOrderApplyListHandler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/pc/orders/([a-z0-9]*)/evaluate", getattr(wx_personal_center, 'WxPcOrderEvaluateHandler')),
+        (r"/bf/wxrepay", getattr(wx_personal_center, 'WxPcOrderRepayHandler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/pc/vouchers", getattr(wx_personal_center, 'WxPcVoucherListHandler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/pc/bonus", getattr(wx_personal_center, 'WxPcBonusListHandler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/pc/certs", getattr(wx_personal_center, 'WxPcCertListHandler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/pc/certs/([a-z0-9]*)", getattr(wx_personal_center, 'WxPcCertInfoHandler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/pc/tasks", getattr(wx_personal_center, 'WxPcTaskListHandler')),
+
+
         # comm
         ('.*', getattr(comm, 'PageNotFoundHandler'))
 

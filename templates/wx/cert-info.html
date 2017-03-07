@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>证书</title>
+    <meta name="description" content="MSUI: Build mobile apps with simple HTML, CSS, and JS components.">
+    <meta name="author" content="个人中心">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Google Web Fonts -->
+
+    <link rel="stylesheet" href="{{ static_url('suimobile/css/sm.css') }}">
+    <link rel="stylesheet" href="{{ static_url('suimobile/css/sm-extend.css') }}">
+    <link rel="stylesheet" href="{{ static_url('customer/css/assem-self.css') }}">
+
+    <script src="{{ static_url('suimobile/js/zepto.js') }}"></script>
+    <script src="{{ static_url('suimobile/js/config.js') }}"></script>
+
+  </head>
+
+    <body>
+      <!-- page集合的容器，里面放多个平行的.page，其他.page作为内联页面由路由控制展示 -->
+      <div class="page-group">
+        <!-- 单个page ,第一个.page默认被展示-->
+        <div class="page">
+
+          <!-- 这里是页面内容区 -->
+          <div class="content">
+
+            <div class="row no-gutter main">
+              <div class="col-80">
+                <a><img class="avator" src="{{ profile['account_avatar'] }}"></a>
+                <a><span class="vip-name">{{ profile['account_nickname'] }}</span></a>
+              </div>
+              <div class="col-20">
+                <div class="vip">L{{ profile['rank'] }}会员</div>
+              </div>
+            </div>
+
+            <div class="separator-block" />
+
+            <div class="content-padded grid-panel">
+              <div class="row no-gutter">
+                <div class="col-25">
+                  <div href="#" class="item-link item-content">
+                    <div class="item-inner">
+                      <div class="item-title-row">
+                        <div class="item-title">里程</div>
+                      </div>
+                    </div>
+                    <div class="item-media"><img src="{{ static_url( 'customer/img/level.png' ) }}" style='width: 1.6rem;'></div>
+                    <div class="item-inner">
+                      <div class="item-title-row">
+                        <div class="item-title">{{ cret['distance'] }}公里</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-25">
+                  <div href="#" class="item-link item-content">
+                    <div class="item-inner">
+                      <div class="item-title-row">
+                        <div class="item-title">用时</div>
+                      </div>
+                    </div>
+                    <div class="item-media"><img src="{{ static_url( 'customer/img/certificate.png' ) }}" style='width: 1.6rem;'></div>
+                    <div class="item-inner">
+                      <div class="item-title-row">
+                        <div class="item-title">{{ cret['hours'] }}小时</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-25">
+                  <div href="/bike-forever/wechat/my-points" class="item-link item-content">
+                    <div class="item-inner">
+                      <div class="item-title-row">
+                        <div class="item-title">爬升</div>
+                      </div>
+                    </div>
+                    <div class="item-media"><img src="{{ static_url( 'customer/img/point.png' ) }}" style='width: 1.6rem;'></div>
+                    <div class="item-inner">
+                      <div class="item-title-row">
+                        <div class="item-title">{{ cret['height'] }}米</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-25">
+                  <div href="#" class="item-link item-content">
+                    <div class="item-inner">
+                      <div class="item-title-row">
+                        <div class="item-title">爬坡</div>
+                      </div>
+                    </div>
+                    <div class="item-media"><img src="{{ static_url( 'customer/img/louchers.png' ) }}" style='width: 1.6rem;'></div>
+                    <div class="item-inner">
+                      <div class="item-title-row">
+                        <div class="item-title">{{ cret['speed'] }}米</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <img class="img-responsive" src="http://bighorn.b0.upaiyun.com/image/test/2016/6/6/1dc16b3d-4c80-4c32-8d3c-09a7d2ef9dbf.jpeg" alt="">
+            <img class="img-responsive" src="http://bighorn.b0.upaiyun.com/image/test/2016/7/12/310fc4a3-36ca-46c5-8c7b-4d88ecf36c82.jpeg" alt="">
+
+            <div class="card">
+              <div class="card-content">
+                <div class="list-block">
+                  <ul>
+                    <li>
+                      <a href="/bf/wx/vendors/{{ vendor_id }}/activitys/{{ cret['activity_id'] }}" class="item-link item-content">
+                        <div class="item-media">
+                          <img src="http://gqianniu.alicdn.com/bao/uploaded/i4//tfscom/i3/TB10LfcHFXXXXXKXpXXXXXXXXXX_!!0-item_pic.jpg_250x250q60.jpg" width="34" height="34">
+                          <i class="icon icon-f7"></i></div>
+                        <div class="item-inner">
+                          <div class="item-title">{{ cret['activity_title'] }}</div>
+                        </div>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <center><p style="color: #c7c7cc; font-size: 0.7rem;">&reg;骑无止境 提供技术支持</p></center>
+
+          </div>
+
+        </div> <!-- page -->
+      </div> <!-- page group -->
+
+      <!-- popup, panel 等放在这里 -->
+      <div class="panel-overlay"></div>
+
+      <script>
+        //打开自动初始化页面的功能
+        //建议不要打开自动初始化，而是自己调用 $.init 方法完成初始化
+        $.config = {
+          autoInit: true
+        }
+      </script>
+
+      <script src="{{ static_url('suimobile/js/sm.js') }}"></script>
+      <script src="{{ static_url('suimobile/js/sm-extend.js') }}"></script>
+      <script src="{{ static_url('suimobile/js/sm-city-picker.js') }}"></script>
+
+      <!-- 默认必须要执行$.init(),实际业务里一般不会在HTML文档里执行，通常是在业务页面代码的最后执行 -->
+      <script>$.init()</script>
+
+    </body>
+  </html>
