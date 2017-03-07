@@ -34,13 +34,9 @@ from tornado.httpclient import HTTPClient
 from tornado.httputil import url_concat
 from bson import json_util
 
-from comm import BaseHandler
-from comm import timestamp_datetime
-from comm import datetime_timestamp
-from comm import timestamp_date
-from comm import date_timestamp
-from comm import timestamp_friendly_date
-
+from comm import *
+from auth import auth_email
+from auth import auth_phone
 from dao import budge_num_dao
 from dao import category_dao
 from dao import activity_dao
@@ -60,43 +56,9 @@ from dao import task_dao
 from dao import personal_task_dao
 from dao import trip_router_dao
 from dao import evaluation_dao
-
-from auth import ssoLogin
-
-from wx_wrap import getAccessTokenByClientCredential
-from wx_wrap import getJsapiTicket
-from wx_wrap import Sign
-from wx_wrap import getNonceStr
-from wx_wrap import getOrderSign
-from wx_wrap import getPaySign
-from wx_wrap import getAccessToken
-from wx_wrap import getUserInfo
+from wx_wrap import *
 from xml_parser import parseWxOrderReturn, parseWxPayReturn
-
-from global_const import VENDOR_ID
-from global_const import ACTIVITY_STATUS_DRAFT
-from global_const import ACTIVITY_STATUS_POP
-from global_const import ACTIVITY_STATUS_DOING
-from global_const import ACTIVITY_STATUS_RECRUIT
-from global_const import ACTIVITY_STATUS_COMPLETED
-from global_const import ACTIVITY_STATUS_CANCELED
-from global_const import ORDER_STATUS_BF_INIT
-from global_const import ORDER_STATUS_WECHAT_UNIFIED_SUCCESS
-from global_const import ORDER_STATUS_WECHAT_UNIFIED_FAILED
-from global_const import ORDER_STATUS_WECHAT_PAY_SUCCESS
-from global_const import ORDER_STATUS_WECHAT_PAY_FAILED
-from global_const import ORDER_STATUS_BF_APPLY_REFUND
-from global_const import ORDER_STATUS_BF_REFUND_SUCCESS
-from global_const import ORDER_STATUS_BF_APPLY
-from global_const import ORDER_STATUS_BF_DELIVER
-from global_const import ORDER_STATUS_BF_COMMENT
-from global_const import STP
-from global_const import WX_APP_ID
-from global_const import WX_APP_SECRET
-from global_const import WX_MCH_ID
-from global_const import WX_MCH_KEY
-from global_const import WX_NOTIFY_DOMAIN
-from global_const import PAGE_SIZE_LIMIT
+from global_const import *
 
 
 # 活动首页

@@ -11,7 +11,7 @@ case "$1" in
     PID=`sed -n 1p pidfile`  #get pid from file
     if [ ! -z "$PID" ] ; then
 #        ./crntb-adm.sh uninstall
-        echo "Stopping legend-club-admin service, begin killing ${PID}"
+        echo "Stopping legend-club-activity service, begin killing ${PID}"
         kill ${PID} >/dev/null 2>&1
         sleep 2
         echo "Stop: "`date` >> ./log/ctrl.log
@@ -20,10 +20,10 @@ case "$1" in
     # second Starting the Service
     cmd=`ps -e|grep $PID`    #get process with the given pid
     if [ "$PID" != "" ] ; then
-        echo "Starting legend-club-admin service..."
-        nohup python index.py -log_file_prefix=./log/club.admin.log &
+        echo "Starting legend-club-activity service..."
+        nohup python index.py -log_file_prefix=./log/club.activity.log &
         echo $! > pidfile    #record process id to file
-        echo 'Startup legend-club-admin service success!'
+        echo 'Startup legend-club-activity service success!'
 #        ./crntb-adm.sh install
         echo "Start: "`date` >> ./log/ctrl.log
     fi
@@ -34,7 +34,7 @@ case "$1" in
     PID=`sed -n 1p pidfile`  #get pid from pidfile
     if [ ! -z "$PID" ] ; then
 #        ./crntb-adm.sh uninstall
-        echo "Stopping legend-club-admin service, begin killing ${PID}"
+        echo "Stopping legend-club-activity service, begin killing ${PID}"
         kill ${PID} >/dev/null 2>&1
         echo "Stop: "`date` >> ./log/ctrl.log
     fi

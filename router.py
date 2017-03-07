@@ -19,6 +19,10 @@ from vendor import vendor_customer
 from vendor import vendor_voucher
 from vendor import vendor_setup
 from vendor import trip_router
+from wx import wx_activity
+from wx import wx_personal_center
+from wx import wx_wrap
+from wx import xml_parser
 from api import api_category
 from api import api_activity
 from api import api_blog
