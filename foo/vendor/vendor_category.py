@@ -23,14 +23,14 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../"))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../dao"))
-from comm import BaseHandler
+from comm import AuthorizationHandler
 from dao import budge_num_dao
 from dao import category_dao
 from global_const import VENDOR_ID
 import uuid
 
 # 这里vendorid是应该动态得到并赋值
-class VendorIndexHandler(BaseHandler):
+class VendorIndexHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self):
         self.set_secure_cookie("vendor_id", VENDOR_ID)
@@ -38,7 +38,7 @@ class VendorIndexHandler(BaseHandler):
 
 
 # /vendors/<string:vendor_id>/categorys/<string:category_id>/delete
-class VendorCategoryDeleteHandler(BaseHandler):
+class VendorCategoryDeleteHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, category_id):
         logging.info("got vendor_id %r in uri", vendor_id)
@@ -53,25 +53,24 @@ class VendorCategoryDeleteHandler(BaseHandler):
 
 
 # /vendors/<string:vendor_id>/categorys
-class VendorCategoryListHandler(BaseHandler):
+class VendorCategoryListHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        session_ticket = self.get_session_ticket()
-        my_account = self.get_account_info()
+        ops = self.get_myinfo_basic()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/category-list.html',
                 vendor_id=vendor_id,
-                my_account=my_account,
+                ops=ops,
                 budge_num=budge_num,
                 categorys=categorys)
 
 
 # /vendors/<string:vendor_id>/categorys/create
-class VendorCategoryCreateHandler(BaseHandler):
+class VendorCategoryCreateHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
@@ -109,7 +108,7 @@ class VendorCategoryCreateHandler(BaseHandler):
 
 
 # /vendors/<string:vendor_id>/categorys/<string:category_id>/edit
-class VendorCategoryEditHandler(BaseHandler):
+class VendorCategoryEditHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, category_id):
         logging.info("got vendor_id %r in uri", vendor_id)

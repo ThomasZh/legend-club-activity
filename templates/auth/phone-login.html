@@ -1,0 +1,150 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- All the files that are required -->
+  <link href='http://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
+  <link href="{{ static_url('css/bootstrap.min.css') }}" rel="stylesheet" type="text/css">
+  <link href="{{ static_url('css/font-awesome.min.css') }}" rel="stylesheet" type="text/css">
+  <link href="{{ static_url('css/login.css') }}" rel="stylesheet" type="text/css">
+
+  <title>login</title>
+</head>
+
+<body>
+
+  <!-- Where all the magic happens -->
+  <!-- LOGIN FORM -->
+  <div class="text-center" style="padding:50px 0">
+    <div class="logo">login</div>
+    <!-- Main Form -->
+    <div class="login-form-1">
+      <form id="login-form" class="text-left" method="POST" action="/ops/auth/phone/login">
+        <fieldset>
+          {% if err_msg %}
+          <div class="login-form-main-message show error">
+            {{ err_msg }}
+          </div>
+          {% else %}
+          <div class="login-form-main-message"></div>
+          {% end %}
+          <div class="main-login-form">
+            <div class="login-group">
+              <div class="form-group">
+                <label for="lg_phone" class="sr-only">Phone</label>
+                <input type="text" class="form-control" id="lg_phone" name="lg_phone" placeholder="phone number">
+              </div>
+              <div class="form-group">
+                <label for="lg_pwd" class="sr-only">Password</label>
+                <input type="password" class="form-control" id="lg_pwd" name="lg_pwd" placeholder="password">
+              </div>
+              <div class="form-group login-group-checkbox">
+                <input type="checkbox" id="lg_remember" name="lg_remember">
+                <label for="lg_remember">remember</label>
+              </div>
+            </div>
+            {% if err_msg %}
+            <button type="submit" class="login-button error">
+              <i class="fa fa-lock"></i>
+            </button> {% else %}
+            <button type="submit" class="login-button">
+              <i class="fa fa-chevron-right"></i>
+            </button> {% end %}
+          </div>
+          <div class="etc-login-form">
+            <p>forgot your password? <a href="/ops/auth/phone/lost-pwd">click here</a></p>
+            <p>new user? <a href="/ops/auth/phone/register">create new account</a></p>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+    <!-- end:Main Form -->
+  </div>
+
+  <script type="text/javascript" src="{{ static_url('js/jquery.2.2.4.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('js/bootstrap.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('js/jquery.validate.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('js/localization/messages_zh.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('upyun/js/spark-md5.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('js/json2.js') }}"></script>
+
+  <script>
+    $(function() {
+      // 字符验证
+      jQuery.validator.addMethod("stringCheck", function(value, element) {
+        return this.optional(element) || /^[\u0391-\uFFE5\w]+$/.test(value);
+      }, "只能包括中文字、英文字母、数字和下划线");
+
+      // 中文字两个字节
+      jQuery.validator.addMethod("byteRangeLength", function(value, element, param) {
+        var length = value.length;
+        for (var i = 0; i < value.length; i++) {
+          if (value.charCodeAt(i) > 127) {
+            length++;
+          }
+        }
+        return this.optional(element) || (length >= param[0] && length <= param[1]);
+      }, "请确保输入的值在3-15个字节之间(一个中文字算2个字节)");
+
+      // 手机号码验证
+      jQuery.validator.addMethod("mobile", function(value, element) {
+        var length = value.length;
+        var mobile = /^(((13[0-9]{1})|(15[0-9]{1})|(17[0-9]{1})|(18[0-9]{1})|(19[0-9]{1}))+\d{8})$/;
+        return this.optional(element) || (length == 11 && mobile.test(value));
+      }, "请正确填写您的手机号码");
+
+      // 电话号码验证
+      jQuery.validator.addMethod("tel", function(value, element) {
+        var tel = /^\d{3,4}-?\d{7,9}$/; //电话号码格式010-12345678
+        return this.optional(element) || (tel.test(value));
+      }, "请正确填写您的电话号码");
+
+      // 邮政编码验证
+      jQuery.validator.addMethod("zipCode", function(value, element) {
+        var tel = /^[0-9]{6}$/;
+        return this.optional(element) || (tel.test(value));
+      }, "请正确填写您的邮政编码");
+
+      // 身份证号码验证
+      jQuery.validator.addMethod("idCardNo", function(value, element) {
+        return this.optional(element) || idCardNoUtil.checkIdCardNo(value);
+      }, "请正确输入您的身份证号码");
+
+      //护照编号验证
+      jQuery.validator.addMethod("passport", function(value, element) {
+        return this.optional(element) || checknumber(value);
+      }, "请正确输入您的护照编号");
+
+      // Login Form
+      //----------------------------------------------
+      // Validation
+      $("#login-form").validate({
+        rules: {
+          lg_phone: {
+            minlength: 11,
+            maxlength: 11,
+            required: true,
+            mobile: true
+          },
+          lg_pwd: {
+            required: true,
+            minlength: 6
+          },
+        },
+        errorClass: "form-invalid",
+        submitHandler: function(form) {
+          var pwd = $("#lg_pwd").val();
+          var md5pwd = SparkMD5.hash(pwd);
+          $("#lg_pwd").val(md5pwd);
+          form.submit();
+        }
+      });
+    });
+  </script>
+
+</body>
+
+</html>

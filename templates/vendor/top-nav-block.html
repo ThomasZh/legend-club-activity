@@ -10,10 +10,10 @@
       <ul class="nav navbar-nav navbar-right">
         <li class="">
           <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-{% if not my_account['avatarUrl'] %}
-            <img src="/static/admin/images/user.png" alt="">{{ my_account['name'] }}
+{% if not ops['avatar'] %}
+            <img src="/static/admin/images/user.png" alt="">{{ ops['nickname'] }}
 {% else %}
-            <img src="{{ my_account['avatarUrl'] }}" alt="">{{ my_account['name'] }}
+            <img src="{{ ops['avatar'] }}" alt="">{{ ops['nickname'] }}
 {% end %}
             <span class=" fa fa-angle-down"></span>
           </a>

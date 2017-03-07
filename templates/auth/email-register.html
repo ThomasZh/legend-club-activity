@@ -1,0 +1,125 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- All the files that are required -->
+  <link href='http://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
+  <link href="{{ static_url('css/bootstrap.min.css') }}" rel="stylesheet" type="text/css">
+  <link href="{{ static_url('css/font-awesome.min.css') }}" rel="stylesheet" type="text/css">
+  <link href="{{ static_url('css/login.css') }}" rel="stylesheet" type="text/css">
+
+  <title>register</title>
+</head>
+
+<body>
+
+  <!-- Where all the magic happens -->
+  <!-- REGISTRATION FORM -->
+  <div class="text-center" style="padding:50px 0">
+    <div class="logo">register</div>
+    <!-- Main Form -->
+    <div class="login-form-1">
+      <form id="register-form" class="text-left" method="POST" action="/ops/auth/email/register">
+        <div class="login-form-main-message"></div>
+        <div class="etc-login-form" id="err-msg">
+          <p>{{ err_msg }}</p>
+        </div>
+        <div class="main-login-form">
+          <div class="login-group">
+            <div class="form-group">
+              <label for="reg_email" class="sr-only">Email</label>
+              <input type="email" class="form-control" id="reg_email" name="reg_email" placeholder="email address">
+            </div>
+            <div class="form-group">
+              <label for="reg_pwd" class="sr-only">Password</label>
+              <input type="password" class="form-control" id="reg_pwd" name="reg_pwd" placeholder="password">
+            </div>
+
+            <div class="form-group login-group-checkbox">
+              <input type="checkbox" class="" id="reg_agree" name="reg_agree">
+              <label for="reg_agree">i agree with <a href="#">terms</a></label>
+            </div>
+          </div>
+          <button type="submit" class="login-button"><i class="fa fa-chevron-right"></i></button>
+        </div>
+        <div class="etc-login-form">
+          <p>already have an account? <a href="/ops/auth/email/login">login here</a></p>
+        </div>
+      </form>
+    </div>
+    <!-- end:Main Form -->
+  </div>
+
+  <script type="text/javascript" src="{{ static_url('js/jquery.2.2.4.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('js/bootstrap.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('js/jquery.validate.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('js/localization/messages_zh.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('upyun/js/spark-md5.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('js/json2.js') }}"></script>
+
+  <script>
+    $(function() {
+      // Login Form
+      //----------------------------------------------
+      // Validation
+      $("#register-form").validate({
+        rules: {
+          reg_email: {
+            required: true,
+            email: true
+          },
+          reg_pwd: {
+            required: true,
+            minlength: 6
+          },
+        },
+        errorClass: "form-invalid",
+        submitHandler: function(form) {
+          var email = $("#reg_email").val();
+          var pwd = $("#reg_pwd").val();
+          var md5pwd = SparkMD5.hash(pwd);
+          $("#reg_pwd").val(md5pwd);
+          form.submit();
+          /*
+          var data = {
+            "appid": "api",
+            "app_secret": "81aa714142f897fa318f3315c9f853",
+            "login": email,
+            "pwd": md5pwd
+          };
+          var json = JSON.stringify(data);
+
+          $.ajax({
+            type: "POST",
+            url: "http://api.7x24hs.com/api/auth/accounts",
+            data: json,
+            dataType: "json",
+            contentType: 'application/json',
+            success: function(data, status, xhr) {},
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+              console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+              if (XMLHttpRequest.status == 200) {
+                // $.alert("error:200");
+              } else if (XMLHttpRequest.status == 404) {
+                $('#err-msg').html('<div class="etc-login-form" class="#err-msg"><p>用户名或密码不正确!</p></div>');
+                $("#reg_pwd").val('');
+              } else {
+                $('#err-msg').html('<div class="etc-login-form" class="#err-msg"><p>' + XMLHttpRequest.status + ': 服务器异常,请稍后重试!</p></div>');
+              }
+            },
+            complete: function(XMLHttpRequest, textStatus) {
+              this; // 调用本次AJAX请求时传递的options参数
+            }
+          });
+          */
+        }
+      });
+    });
+  </script>
+
+</body>
+
+</html>

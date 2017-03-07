@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- All the files that are required -->
+  <link href='http://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
+  <link href="{{ static_url('css/bootstrap.min.css') }}" rel="stylesheet" type="text/css">
+  <link href="{{ static_url('css/font-awesome.min.css') }}" rel="stylesheet" type="text/css">
+  <link href="{{ static_url('css/login.css') }}" rel="stylesheet" type="text/css">
+
+  <title>lost password</title>
+</head>
+
+<body>
+
+  <!-- Where all the magic happens -->
+  <!-- REGISTRATION FORM -->
+  <div class="text-center" style="padding:50px 0">
+    <div class="logo">lost password</div>
+    <!-- Main Form -->
+    <div class="login-form-1">
+      <form id="reset-pwd-form" class="text-left" method="POST" action="/ops/auth/phone/lost-pwd">
+        {% if err_msg %}
+        <div class="login-form-main-message show error">
+          {{ err_msg }}
+        </div>
+        {% else %}
+        <div class="login-form-main-message"></div>
+        {% end %}
+        <div class="main-login-form">
+          <div class="login-group">
+            <div class="form-group">
+              <label for="reset_phone" class="sr-only">Phone</label>
+              <input type="number" class="form-control" id="reset_phone" name="reset_phone" placeholder="phone number">
+            </div>
+            <div class="form-group login-group-checkbox">
+              <input type="button" onclick="SmsVerifyCode();" id="code-button" class="code-button" value="获取验证码"></button>
+              <label for="reset_verify_code" class="sr-only">Verify Code</label>
+              <input type="number" class="form-control" id="reset_verify_code" name="reset_verify_code" placeholder="verify code">
+            </div>
+            <div class="form-group">
+              <label for="reg_pwd" class="sr-only">Password</label>
+              <input type="password" class="form-control" id="reset_pwd" name="reset_pwd" placeholder="password">
+            </div>
+          </div>
+          <button type="submit" class="login-button"><i class="fa fa-chevron-right"></i></button>
+        </div>
+        <div class="etc-login-form">
+          <p>already have an account? <a href="/ops/auth/phone/login">login here</a></p>
+        </div>
+      </form>
+    </div>
+    <!-- end:Main Form -->
+  </div>
+
+  <script type="text/javascript" src="{{ static_url('js/jquery.2.2.4.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('js/bootstrap.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('js/jquery.validate.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('js/localization/messages_zh.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('upyun/js/spark-md5.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('js/json2.js') }}"></script>
+
+  <script>
+    // 手机号码验证
+    jQuery.validator.addMethod("mobile", function(value, element) {
+      var length = value.length;
+      var mobile = /^(((13[0-9]{1})|(15[0-9]{1})|(17[0-9]{1})|(18[0-9]{1})|(19[0-9]{1}))+\d{8})$/;
+      return this.optional(element) || (length == 11 && mobile.test(value));
+    }, "请正确填写您的手机号码");
+
+    // 验证码
+    jQuery.validator.addMethod("code", function(value, element) {
+      var length = value.length;
+      var code = /^[0-9]{4}$/;
+      return this.optional(element) || (length == 4 && code.test(value));
+    }, "请正确填写验证码");
+
+    function SmsVerifyCode() {
+      var wait = 300; // 5分钟
+      function time(t) {
+        if (wait == 0) {
+          t.removeAttribute("disabled");
+          t.value = "获取验证码";
+          wait = 300; // 5分钟
+        } else {
+          t.setAttribute("disabled", true);
+          t.value = "" + wait + "秒";
+          wait--;
+          setTimeout(function() {
+            time(t)
+          }, 1000)
+        }
+      }
+
+      var validator = $("#reset-pwd-form").validate();
+      if (validator.element("#reset_phone")) {
+        var phone = $("#reset_phone").val();
+        console.log(phone);
+        var data = {
+          "phone": phone,
+        };
+        var json = JSON.stringify(data);
+
+        $.ajax({
+          type: "POST",
+          url: "/admin/auth/phone/verify-code",
+          data: json,
+          dataType: "json",
+          contentType: 'application/json',
+          success: function(data, status, xhr) {
+            var btn = document.getElementById("code-button");
+            time(btn);
+            $('.login-form-main-message').addClass('show error').html("验证码已通过短信发出, 注意查收! 5分钟内有效。");
+          },
+          error: function(XMLHttpRequest, textStatus, errorThrown) {
+            console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+            if (XMLHttpRequest.status == 200) {
+              var btn = document.getElementById("code-button");
+              time(btn);
+              $('.login-form-main-message').addClass('show error').html("验证码已通过短信发出, 注意查收! 5分钟内有效。");
+            } else if (XMLHttpRequest.status == 401) {
+              $('.login-form-main-message').addClass('show error').html("验证码不正确!");
+            } else if (XMLHttpRequest.status == 404) {
+              $('.login-form-main-message').addClass('show error').html("此手机号码未注册!");
+            } else if (XMLHttpRequest.status == 408) {
+              $('.login-form-main-message').addClass('show error').html("短信验证码5分钟内有效, 不必获取新的!");
+            } else {
+              $('.login-form-main-message').addClass('show error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+            }
+          },
+          complete: function(XMLHttpRequest, textStatus) {
+            this; // 调用本次AJAX请求时传递的options参数
+          }
+        });
+      } else {
+        return false;
+      }
+    }
+
+    $(function() {
+      // Login Form
+      //----------------------------------------------
+      // Validation
+      $("#reset-pwd-form").validate({
+        rules: {
+          reset_phone: {
+            minlength: 11,
+            maxlength: 11,
+            required: true,
+            mobile: true
+          },
+          reset_verify_code: {
+            required: true,
+            minlength: 4,
+            maxlength: 4,
+            code: true
+          },
+          reset_pwd: {
+            required: true,
+            minlength: 6
+          },
+        },
+        errorClass: "form-invalid",
+        submitHandler: function(form) {
+          var pwd = $("#reset_pwd").val();
+          var md5pwd = SparkMD5.hash(pwd);
+          $("#reset_pwd").val(md5pwd);
+          form.submit();
+        }
+      });
+    });
+  </script>
+
+</body>
+
+</html>

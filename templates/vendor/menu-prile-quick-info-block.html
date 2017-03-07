@@ -1,15 +1,15 @@
 <!-- menu prile quick info -->
 <div class="profile">
   <div class="profile_pic">
-{% if not my_account['avatarUrl'] %}
+{% if not ops['avatar'] %}
     <img src="/static/admin/images/user.png" alt="avatar" class="img-circle profile_img">
 {% else %}
-    <img src="{{ my_account['avatarUrl'] }}" alt="avatar" class="img-circle profile_img">
+    <img src="{{ ops['avatar'] }}" alt="avatar" class="img-circle profile_img">
 {% end %}
   </div>
   <div class="profile_info">
     <span>Welcome,</span>
-    <h2>{{ my_account['name'] }}</h2>
+    <h2>{{ ops['nickname'] }}</h2>
   </div>
 </div>
 <!-- /menu prile quick info -->

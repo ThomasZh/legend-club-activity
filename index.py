@@ -30,7 +30,7 @@ def main():
         static_path=os.path.join(os.path.dirname(__file__), "static"),
         xsrf_cookies=False,
         debug=options.debug,
-        login_url="/auth/login",
+        login_url="/ops/auth/phone/login",
         ssl_options={
            "certfile": os.path.join(os.path.abspath("."), "bike-forever.com.crt"),
            "keyfile": os.path.join(os.path.abspath("."), "bike-forever.com.key"),
