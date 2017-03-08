@@ -11,50 +11,15 @@
   <title>骑无止境</title>
 
   <!-- Bootstrap core CSS -->
-
-  <link href="/static/admin/css/bootstrap.min.css" rel="stylesheet">
-
-  <link href="/static/admin/fonts/css/font-awesome.min.css" rel="stylesheet">
-  <link href="/static/admin/css/animate.min.css" rel="stylesheet">
-
+  <link href="{{ static_url('gentelella/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ static_url('gentelella/fontawesome/css/font-awesome.min.css') }}" rel="stylesheet">
+  <link href="{{ static_url('gentelella/animate.css/animate.min.css') }}" rel="stylesheet">
   <!-- Custom styling plus plugins -->
-  <link href="/static/admin/css/custom.css" rel="stylesheet">
-  <link href="/static/admin/css/icheck/flat/green.css" rel="stylesheet">
+  <link href="{{ static_url('css/custom.css') }}" rel="stylesheet">
+  <link href="{{ static_url('gentelella/iCheck/skins/flat/green.css') }}" rel="stylesheet">
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css">
-  <link rel="stylesheet" href="{{static_url("froala_editor_2/css/froala_editor.css")}}">
-  <link rel="stylesheet" href="{{static_url("froala_editor_2/css/froala_style.css")}}">
-  <link rel="stylesheet" href="{{static_url("froala_editor_2/css/plugins/code_view.css")}}">
-  <link rel="stylesheet" href="{{static_url("froala_editor_2/css/plugins/colors.css")}}">
-  <link rel="stylesheet" href="{{static_url("froala_editor_2/css/plugins/emoticons.css")}}">
-  <link rel="stylesheet" href="{{static_url("froala_editor_2/css/plugins/line_breaker.css")}}">
-  <link rel="stylesheet" href="{{static_url("froala_editor_2/css/plugins/table.css")}}">
-  <link rel="stylesheet" href="{{static_url("froala_editor_2/css/plugins/char_counter.css")}}">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.3.0/codemirror.min.css">
-
-  <script src="/static/admin/js/jquery.min.js"></script>
-
-  <!--[if lt IE 9]>
-        <script src="../assets/js/ie8-responsive-file-warning.js"></script>
-        <![endif]-->
-
-  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-  <!--[if lt IE 9]>
-          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-        <![endif]-->
-
-        <style>
-          body {
-            text-align: left;
-          }
-
-          div#editor {
-            width: 100%;
-            margin: auto;
-            text-align: left;
-          }
-        </style>
+  <link rel="stylesheet" href="{{ static_url('upyun/css/fileinput.min.css') }}" />
+  <script src="{{ static_url('gentelella/jquery/dist/jquery.min.js') }}"></script>
 
 </head>
 
@@ -119,26 +84,120 @@
                 </div>
 								<div class="x_content">
                   <br />
-                  <form id="form1" data-parsley-validate class="form-horizontal form-label-left"
-                    method="POST" action="/vendors/{{ vendor_id }}/setup/hha">
-                    {% raw xsrf_form_html() %}
-                    <input type="hidden" name="content" id="content" >
+                      <form id="create-form" class="form-horizontal form-label-left" enctype="multipart/form-data" action="/vendors/{{ vendor_id }}/setup/hha">
+                          <div class="form-group">
+                              <!-- uploading toast -->
+                              <div id="loadingToast" class="weui_loading_toast" style="display:none;">
+                                  <div class="weui_mask_transparent"></div>
+                                  <div class="weui_toast">
+                                      <div class="weui_loading">
+                                          <div class="weui_loading_leaf weui_loading_leaf_0"></div>
+                                          <div class="weui_loading_leaf weui_loading_leaf_1"></div>
+                                          <div class="weui_loading_leaf weui_loading_leaf_2"></div>
+                                          <div class="weui_loading_leaf weui_loading_leaf_3"></div>
+                                          <div class="weui_loading_leaf weui_loading_leaf_4"></div>
+                                          <div class="weui_loading_leaf weui_loading_leaf_5"></div>
+                                          <div class="weui_loading_leaf weui_loading_leaf_6"></div>
+                                          <div class="weui_loading_leaf weui_loading_leaf_7"></div>
+                                          <div class="weui_loading_leaf weui_loading_leaf_8"></div>
+                                          <div class="weui_loading_leaf weui_loading_leaf_9"></div>
+                                          <div class="weui_loading_leaf weui_loading_leaf_10"></div>
+                                          <div class="weui_loading_leaf weui_loading_leaf_11"></div>
+                                      </div>
+                                      <p class="weui_toast_content">图片上传中...</p>
+                                  </div>
+                              </div>
 
-                    <div class="form-group">
-                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="content">文本内容<span class="required">*</span>
-                      </label>
-                      <textarea id='edit' style="margin-top: 30px;" placeholder="Type some text">
-                        {{vendor_hha['content']}}
-                      </textarea>
-                    </div>
+                              <div class="form-group">
+                                  <div class="col-md-12 col-sm-12 col-xs-12">
+                                      <div class="x_panel">
+                                          <div class="x_content">
+                                              <div id="alerts"></div>
+                                              <div class="btn-toolbar editor" data-role="editor-toolbar" data-target="#editor">
+                                                  <div class="btn-group">
+                                                      <a class="btn dropdown-toggle" data-toggle="dropdown" title="Font"><i class="fa fa-font"></i><b class="caret"></b></a>
+                                                      <ul class="dropdown-menu">
+                                                      </ul>
+                                                  </div>
 
-                    <div class="ln_solid"></div>
-                    <div class="form-group">
+                                                  <div class="btn-group">
+                                                      <a class="btn dropdown-toggle" data-toggle="dropdown" title="Font Size"><i class="fa fa-text-height"></i>&nbsp;<b class="caret"></b></a>
+                                                      <ul class="dropdown-menu">
+                                                          <li>
+                                                              <a data-edit="fontSize 5">
+                                                                  <p style="font-size:17px">Huge</p>
+                                                              </a>
+                                                          </li>
+                                                          <li>
+                                                              <a data-edit="fontSize 3">
+                                                                  <p style="font-size:14px">Normal</p>
+                                                              </a>
+                                                          </li>
+                                                          <li>
+                                                              <a data-edit="fontSize 1">
+                                                                  <p style="font-size:11px">Small</p>
+                                                              </a>
+                                                          </li>
+                                                      </ul>
+                                                  </div>
+                                                  <div class="btn-group">
+                                                      <a class="btn" data-edit="bold" title="Bold (Ctrl/Cmd+B)"><i class="fa fa-bold"></i></a>
+                                                      <a class="btn" data-edit="italic" title="Italic (Ctrl/Cmd+I)"><i class="fa fa-italic"></i></a>
+                                                      <a class="btn" data-edit="strikethrough" title="Strikethrough"><i class="fa fa-strikethrough"></i></a>
+                                                      <a class="btn" data-edit="underline" title="Underline (Ctrl/Cmd+U)"><i class="fa fa-underline"></i></a>
+                                                  </div>
+
+                                                  <div class="btn-group">
+                                                      <a class="btn" data-edit="insertunorderedlist" title="Bullet list"><i class="fa fa-list-ul"></i></a>
+                                                      <a class="btn" data-edit="insertorderedlist" title="Number list"><i class="fa fa-list-ol"></i></a>
+                                                      <!-- <a class="btn" data-edit="outdent" title="Reduce indent (Shift+Tab)"><i class="fa fa-dedent"></i></a>
+                    <a class="btn" data-edit="indent" title="Indent (Tab)"><i class="fa fa-indent"></i></a> -->
+                                                  </div>
+
+                                                  <div class="btn-group">
+                                                      <a class="btn" data-edit="justifyleft" title="Align Left (Ctrl/Cmd+L)"><i class="fa fa-align-left"></i></a>
+                                                      <a class="btn" data-edit="justifycenter" title="Center (Ctrl/Cmd+E)"><i class="fa fa-align-center"></i></a>
+                                                      <a class="btn" data-edit="justifyright" title="Align Right (Ctrl/Cmd+R)"><i class="fa fa-align-right"></i></a>
+                                                      <a class="btn" data-edit="justifyfull" title="Jus tify (Ctrl/Cmd+J)"><i class="fa fa-align-justify"></i></a>
+                                                  </div>
+
+                                                  <div class="btn-group">
+                                                      <a class="btn dropdown-toggle" data-toggle="dropdown" title="Hyperlink"><i class="fa fa-link"></i></a>
+                                                      <div class="dropdown-menu input-append">
+                                                          <input class="span2" placeholder="URL" type="text" data-edit="createLink" />
+                                                          <button class="btn" type="button">Add</button>
+                                                      </div>
+                                                      <a class="btn" data-edit="unlink" title="Remove Hyperlink"><i class="fa fa-cut"></i></a>
+                                                  </div>
+
+                                                  <div class="btn-group">
+                                                      <a class="btn" title="Insert picture (or just drag & drop)" id="pictureBtn"><i class="fa fa-picture-o"></i></a>
+                                                      <input type="file" id="file" data-role="magic-overlay" data-target="#pictureBtn" data-edit="insertImage" />
+                                                  </div>
+
+                                                  <div class="btn-group">
+                                                      <a class="btn" data-edit="undo" title="Undo (Ctrl/Cmd+Z)"><i class="fa fa-undo"></i></a>
+                                                      <a class="btn" data-edit="redo" title="Redo (Ctrl/Cmd+Y)"><i class="fa fa-repeat"></i></a>
+                                                  </div>
+                                              </div>
+
+                                              <div id="editor" class="editor-wrapper"></div>
+
+                                              <!-- <textarea name="descr" id="descr" style="display:none;"></textarea> -->
+
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                  </div>
+
+                  <!-- <div class="ln_solid"></div> -->
+                  <div class="form-group">
                       <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                        <button type="submit" class="btn btn-primary">重置</button>
-                        <button type="submit" class="btn btn-success">提交</button>
+                          <button type="button" class="btn btn-success" id="state_btn">保存</button>
                       </div>
-                    </div>
+                  </div>
 
                   </form>
                 </div>
@@ -147,11 +206,12 @@
             </div>
 
           </div>
+          <!-- footer content -->
+          {% module Template("vendor/footer-block.html") %}
+          <!-- /footer content -->
         </div>
 
-        <!-- footer content -->
-        {% module Template("vendor/footer-block.html") %}
-        <!-- /footer content -->
+
 
       </div>
       <!-- /page content -->
@@ -159,86 +219,182 @@
 
   </div>
 
-  <div id="custom_notifications" class="custom-notifications dsp_none">
-    <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
-    </ul>
-    <div class="clearfix"></div>
-    <div id="notif-group" class="tabbed_notifications"></div>
-  </div>
-
-  <script src="/static/admin/js/bootstrap.min.js"></script>
-
+  <script src="{{ static_url('gentelella/bootstrap/dist/js/bootstrap.min.js') }}" type="text/javascript"></script>
+  <!-- bootstrap progress js -->
+  <script src="{{ static_url('gentelella/bootstrap-progressbar/bootstrap-progressbar.min.js') }}" type="text/javascript"></script>
   <!-- icheck -->
-  <script src="/static/admin/js/icheck/icheck.min.js"></script>
-  <!-- pace -->
-  <script src="/static/admin/js/pace/pace.min.js"></script>
-  <script src="/static/admin/js/custom.js"></script>
+  <script src="{{ static_url('gentelella/iCheck/icheck.min.js') }}" type="text/javascript"></script>
+  <!-- daterangepicker -->
+  <script src="{{ static_url('gentelella/moment/min/moment.min.js') }}" type="text/javascript"></script>
+  <script src="{{ static_url('gentelella/bootstrap-daterangepicker/daterangepicker.js') }}" type="text/javascript"></script>
+  <!-- bootstrap-wysiwyg -->
+  <script src="{{ static_url('gentelella/bootstrap-wysiwyg/src/bootstrap-wysiwyg.js') }}"></script>
+  <script src="{{ static_url('gentelella/jquery.hotkeys/jquery.hotkeys.js') }}"></script>
+  <script src="{{ static_url('gentelella/google-code-prettify/src/prettify.js') }}"></script>
 
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.3.0/codemirror.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.3.0/mode/xml/xml.min.js"></script>
-  <script type="text/javascript" src="{{static_url("froala_editor_2/js/froala_editor.min.js")}}"></script>
-  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/align.min.js")}}"></script>
-  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/code_beautifier.min.js")}}"></script>
-  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/code_view.min.js")}}"></script>
-  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/colors.min.js")}}"></script>
-  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/emoticons.min.js")}}"></script>
-  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/font_size.min.js")}}"></script>
-  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/font_family.min.js")}}"></script>
-  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/line_breaker.min.js")}}"></script>
-  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/link.min.js")}}"></script>
-  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/lists.min.js")}}"></script>
-  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/paragraph_format.min.js")}}"></script>
-  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/paragraph_style.min.js")}}"></script>
-  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/table.min.js")}}"></script>
-  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/url.min.js")}}"></script>
-  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/entities.min.js")}}"></script>
-  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/char_counter.min.js")}}"></script>
-  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/inline_style.min.js")}}"></script>
-  <script type="text/javascript" src="{{static_url("froala_editor_2/js/plugins/save.min.js")}}"></script>
-  <script type="text/javascript" src="{{static_url("froala_editor_2/js/languages/zh_cn.js")}}"></script>
+  <script src="{{ static_url('js/custom.js') }}" type="text/javascript"></script>
+  <script type="text/javascript" src="{{ static_url('js/json2.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('js/jquery.validate.min.js') }}"></script>
+
+  <!-- fileinput -->
+  <script src="{{ static_url('upyun/js/fileinput.min.js') }}"></script>
+  <script src="{{ static_url('upyun/js/spark-md5.min.js') }}"></script>
+  <script src="{{ static_url('upyun/js/async.js') }}"></script>
+  <script src="{{ static_url('upyun/js/upyun-mu.js') }}"></script>
 
   <script>
-      $(function(){
-        $('#edit')
-          .on('froalaEditor.initialized', function (e, editor) {
-            $('#edit').parents('form').on('submit', function () {
-              var html = $('#edit').val()
-              console.log(html);
+  $(function(){
+    function html_decode(str)
+        {
+          var s = "";
+          if (str.length == 0) return "";
+          s = str;
+          s = s.replace(/&lt;/g, "<");
+          s = s.replace(/&gt;/g, ">");
+          s = s.replace(/&nbsp;/g, " ");
+          s = s.replace(/&#39;/g, "\'");
+          s = s.replace(/&quot;/g, "\"");
+          s = s.replace(/<br>/g, "\n");
+          s = s.replace(/&amp;/g, "&");
+          s = s.replace(/\\/g, "");
+          return s;
+        }
+    var html = html_decode("{{ vendor_hha['content'] }}");
+    //   alert(html);
+    $("#editor").html(html);
 
-              if (html == null || html == undefined || html == '') {
-            	  return false;
+      $("#file1").on("change",uploadHandle);
+      // var element1 = document.getElementById("file1");
+      // element1.addEventListener("change", uploadHandle, false);
+
+      function uploadHandle() {
+          var file1 = document.getElementById('file1').files[0];
+          //alert(file.name);
+          var imgUrl = uploadUpyun(file1, 'file1');
+          $('#loadingToast').show();
+          document.getElementById("img").value = imgUrl;
+      }
+      document.addEventListener('uploaded',function(e) {
+        //alert('uploaded');
+        $('#loadingToast').hide();
+      });
+
+      function uuid() {
+          var s = [];
+          var hexDigits = "0123456789abcdef";
+          for (var i = 0; i < 36; i++) {
+              s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+          }
+          s[14] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
+          s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
+          s[8] = s[13] = s[18] = s[23] = "-";
+
+          var uuid = s.join("");
+          return uuid;
+      }
+
+      function uploadUpyun(file, elementId) {
+          var ext = '.' + file.name.split('.').pop();
+
+          var config = {
+              // 空间名称
+              bucket: 'tripc2c-club-title',
+              // 上传请求过期时间
+              expiration: parseInt((new Date().getTime() + 3600000) / 1000),
+              // 尽量不要使用直接传表单 API 的方式，以防泄露造成安全隐患
+              form_api_secret: 'CRKAOsKHGbbCnU+yztBxUT0bYR0='
+          };
+
+          var instance = new Sand(config);
+          var options = {
+              'notify_url': 'http://upyun.com'
+          };
+          instance.setOptions(options);
+          instance.setElementId(elementId);
+
+          var d = new Date();
+          var month = d.getMonth() + 1;
+          var filename = '/articles/bg/' + d.getFullYear() + '/' + month + '/' + d.getDate() + '/' + uuid() + ext;
+          console.log(filename);
+          instance.upload(filename);
+
+
+          return 'https://tripc2c-club-title.b0.upaiyun.com' + filename;
+      }
+
+    });
+  </script>
+
+  <!-- bootstrap-wysiwyg -->
+  <script>
+      $(document).ready(function() {
+          function initToolbarBootstrapBindings() {
+              var fonts = ['Serif', 'Sans', 'Arial', 'Arial Black', 'Courier',
+                      'Courier New', 'Comic Sans MS', 'Helvetica', 'Impact', 'Lucida Grande', 'Lucida Sans', 'Tahoma', 'Times',
+                      'Times New Roman', 'Verdana'
+                  ],
+                  fontTarget = $('[title=Font]').siblings('.dropdown-menu');
+              $.each(fonts, function(idx, fontName) {
+                  fontTarget.append($('<li><a data-edit="fontName ' + fontName + '" style="font-family:\'' + fontName + '\'">' + fontName + '</a></li>'));
+              });
+              $('a[title]').tooltip({
+                  container: 'body'
+              });
+              $('.dropdown-menu input').click(function() {
+                      return false;
+                  })
+                  .change(function() {
+                      $(this).parent('.dropdown-menu').siblings('.dropdown-toggle').dropdown('toggle');
+                  })
+                  .keydown('esc', function() {
+                      this.value = '';
+                      $(this).change();
+                  });
+
+              $('[data-role=magic-overlay]').each(function() {
+                  var overlay = $(this),
+                      target = $(overlay.data('target'));
+                  overlay.css('opacity', 0).css('position', 'absolute').offset(target.offset()).width(target.outerWidth()).height(target.outerHeight());
+              });
+
+              if ("onwebkitspeechchange" in document.createElement("input")) {
+                  var editorOffset = $('#editor').offset();
+                  $('.voiceBtn').css('position', 'absolute').offset({
+                      top: editorOffset.top,
+                      left: editorOffset.left + $('#editor').innerWidth() - 35
+                  });
               } else {
-  			    document.getElementById("content").value = html;
-  			    document.getElementById("form1").submit();
-
-                return true;
+                  $('.voiceBtn').hide();
               }
-            })
-          })
-          .froalaEditor({
-			toolbarButtons : [ 'bold', 'italic', 'underline', 'strikeThrough', 'fontFamily', 'fontSize', 'subscript', 'superscript',
-			                    '|', 'color', 'emoticons', 'paragraphFormat', 'paragraphStyle',
-			                    '|', 'align', 'formatOL', 'formatUL', 'outdent', 'indent',
-			                    '|', 'insertLink', 'insertTable', 'insertHR',
-			                    '|', 'undo', 'redo', 'clearFormatting', 'html'],
-			toolbarButtonsMD: [ 'bold', 'italic', 'underline', 'strikeThrough', 'fontFamily', 'fontSize',
-			                    '|', 'color', 'emoticons', 'paragraphFormat', 'paragraphStyle',
-			                    '|', 'align', 'formatOL', 'formatUL', 'outdent', 'indent',
-			                    '|', 'insertLink', 'insertHR',
-			                    '|', 'undo', 'redo', 'html'],
-			toolbarButtonsSM: [ 'bold', 'italic', 'underline', 'fontFamily', 'fontSize',
-			                    '|', 'color', 'paragraphFormat', 'align', 'formatOL', 'formatUL',
-			                    '|', 'insertLink',
-			                    '|', 'undo', 'redo', 'html'],
-			toolbarButtonsXS: [ 'bold', 'fontFamily', 'fontSize', '|',
-			                    'color', 'paragraphFormat', 'align', 'formatUL'],
-			enter: $.FroalaEditor.ENTER_P,
-			// Set the language code.
-		    language: 'zh_cn',
-		    toolbarSticky: true,
-        heightMax: 300
-          })
+          }
+
+          function showErrorAlert(reason, detail) {
+              var msg = '';
+              if (reason === 'unsupported-file-type') {
+                  msg = "Unsupported format " + detail;
+              } else {
+                  console.log("error uploading file", reason, detail);
+              }
+              $('<div class="alert"> <button type="button" class="close" data-dismiss="alert">&times;</button>' +
+                  '<strong>File upload error</strong> ' + msg + ' </div>').prependTo('#alerts');
+          }
+
+          initToolbarBootstrapBindings();
+
+          $('#editor').wysiwyg({
+              fileUploadError: showErrorAlert
+          });
+
+          window.prettyPrint;
+          prettyPrint();
+
+        $("#state_btn").on("click",function(){
+          console.log($("#editor").html());
+          $("#create-form").submit();
+
+        });
       });
   </script>
+  <!-- /bootstrap-wysiwyg -->
 </body>
 </html>

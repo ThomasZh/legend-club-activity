@@ -281,6 +281,7 @@ class VendorSetupHhaHandler(AuthorizationHandler):
         vendor_hha = vendor_hha_dao.vendor_hha_dao().query_not_safe(vendor_id)
         _json = {"_id":vendor_id,
                 "content":content}
+        logging.info("got _json", _json)
         if not vendor_hha:
             vendor_hha_dao.vendor_hha_dao().create(_json)
         else:
