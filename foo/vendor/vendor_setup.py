@@ -54,6 +54,10 @@ from dao import trip_router_dao
 from dao import club_dao
 from global_const import *
 
+import html2text
+import markdown
+import re
+
 
 class VendorSetupOperatorsHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
@@ -261,6 +265,7 @@ class VendorSetupHhaHandler(AuthorizationHandler):
         ops = self.get_myinfo_basic()
 
         vendor_hha = vendor_hha_dao.vendor_hha_dao().query(vendor_id)
+        vendor_hha['content'] = markdown_html(vendor_hha['content'])
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/hold-harmless-agreements.html',
@@ -268,6 +273,7 @@ class VendorSetupHhaHandler(AuthorizationHandler):
                 ops=ops,
                 budge_num=budge_num,
                 vendor_hha=vendor_hha)
+
 
     @tornado.web.authenticated  # if no session, redirect to login page
     def post(self, vendor_id):
@@ -277,6 +283,7 @@ class VendorSetupHhaHandler(AuthorizationHandler):
 
         content = self.get_argument("content", "")
         logging.info("got content %r", content)
+        content = html_markdown(content)
 
         vendor_hha = vendor_hha_dao.vendor_hha_dao().query_not_safe(vendor_id)
         _json = {"_id":vendor_id,

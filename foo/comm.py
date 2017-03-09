@@ -24,6 +24,9 @@ from global_const import STP
 from tornado.escape import json_encode, json_decode
 from tornado.httpclient import HTTPClient
 from tornado.httputil import url_concat
+import html2text
+import markdown
+import re
 
 
 class singleton(object):
@@ -213,3 +216,35 @@ class AuthorizationHandler(BaseHandler):
                         except:
                             return None
                     return None
+
+
+def markdown_html(markdown_content):
+    html = markdown.markdown(markdown_content)
+    html = html.replace('\n','')
+    logging.info("got html of content %r", html)
+
+    # 图片Markdown格式->html格式
+    # ![](https://tripc2c-club-title.b0.upaiyun.com/articles/bg/2017/2/28/becf7582-3c0c-4305-9440-2fe088d516ee.jpeg)
+    # <img alt="" src="http://bighorn.b0.upaiyun.com/blog/2016/11/2/758f7478-d406-4f2e-9566-306a963fb979" />
+    markdown_img_ptn = "(!\[[\w\.\/\-]*\]\(http[s]*://[\w\.\/\-]+\))"
+    img_ptn = re.compile(markdown_img_ptn)
+    markdown_imgs = img_ptn.findall(html)
+    for markdown_img in markdown_imgs:
+        logging.info("got html ![](img_url) of content %r", markdown_img)
+        ptn="(http[s]*://[\w\.\/\-]+)"
+        url_ptn = re.compile(ptn)
+        urls = url_ptn.findall(markdown_img)
+        url = urls[0]
+        logging.info("got url %r", url)
+        html = html.replace(markdown_img, "<img src=\""+url+"\" />")
+
+    return html
+
+
+def html_markdown(html):
+    # 使用 html2text 将网页内容转换为 Markdown 格式
+    h = html2text.HTML2Text()
+    h.ignore_links = False
+    markdown_content = h.handle(html)
+    logging.info("got markdown content %r", markdown_content)
+    return markdown_content
