@@ -84,7 +84,7 @@
                 </div>
 								<div class="x_content">
                   <br />
-                      <form id="create-form" class="form-horizontal form-label-left" enctype="multipart/form-data" action="/vendors/{{ vendor_id }}/setup/hha">
+                      <form id="create-form" class="form-horizontal form-label-left" enctype="multipart/form-data" method="post" action="/vendors/{{ vendor_id }}/setup/hha">
                           <div class="form-group">
                               <!-- uploading toast -->
                               <div id="loadingToast" class="weui_loading_toast" style="display:none;">
@@ -181,7 +181,10 @@
                                                   </div>
                                               </div>
 
-                                              <div id="editor" class="editor-wrapper"></div>
+                                              <div id="editor" style="height:260px;" class="editor-wrapper">
+
+                                              </div>
+                                              <input id="editor_input" type="hidden" name="content" value=""/>
 
                                               <!-- <textarea name="descr" id="descr" style="display:none;"></textarea> -->
 
@@ -243,7 +246,7 @@
   <script src="{{ static_url('upyun/js/upyun-mu.js') }}"></script>
 
   <script>
-  $(function(){
+
     function html_decode(str)
         {
           var s = "";
@@ -322,7 +325,6 @@
           return 'https://tripc2c-club-title.b0.upaiyun.com' + filename;
       }
 
-    });
   </script>
 
   <!-- bootstrap-wysiwyg -->
@@ -389,7 +391,8 @@
           prettyPrint();
 
         $("#state_btn").on("click",function(){
-          console.log($("#editor").html());
+          // console.log($("#editor").html());
+          $("#editor_input").val($("#editor").html());
           $("#create-form").submit();
 
         });
