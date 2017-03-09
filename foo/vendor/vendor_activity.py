@@ -809,8 +809,8 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
+        access_token = self.get_secure_cookie("access_token")
         ops = self.get_myinfo_basic()
-        _scroll_to = self.get_argument("scroll_to", "")
 
         activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
@@ -821,13 +821,29 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
         bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
 
-        _article_id = activity['article_id']
+        _article_id = None
+        _paragraphs = None
+        if activity.has_key('article_id'):
+            _article_id = activity['article_id']
+            url = "http://api.7x24hs.com/api/articles/" + _article_id
+            http_client = HTTPClient()
+            response = http_client.fetch(url, method="GET")
+            logging.info("got response %r", response.body)
+            article = json_decode(response.body)
+            _paragraphs = article['paragraphs']
+        else:
+            article = {'title':activity['title'], 'subtitle':activity['location'], 'img':activity['bk_img_url'],'paragraphs':''}
+            _json = json_encode(article)
+            headers = {"Authorization":"Bearer "+access_token}
+            url = "http://api.7x24hs.com/api/articles"
+            http_client = HTTPClient()
+            response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+            logging.info("got response %r", response.body)
+            article = json_decode(response.body)
+            article_id = article['_id']
+            _paragraphs = ''
 
-        url = "http://"+STP+"/blogs/my-articles/" + _article_id + "/paragraphs"
-        http_client = HTTPClient()
-        response = http_client.fetch(url, method="GET")
-        logging.info("got response %r", response.body)
-        _paragraphs = json_decode(response.body)
+            activity_dao.activity_dao().update({'_id':activity_id, 'article_id':article_id})
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/activity-edit-step7.html',
@@ -838,7 +854,40 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
                 activity=activity, categorys=categorys,
                 orders=orders, applys=applys, bonus=bonus,
                 cret_template=cret_template,
-                article_id=_article_id, paragraphs=_paragraphs, scroll_to=_scroll_to)
+                article_id=_article_id, paragraphs=_paragraphs)
+
+    def post(self,vendor_id, activity_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+        logging.info("got activity_id %r in uri", activity_id)
+
+        access_token = self.get_secure_cookie("access_token")
+        # ops = self.get_myinfo_basic()
+
+        activity = activity_dao.activity_dao().query(activity_id)
+        categorys = category_dao.category_dao().query_by_vendor(vendor_id)
+        applys = apply_dao.apply_dao().query_by_activity(activity_id)
+        orders = order_dao.order_dao().query_by_activity(activity_id)
+        cret_template = cret_template_dao.cret_template_dao().query(activity_id)
+        bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
+        bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
+        qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
+
+        content = self.get_argument("content","")
+        logging.info("got content %r", content)
+
+        _article_id = None
+        if activity.has_key('article_id'):
+            _article_id = activity['article_id']
+        article = {'title':activity['title'], 'subtitle':activity['location'], 'img':activity['bk_img_url'],'paragraphs':content}
+        _json = json_encode(article)
+        headers = {"Authorization":"Bearer "+access_token}
+        url = "http://api.7x24hs.com/api/articles/"+_article_id
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="PUT", headers=headers, body=_json)
+        logging.info("got response %r", response.body)
+
+        self.redirect('/vendors/' + vendor_id + '/activitys/' + activity_id + '/detail/step7')
+
 
 
 class VendorActivityDetailStep8Handler(AuthorizationHandler):
@@ -956,11 +1005,37 @@ class VendorActivityActionPublishHandler(AuthorizationHandler):
     def get(self, vendor_id, activity_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
+
+        access_token = self.get_secure_cookie("access_token")
+        # ops = self.get_myinfo_basic()
+
+        activity = activity_dao.activity_dao().query(activity_id)
+        categorys = category_dao.category_dao().query_by_vendor(vendor_id)
+        applys = apply_dao.apply_dao().query_by_activity(activity_id)
+        orders = order_dao.order_dao().query_by_activity(activity_id)
+        cret_template = cret_template_dao.cret_template_dao().query(activity_id)
+        bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
+        bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
+        qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
+
+
+        _article_id = None
+        if activity.has_key('article_id'):
+            _article_id = activity['article_id']
+        headers = {"Authorization":"Bearer "+access_token}
+        url = "http://api.7x24hs.com/api/articles/" + _article_id + "/publish"
+        http_client = HTTPClient()
+        _json = json_encode(headers)
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("got response %r", response.body)
+
         # 发布时判断一下是否已经填写费用信息
         activity = activity_dao.activity_dao().query(activity_id)
 
         if activity['base_fee_template']:
             activity_dao.activity_dao().update_status(activity_id, ACTIVITY_STATUS_RECRUIT)
+
+
         else:
             self.redirect('/vendors/' + vendor_id + '/activitys/' + activity_id + '/detail/step8')
 
