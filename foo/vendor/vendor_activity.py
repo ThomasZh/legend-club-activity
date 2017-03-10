@@ -232,6 +232,7 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
 
     def post(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
+        access_token = self.get_secure_cookie("access_token")
 
         ops = self.get_myinfo_basic()
 
@@ -283,6 +284,19 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
                 "member_min":_member_min, "member_max":_member_max, "notes":'' }
         activity_dao.activity_dao().create(json)
 
+        article = {'title':_title, 'subtitle':location, 'img':_bk_img_url,'paragraphs':''}
+        _json = json_encode(article)
+        headers = {"Authorization":"Bearer "+access_token}
+        url = "http://api.7x24hs.com/api/articles"
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("got response %r", response.body)
+        article = json_decode(response.body)
+        article_id = article['_id']
+        _paragraphs = ''
+
+        activity_dao.activity_dao().update({'_id':_activity_id, 'article_id':article_id})
+
         # create wechat qrcode
         activity_url = WX_NOTIFY_DOMAIN + "/bf/wx/vendors/" + vendor_id + "/activitys/" + _activity_id
         logging.info("got activity_url %r", activity_url)
@@ -315,21 +329,6 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
                 "create_time":_timestamp, "last_update_time":_timestamp,
                 "activity_shared":0, "cret_shared":0}
         bonus_template_dao.bonus_template_dao().create(json)
-
-        # create blog article
-        _ticket = self.get_secure_cookie("session_ticket")
-        params = {"X-Session-Id": _ticket}
-        url = url_concat("http://" + STP + "/blogs/articles", params)
-        data = {"title": _title, "content": "", "imgUrl": _bk_img_url}
-        _json = json_encode(data)
-        http_client = HTTPClient()
-        response = http_client.fetch(url, method="POST", body=_json)
-        logging.info("got response %r", response.body)
-        _article_id = json_decode(response.body)
-        logging.info("got _article_id %r", _article_id)
-
-        json = {"_id":_activity_id, "article_id":_article_id}
-        activity_dao.activity_dao().update(json)
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/activity-create-step2.html',
@@ -861,7 +860,7 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
         logging.info("got activity_id %r in uri", activity_id)
 
         access_token = self.get_secure_cookie("access_token")
-        # ops = self.get_myinfo_basic()
+        ops = self.get_myinfo_basic()
 
         activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
@@ -887,7 +886,6 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
         logging.info("got response %r", response.body)
 
         self.redirect('/vendors/' + vendor_id + '/activitys/' + activity_id + '/detail/step7')
-
 
 
 class VendorActivityDetailStep8Handler(AuthorizationHandler):
@@ -1018,28 +1016,34 @@ class VendorActivityActionPublishHandler(AuthorizationHandler):
         bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
 
-
-        _article_id = None
-        if activity.has_key('article_id'):
-            _article_id = activity['article_id']
-        headers = {"Authorization":"Bearer "+access_token}
-        url = "http://api.7x24hs.com/api/articles/" + _article_id + "/publish"
-        http_client = HTTPClient()
-        _json = json_encode(headers)
-        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
-        logging.info("got response %r", response.body)
-
         # 发布时判断一下是否已经填写费用信息
         activity = activity_dao.activity_dao().query(activity_id)
 
         if activity['base_fee_template']:
             activity_dao.activity_dao().update_status(activity_id, ACTIVITY_STATUS_RECRUIT)
 
+            _article_id = None
+            if activity.has_key('article_id'):
+                _article_id = activity['article_id']
+            headers = {"Authorization":"Bearer "+access_token}
+            url = "http://api.7x24hs.com/api/articles/" + _article_id + "/publish"
+            http_client = HTTPClient()
+            _json = json_encode(headers)
+            response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+            logging.info("got response %r", response.body)
 
+            ids = {'ids':['0bbf89e2f73411e69a3c00163e023e51']}
+            _json = json_encode(ids)
+            headers = {"Authorization":"Bearer "+access_token}
+            url = "http://api.7x24hs.com/api/articles/" + _article_id + "/categories"
+            http_client = HTTPClient()
+            response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+            logging.info("got response %r", response.body)
+
+            self.redirect('/vendors/' + vendor_id + '/activitys/draft')
         else:
             self.redirect('/vendors/' + vendor_id + '/activitys/' + activity_id + '/detail/step8')
 
-        self.redirect('/vendors/' + vendor_id + '/activitys/draft')
 
 
 class VendorActivityActionDeleteHandler(AuthorizationHandler):

@@ -352,11 +352,11 @@
 
     var config = {
       // 空间名称
-      bucket : 'bike-forever',
+      bucket : 'tripc2c-club-title',
       // 上传请求过期时间
       expiration : parseInt((new Date().getTime() + 3600000) / 1000),
       // 尽量不要使用直接传表单 API 的方式，以防泄露造成安全隐患
-      form_api_secret : 'c3sWvWKcyWo06nKPPcazKT/R4H8='
+      form_api_secret : 'CRKAOsKHGbbCnU+yztBxUT0bYR0='
     };
 
     var instance = new Sand(config);
@@ -371,7 +371,7 @@
     console.log(filename);
     instance.upload(filename);
 
-    return 'http://bike-forever.b0.upaiyun.com' + filename;
+    return 'https://tripc2c-club-title.b0.upaiyun.com' + filename;
   }
 
     // with plugin options

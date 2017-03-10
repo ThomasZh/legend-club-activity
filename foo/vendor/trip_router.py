@@ -100,6 +100,7 @@ class VendorTriprouterCreateHandler(AuthorizationHandler):
     def post(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
+        access_token = self.get_secure_cookie("access_token")
         ops = self.get_myinfo_basic()
 
         _title = self.get_argument("title", "")
@@ -123,20 +124,33 @@ class VendorTriprouterCreateHandler(AuthorizationHandler):
 
         trip_router_dao.trip_router_dao().create(triprouters);
 
-        # create blog article
-        _ticket = self.get_secure_cookie("session_ticket")
-        params = {"X-Session-Id": _ticket}
-        url = url_concat("http://" + STP + "/blogs/articles", params)
-        data = {"title": _title, "content": "", "imgUrl": _bk_img_url}
-        _json = json_encode(data)
+        article = {'title':_title, 'subtitle':_location, 'img':_bk_img_url,'paragraphs':''}
+        _json = json_encode(article)
+        headers = {"Authorization":"Bearer "+access_token}
+        url = "http://api.7x24hs.com/api/articles"
         http_client = HTTPClient()
-        response = http_client.fetch(url, method="POST", body=_json)
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
         logging.info("got response %r", response.body)
-        _article_id = json_decode(response.body)
-        logging.info("got _article_id %r", _article_id)
+        article = json_decode(response.body)
+        article_id = article['_id']
+        _paragraphs = ''
 
-        json = {"_id":_id, "article_id":_article_id}
-        trip_router_dao.trip_router_dao().update(json)
+        trip_router_dao.trip_router_dao().update({'_id':_id, 'article_id':article_id})
+
+        # create blog article
+        # _ticket = self.get_secure_cookie("session_ticket")
+        # params = {"X-Session-Id": _ticket}
+        # url = url_concat("http://" + STP + "/blogs/articles", params)
+        # data = {"title": _title, "content": "", "imgUrl": _bk_img_url}
+        # _json = json_encode(data)
+        # http_client = HTTPClient()
+        # response = http_client.fetch(url, method="POST", body=_json)
+        # logging.info("got response %r", response.body)
+        # _article_id = json_decode(response.body)
+        # logging.info("got _article_id %r", _article_id)
+        #
+        # json = {"_id":_id, "article_id":_article_id}
+        # trip_router_dao.trip_router_dao().update(json)
 
 
         self.redirect('/vendors/' + vendor_id + '/trip_router')
@@ -208,18 +222,35 @@ class VendorTriprouterEditStep2Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got trip_router_id %r in edit step2", trip_router_id)
 
+        access_token = self.get_secure_cookie("access_token")
         ops = self.get_myinfo_basic()
 
-        _scroll_to = self.get_argument("scroll_to", "")
-
         triprouter = trip_router_dao.trip_router_dao().query(trip_router_id)
-        _article_id = triprouter['article_id']
+        # _article_id = triprouter['article_id']
 
-        url = "http://"+STP+"/blogs/my-articles/" + _article_id + "/paragraphs"
-        http_client = HTTPClient()
-        response = http_client.fetch(url, method="GET")
-        logging.info("got response %r", response.body)
-        _paragraphs = json_decode(response.body)
+        _article_id = None
+        _paragraphs = None
+        if triprouter.has_key('article_id'):
+            _article_id = triprouter['article_id']
+            url = "http://api.7x24hs.com/api/articles/" + _article_id
+            http_client = HTTPClient()
+            response = http_client.fetch(url, method="GET")
+            logging.info("got response %r", response.body)
+            article = json_decode(response.body)
+            _paragraphs = article['paragraphs']
+        else:
+            article = {'title':triprouter['title'], 'subtitle':triprouter['location'], 'img':triprouter['bk_img_url'],'paragraphs':''}
+            _json = json_encode(article)
+            headers = {"Authorization":"Bearer "+access_token}
+            url = "http://api.7x24hs.com/api/articles"
+            http_client = HTTPClient()
+            response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+            logging.info("got response %r", response.body)
+            article = json_decode(response.body)
+            article_id = article['_id']
+            _paragraphs = ''
+
+            trip_router_dao.trip_router_dao().update({'_id':trip_router_id, 'article_id':article_id})
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/trip-router-edit-step2.html',
@@ -229,8 +260,33 @@ class VendorTriprouterEditStep2Handler(AuthorizationHandler):
                 triprouter=triprouter,
                 travel_id=trip_router_id,
                 article_id=_article_id,
-                paragraphs=_paragraphs,
-                scroll_to=_scroll_to)
+                paragraphs=_paragraphs)
+
+    def post(self,vendor_id, trip_router_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+        logging.info("got trip_router_id %r in uri", trip_router_id)
+
+        access_token = self.get_secure_cookie("access_token")
+        ops = self.get_myinfo_basic()
+
+        triprouter = trip_router_dao.trip_router_dao().query(trip_router_id)
+
+        content = self.get_argument("content","")
+        logging.info("got content %r", content)
+
+        _article_id = None
+        if triprouter.has_key('article_id'):
+            _article_id = triprouter['article_id']
+        article = {'title':triprouter['title'], 'subtitle':triprouter['location'], 'img':triprouter['bk_img_url'],'paragraphs':content}
+        _json = json_encode(article)
+        headers = {"Authorization":"Bearer "+access_token}
+        url = "http://api.7x24hs.com/api/articles/"+_article_id
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="PUT", headers=headers, body=_json)
+        logging.info("got response %r", response.body)
+
+        self.redirect('/vendors/' + vendor_id + '/trip_router/' + trip_router_id + '/edit/step2')
+
 
  #/vendors/<string:vendor_id>/trip_router/<string:trip_router_id>/clone
 class VendorTriprouterCloneHandler(AuthorizationHandler):
@@ -373,10 +429,31 @@ class VendorTriprouterOpenSetHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got trip-router_id %r in uri", trip_router_id)
 
+        triprouter = trip_router_dao.trip_router_dao().query(trip_router_id)
+
+        access_token = self.get_secure_cookie("access_token")
         ops = self.get_myinfo_basic()
 
         json = {"_id":trip_router_id, "open":True}
         trip_router_dao.trip_router_dao().updateOpenStatus(json)
+
+        _article_id = None
+        if triprouter.has_key('article_id'):
+            _article_id = triprouter['article_id']
+        headers = {"Authorization":"Bearer "+access_token}
+        url = "http://api.7x24hs.com/api/articles/" + _article_id + "/publish"
+        http_client = HTTPClient()
+        _json = json_encode(headers)
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("got response %r", response.body)
+
+        ids = {'ids':['8853422e03a911e7998c00163e023e51']}
+        _json = json_encode(ids)
+        headers = {"Authorization":"Bearer "+access_token}
+        url = "http://api.7x24hs.com/api/articles/" + _article_id + "/categories"
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("got response %r", response.body)
 
         self.redirect('/vendors/' + vendor_id + '/trip_router')
 
@@ -386,7 +463,20 @@ class VendorTriprouterOpenCancelHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got trip-router_id %r in uri", trip_router_id)
 
+        triprouter = trip_router_dao.trip_router_dao().query(trip_router_id)
+
+        access_token = self.get_secure_cookie("access_token")
         ops = self.get_myinfo_basic()
+
+        _article_id = None
+        if triprouter.has_key('article_id'):
+            _article_id = triprouter['article_id']
+        headers = {"Authorization":"Bearer "+access_token}
+        url = "http://api.7x24hs.com/api/articles/" + _article_id + "/unpublish"
+        http_client = HTTPClient()
+        _json = json_encode(headers)
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("got response %r", response.body)
 
         json = {"_id":trip_router_id, "open":False}
         trip_router_dao.trip_router_dao().updateOpenStatus(json)
