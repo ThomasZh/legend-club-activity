@@ -34,8 +34,10 @@ import uuid
 class VendorIndexHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self):
-        self.set_secure_cookie("vendor_id", VENDOR_ID)
-        self.redirect('/vendors/' + VENDOR_ID + '/categorys')
+        ops = self.get_ops_info()
+        logging.info("got ops %r in uri", ops)
+
+        self.redirect('/vendors/' + ops['club_id'] + '/categorys')
 
 
 # /vendors/<string:vendor_id>/categorys/<string:category_id>/delete
@@ -45,7 +47,7 @@ class VendorCategoryDeleteHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got category_id %r in uri", category_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         category_dao.category_dao().delete(category_id)
 
@@ -58,7 +60,7 @@ class VendorCategoryListHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
@@ -75,7 +77,7 @@ class VendorCategoryCreateHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/category-create.html',
@@ -87,7 +89,7 @@ class VendorCategoryCreateHandler(AuthorizationHandler):
     def post(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         title = self.get_argument("title", "")
         desc = self.get_argument("desc", "")
@@ -112,7 +114,7 @@ class VendorCategoryEditHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got category_id %r in uri", category_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         category = category_dao.category_dao().query(category_id)
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
@@ -127,7 +129,7 @@ class VendorCategoryEditHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got category_id %r in uri", category_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         title = self.get_argument("title", "")
         desc = self.get_argument("desc", "")

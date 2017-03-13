@@ -21,9 +21,7 @@ API_HOST = "127.0.0.1"
 API_PORT = "8009"
 # STP = "127.0.0.1:8082"
 # bike-forever club
-LEAGUE_ID = "f24794c7e1d511e68c0aa45e60efbf2d"
-CLUB_ID = "702c87d4f73111e69a3c00163e023e51"
-VENDOR_ID = "b9f1ffe612aa11e6a4f6a45e60efbf2d"
+
 # mongodb
 MONGO_HOST = "123.56.165.59"
 MONGO_PORT = 3717

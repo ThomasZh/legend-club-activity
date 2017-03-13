@@ -49,10 +49,10 @@ from global_const import *
 class TripRouterIndexHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self):
-        self.set_secure_cookie("vendor_id", VENDOR_ID)
-        # logging.info("got vendor_id %r", VENDOR_ID)
+        ops = self.get_ops_info()
+        logging.info("got ops %r in uri", ops)
 
-        self.redirect('/vendors/' + VENDOR_ID + '/trip_router')
+        self.redirect('/vendors/' + ops['club_id'] + '/trip_router')
 
 
 # /vendors/<string:vendor_id>/triprouters
@@ -61,7 +61,8 @@ class VendorTriprouterListHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
+        logging.info("got ops %r in uri", ops)
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         triprouters = trip_router_dao.trip_router_dao().query_by_vendor(vendor_id)
@@ -86,7 +87,7 @@ class VendorTriprouterCreateHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
@@ -101,7 +102,7 @@ class VendorTriprouterCreateHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
 
         access_token = self.get_secure_cookie("access_token")
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _title = self.get_argument("title", "")
         _bk_img_url = self.get_argument("bk_img_url", "")
@@ -162,7 +163,7 @@ class VendorTriprouterDeleteHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got trip-router_id %r in uri", trip_router_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         trip_router_dao.trip_router_dao().delete(trip_router_id)
 
@@ -175,7 +176,7 @@ class VendorTriprouterEditStep1Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got trip-router_id %r in edit step1", trip_router_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         triprouter = trip_router_dao.trip_router_dao().query(trip_router_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
@@ -193,7 +194,7 @@ class VendorTriprouterEditStep1Handler(AuthorizationHandler):
         logging.info("got vendor_id %r ~~~~~~in uri", vendor_id)
         logging.info("got trip_router_id %r @@@@@@in uri", trip_router_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _title = self.get_argument("title", "")
         _bk_img_url = self.get_argument("bk_img_url", "")
@@ -223,7 +224,7 @@ class VendorTriprouterEditStep2Handler(AuthorizationHandler):
         logging.info("got trip_router_id %r in edit step2", trip_router_id)
 
         access_token = self.get_secure_cookie("access_token")
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         triprouter = trip_router_dao.trip_router_dao().query(trip_router_id)
         # _article_id = triprouter['article_id']
@@ -267,7 +268,7 @@ class VendorTriprouterEditStep2Handler(AuthorizationHandler):
         logging.info("got trip_router_id %r in uri", trip_router_id)
 
         access_token = self.get_secure_cookie("access_token")
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         triprouter = trip_router_dao.trip_router_dao().query(trip_router_id)
 
@@ -295,7 +296,7 @@ class VendorTriprouterCloneHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got trip_router_id %r in uri", trip_router_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         triprouter = trip_router_dao.trip_router_dao().query(trip_router_id)
         article_id = triprouter['article_id']
@@ -382,7 +383,7 @@ class VendorTriprouterActivityListHandler(AuthorizationHandler):
     def get(self, vendor_id, trip_router_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         activitys = activity_dao.activity_dao().query_by_triprouter(trip_router_id)
@@ -409,7 +410,7 @@ class VendorTriprouterEvalListHandler(AuthorizationHandler):
     def get(self, vendor_id, trip_router_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         triprouter = trip_router_dao.trip_router_dao().query(trip_router_id)
         evaluations = evaluation_dao.evaluation_dao().query_by_triprouter(trip_router_id)
@@ -432,7 +433,7 @@ class VendorTriprouterOpenSetHandler(AuthorizationHandler):
         triprouter = trip_router_dao.trip_router_dao().query(trip_router_id)
 
         access_token = self.get_secure_cookie("access_token")
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         json = {"_id":trip_router_id, "open":True}
         trip_router_dao.trip_router_dao().updateOpenStatus(json)
@@ -466,7 +467,7 @@ class VendorTriprouterOpenCancelHandler(AuthorizationHandler):
         triprouter = trip_router_dao.trip_router_dao().query(trip_router_id)
 
         access_token = self.get_secure_cookie("access_token")
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _article_id = None
         if triprouter.has_key('article_id'):
@@ -490,7 +491,7 @@ class VendorTriprouterShareListHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         # categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         triprouters = trip_router_dao.trip_router_dao().query_by_open(vendor_id)
@@ -527,7 +528,7 @@ class VendorTriprouterShareSetHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got trip-router_id %r in uri", trip_router_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         # 设置别人开放的线路为自己所用
         triprouter = trip_router_dao.trip_router_dao().query(trip_router_id)
@@ -548,7 +549,7 @@ class VendorTriprouterShareCancelHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got trip_router_id %r in uri", trip_router_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         triprouter_share = triprouter_share_dao.triprouter_share_dao().query_by_triprouter_vendor(trip_router_id,vendor_id)
         triprouter_share_dao.triprouter_share_dao().delete(triprouter_share['_id'])
@@ -561,7 +562,7 @@ class VendorTriprouterUseListHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         triprouters_me = trip_router_dao.trip_router_dao().query_by_vendor(vendor_id)
         triprouters_share = triprouter_share_dao.triprouter_share_dao().query_by_vendor(vendor_id)

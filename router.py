@@ -8,9 +8,8 @@
 import tornado.web
 
 from foo import comm
-from foo import demo
-from auth import auth_email
-from auth import auth_phone
+from foo.auth import auth_email
+from foo.auth import auth_phone
 from vendor import vendor_category
 from vendor import vendor_activity
 from vendor import blog

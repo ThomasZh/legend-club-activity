@@ -253,6 +253,7 @@ class AuthLogoutHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self):
         access_token = self.get_secure_cookie("access_token")
+        logging.info("got access_token %r", access_token)
 
         # logout
         url = "http://api.7x24hs.com/api/auth/tokens"

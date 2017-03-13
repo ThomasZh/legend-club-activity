@@ -54,7 +54,7 @@ from dao import contact_dao
 from dao import insurance_template_dao
 from dao import cret_dao
 
-from global_const import VENDOR_ID
+ 
 from global_const import ACTIVITY_STATUS_DRAFT
 from global_const import ACTIVITY_STATUS_POP
 from global_const import ACTIVITY_STATUS_DOING

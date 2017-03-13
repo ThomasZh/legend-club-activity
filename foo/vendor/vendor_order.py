@@ -49,7 +49,7 @@ from dao import insurance_template_dao
 from dao import vendor_member_dao
 from dao import voucher_order_dao
 
-from global_const import VENDOR_ID
+ 
 from global_const import STP
 from global_const import PAGE_SIZE_LIMIT
 
@@ -59,7 +59,7 @@ class VendorOrderListHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         before = time.time()
         _array = order_dao.order_dao().query_pagination_by_vendor(vendor_id, before, PAGE_SIZE_LIMIT);
@@ -125,7 +125,7 @@ class VendorApplyListHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         before = time.time()
         _array = apply_dao.apply_dao().query_pagination_by_vendor(vendor_id, before, PAGE_SIZE_LIMIT);
@@ -155,7 +155,7 @@ class VendorVoucherOrderListHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         before = time.time()
         _array = voucher_order_dao.voucher_order_dao().query_pagination_by_vendor(vendor_id, before, PAGE_SIZE_LIMIT);
@@ -178,7 +178,7 @@ class VendorOrderInfoHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got order_id %r in uri", order_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         order = order_dao.order_dao().query(order_id)
         _activity = activity_dao.activity_dao().query(order['activity_id'])

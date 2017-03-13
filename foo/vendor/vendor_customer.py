@@ -56,7 +56,7 @@ class VendorCustomerListHandler(AuthorizationHandler):
     def get(self, vendor_id,):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         customers = vendor_member_dao.vendor_member_dao().query_pagination(vendor_id, 0, PAGE_SIZE_LIMIT)
         for _customer_profile in customers:
@@ -118,7 +118,7 @@ class VendorCustomerSearchHandler(AuthorizationHandler):
     def post(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         keys_value = self.get_argument("search_keys", "")
         customers = vendor_member_dao.vendor_member_dao().query_by_keys(vendor_id,keys_value)
@@ -181,7 +181,7 @@ class VendorCustomerProfileHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got account_id %r in uri", account_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
         try:
@@ -293,7 +293,7 @@ class VendorCustomerProfileHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got account_id %r in uri", account_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _comment = self.get_argument("comment", "")
         logging.info("got _comment %r", _comment)
@@ -325,7 +325,7 @@ class VendorCustomerCretInfoHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got cret_id %r in uri", cret_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _cret = cret_dao.cret_dao().query(cret_id)
 
@@ -353,7 +353,7 @@ class VendorCustomerCretInfoHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got cret_id %r in uri", cret_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         distance = self.get_argument("distance", "")
         hours = self.get_argument("hours", "")

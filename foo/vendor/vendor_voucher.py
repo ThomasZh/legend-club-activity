@@ -52,7 +52,7 @@ class VendorVoucherListHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _status = self.get_argument("status", "")
         logging.info("got _status %r", _status)
@@ -104,7 +104,7 @@ class VendorVoucherFreeCreateHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/vouchers-free-create.html',
@@ -115,7 +115,7 @@ class VendorVoucherFreeCreateHandler(AuthorizationHandler):
     def post(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _amount = self.get_argument("amount", "")
         logging.info("got _amount %r", _amount)
@@ -144,7 +144,7 @@ class VendorVoucherPayCreateHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/vouchers-pay-create.html',
@@ -155,7 +155,7 @@ class VendorVoucherPayCreateHandler(AuthorizationHandler):
     def post(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _amount = self.get_argument("amount", "")
         logging.info("got _amount %r", _amount)
@@ -197,7 +197,7 @@ class VendorVoucherFreeEditHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got voucher_id %r in uri", voucher_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _voucher = voucher_dao.voucher_dao().query_not_safe(voucher_id)
         # 转换成元
@@ -215,7 +215,7 @@ class VendorVoucherFreeEditHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got voucher_id %r in uri", voucher_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _amount = self.get_argument("amount", "")
         logging.info("got _amount %r", _amount)
@@ -242,7 +242,7 @@ class VendorVoucherFreeAllocateHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got voucher_id %r in uri", voucher_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _voucher = voucher_dao.voucher_dao().query_not_safe(voucher_id)
         # 转换成元
@@ -280,7 +280,7 @@ class VendorVoucherFreeAllocateHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got voucher_id %r in uri", voucher_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _account_id = self.get_argument("account_id", "")
         logging.info("got _account_id %r", _account_id)
@@ -311,7 +311,7 @@ class VendorVoucherPayEditHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got voucher_id %r in uri", voucher_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _voucher = voucher_pay_dao.voucher_pay_dao().query_not_safe(voucher_id)
         # 转换成元
@@ -330,7 +330,7 @@ class VendorVoucherPayEditHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got voucher_id %r in uri", voucher_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _amount = self.get_argument("amount", "")
         logging.info("got _amount %r", _amount)
@@ -361,7 +361,7 @@ class VendorVoucherPayAllocateHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got voucher_id %r in uri", voucher_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _voucher = voucher_pay_dao.voucher_pay_dao().query_not_safe(voucher_id)
         # 转换成元

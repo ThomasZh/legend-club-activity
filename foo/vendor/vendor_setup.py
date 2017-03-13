@@ -64,7 +64,7 @@ class VendorSetupOperatorsHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/operators.html',
@@ -78,7 +78,7 @@ class VendorSetupInsuranceListHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _array = insurance_template_dao.insurance_template_dao().query_by_vendor(vendor_id)
         for _insurance in _array:
@@ -98,7 +98,7 @@ class VendorSetupInsuranceCreateHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/insurance-create.html',
@@ -110,7 +110,7 @@ class VendorSetupInsuranceCreateHandler(AuthorizationHandler):
     def post(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _title = self.get_argument("title", "")
         _amount = self.get_argument("amount", "")
@@ -146,7 +146,7 @@ class VendorSetupInsuranceEditHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got insurance_id %r in uri", insurance_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _title = self.get_argument("title", "")
         _amount = self.get_argument("amount", "")
@@ -167,7 +167,7 @@ class VendorSetupInsuranceDeleteHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got insurance_id %r in uri", insurance_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         insurance_template_dao.insurance_template_dao().delete(insurance_id)
 
@@ -179,7 +179,7 @@ class VendorSetupWxHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         vendor_wx = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
 
@@ -193,7 +193,7 @@ class VendorSetupWxHandler(AuthorizationHandler):
     def post(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         wx_app_id = self.get_argument("wx_app_id", "")
         wx_app_secret = self.get_argument("wx_app_secret", "")
@@ -221,7 +221,7 @@ class VendorSetupClubHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         club = club_dao.club_dao().query(vendor_id)
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
@@ -235,7 +235,7 @@ class VendorSetupClubHandler(AuthorizationHandler):
     def post(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _name = self.get_argument("club_name", "")
         _desc = self.get_argument("club_desc", "")
@@ -262,7 +262,7 @@ class VendorSetupHhaHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         vendor_hha = vendor_hha_dao.vendor_hha_dao().query(vendor_id)
         vendor_hha['content'] = markdown_html(vendor_hha['content'])
@@ -279,7 +279,7 @@ class VendorSetupHhaHandler(AuthorizationHandler):
     def post(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         content = self.get_argument("content", "")
         logging.info("got content %r", content)
@@ -302,7 +302,7 @@ class VendorSetupTaskHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         tasks = task_dao.task_dao().query_by_vendor(vendor_id)
@@ -333,7 +333,7 @@ class VendorSetupTaskDeleteHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got task_id %r in uri", task_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         task_dao.task_dao().delete(task_id)
         personal_task_dao.personal_task_dao().delete_by_task(task_id)
@@ -347,7 +347,7 @@ class VendorSetupTaskCreateHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         tasks= task_dao.task_dao().query_by_vendor(vendor_id)
         trip_routers = trip_router_dao.trip_router_dao().query_by_vendor(vendor_id)
@@ -394,7 +394,7 @@ class VendorSetupTaskAllocateHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got task_id %r in uri", task_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _task = task_dao.task_dao().query(task_id)
         _task['create_time'] = timestamp_datetime(_task['create_time'])
@@ -442,7 +442,7 @@ class VendorSetupTaskAllocateHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got voucher_id %r in uri", task_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _account_id = self.get_argument("account_id", "")
         logging.info("got _account_id %r", _account_id)

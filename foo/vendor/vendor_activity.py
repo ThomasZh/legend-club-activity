@@ -56,7 +56,7 @@ class VendorActivityDraftHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         before = time.time();
@@ -83,7 +83,7 @@ class VendorActivityPopHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         before = time.time();
@@ -110,7 +110,7 @@ class VendorActivityDoingHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         before = time.time();
@@ -137,7 +137,7 @@ class VendorActivityRecruitHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         before = time.time();
@@ -164,7 +164,7 @@ class VendorActivityCanceledHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         before = time.time();
@@ -191,7 +191,7 @@ class VendorActivityCompletedHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         before = 0
@@ -218,7 +218,7 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         triprouters = trip_router_dao.trip_router_dao().query_by_vendor(vendor_id)
@@ -234,7 +234,7 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         access_token = self.get_secure_cookie("access_token")
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _title = self.get_argument("title", "")
         _bk_img_url = self.get_argument("bk_img_url", "")
@@ -344,7 +344,7 @@ class VendorActivityCreateStep2Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/activity-create-step2.html',
@@ -358,7 +358,7 @@ class VendorActivityCreateStep2Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         slope_length = self.get_argument("slope_length", "")
         distance = self.get_argument("distance", "")
@@ -389,7 +389,7 @@ class VendorActivityCreateStep3Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/activity-create-step3.html',
@@ -403,7 +403,7 @@ class VendorActivityCreateStep3Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         activity_shared = self.get_argument("activity_shared", "")
         cret_shared = self.get_argument("cret_shared", "")
@@ -423,7 +423,7 @@ class VendorActivityDetailStep1Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _activity = activity_dao.activity_dao().query(activity_id)
         _activity['begin_time'] = timestamp_date(float(_activity['begin_time'])) # timestamp -> %m/%d/%Y
@@ -461,7 +461,7 @@ class VendorActivityDetailStep1Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _title = self.get_argument("title", "")
         _bk_img_url = self.get_argument("bk_img_url", "")
@@ -508,7 +508,7 @@ class VendorActivityDetailStep2Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
@@ -541,7 +541,7 @@ class VendorActivityDetailStep2Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         wx_qrcode_url = self.get_argument("wx_qrcode_url", "")
         logging.info("got wx_qrcode_url----------------- %r", wx_qrcode_url)
@@ -561,7 +561,7 @@ class VendorActivityDetailStep3Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
@@ -587,7 +587,7 @@ class VendorActivityDetailStep3Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         template_id = self.get_argument("template_id", "")
         logging.info("got template_id %r", template_id)
@@ -616,7 +616,7 @@ class VendorActivityDetailStep4Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
@@ -642,7 +642,7 @@ class VendorActivityDetailStep4Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         activity_shared = self.get_argument("activity_shared", "")
         cret_shared = self.get_argument("cret_shared", "")
@@ -662,7 +662,7 @@ class VendorActivityDetailStep5Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
@@ -747,7 +747,7 @@ class VendorActivityDetailStep6Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
@@ -809,7 +809,7 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
         logging.info("got activity_id %r in uri", activity_id)
 
         access_token = self.get_secure_cookie("access_token")
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
@@ -860,7 +860,7 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
         logging.info("got activity_id %r in uri", activity_id)
 
         access_token = self.get_secure_cookie("access_token")
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
@@ -894,7 +894,7 @@ class VendorActivityDetailStep8Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         activity = activity_dao.activity_dao().query(activity_id)
         for base_fee_template in activity['base_fee_template']:
@@ -924,7 +924,7 @@ class VendorActivityDetailStep8Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         # 生成基本服务
         base_serv_names = self.get_arguments("base_serv_name")
@@ -965,7 +965,7 @@ class VendorActivityDetailStep9Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
@@ -989,7 +989,7 @@ class VendorActivityDetailStep9Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         activity_notes = self.get_argument("notes", "")
         json = {"_id":activity_id, "notes":activity_notes}
@@ -1005,7 +1005,7 @@ class VendorActivityActionPublishHandler(AuthorizationHandler):
         logging.info("got activity_id %r in uri", activity_id)
 
         access_token = self.get_secure_cookie("access_token")
-        # ops = self.get_myinfo_basic()
+        # ops = self.get_ops_info()
 
         activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
@@ -1052,7 +1052,7 @@ class VendorActivityActionDeleteHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         activity_dao.activity_dao().delete(activity_id)
         self.redirect('/vendors/' + vendor_id + '/activitys/draft')
@@ -1064,7 +1064,7 @@ class VendorActivityActionKickoffHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         activity_dao.activity_dao().update_status(activity_id, ACTIVITY_STATUS_DOING)
         self.redirect('/vendors/' + vendor_id + '/activitys/recruit')
@@ -1076,7 +1076,7 @@ class VendorActivityActionCancelHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         activity_dao.activity_dao().update_status(activity_id, ACTIVITY_STATUS_CANCELED)
         self.redirect('/vendors/' + vendor_id + '/activitys/recruit')
@@ -1089,7 +1089,7 @@ class VendorActivityActionResetHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         activity_dao.activity_dao().update_status(activity_id, ACTIVITY_STATUS_DRAFT)
         self.redirect('/vendors/' + vendor_id + '/activitys/draft')
@@ -1101,7 +1101,7 @@ class VendorActivityActionPopularHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         json = {"_id":activity_id, "popular":True}
         activity_dao.activity_dao().update(json)
@@ -1114,7 +1114,7 @@ class VendorActivityActionUnpopularHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         json = {"_id":activity_id, "popular":False}
         activity_dao.activity_dao().update(json)
@@ -1127,7 +1127,7 @@ class VendorActivityActionCompleteHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         activity_dao.activity_dao().update_status(activity_id, ACTIVITY_STATUS_COMPLETED)
 
@@ -1177,7 +1177,7 @@ class VendorActivityActionCloneHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         activity = activity_dao.activity_dao().query(activity_id)
         article_id = activity['article_id']
@@ -1260,7 +1260,7 @@ class VendorActivityActionEvalHandler(AuthorizationHandler):
     def get(self, vendor_id, activity_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         activity = activity_dao.activity_dao().query(activity_id)
@@ -1277,7 +1277,7 @@ class VendorActivityActionEvalHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        ops = self.get_myinfo_basic()
+        ops = self.get_ops_info()
 
         _content = self.get_argument("content", "")
         _score = self.get_argument("score", "")

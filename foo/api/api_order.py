@@ -53,7 +53,7 @@ from dao import cret_dao
 from dao import vendor_member_dao
 from dao import voucher_order_dao
 
-from global_const import VENDOR_ID
+ 
 from global_const import ACTIVITY_STATUS_DRAFT
 from global_const import ACTIVITY_STATUS_POP
 from global_const import ACTIVITY_STATUS_DOING
