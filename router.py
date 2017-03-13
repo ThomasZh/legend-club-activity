@@ -196,6 +196,7 @@ def map():
         (r"/bf/wx/vendors/([a-z0-9]*)/activitys", getattr(wx_activity, 'WxActivityListHandler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)", getattr(wx_activity, 'WxActivityInfoHandler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/qrcode", getattr(wx_activity, 'WxActivityQrcodeHandler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/apply/step0", getattr(wx_activity, 'WxActivityApplyStep0Handler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/apply/step1", getattr(wx_activity, 'WxActivityApplyStep1Handler')),
         (r"/bf/wxpay", getattr(wx_activity, 'WxActivityApplyStep2Handler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/apply/step3", getattr(wx_activity, 'WxActivityApplyStep3Handler')),

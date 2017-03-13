@@ -111,7 +111,6 @@
 	<!-- 底部工具栏 -->
   <div class="ui-footer ui-footer-stable white ui-border-t ui-row-flex">
     <div class="ui-btn-group no-gap">
-      <input id="logined" type="hidden" value="{{ logined }}"/>
       <input id="phase" type="hidden" value="{{ activity['phase'] }}"/>
       <button class="ui-btn-lg round-corner no-border in-footer ui-btn-success join-wexin-group" >
           微信群
@@ -284,7 +283,7 @@
       // 报名中 or 已成行
       if (phase == "0" || phase == "1") {
         // redirect http for test(A计划公众号)
-        location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid={{ wx_app_id }}&redirect_uri={{ wx_notify_domain }}/bf/wx/vendors/{{ vendor_id }}/activitys/'+activityID+'/apply/step1&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect';
+        location.href = '/bf/wx/vendors/{{ vendor_id }}/activitys/'+ activityID+'/apply/step0'
         // redirect https for 沐雨户外公众号
       }
 

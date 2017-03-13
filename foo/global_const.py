@@ -21,7 +21,9 @@ API_HOST = "127.0.0.1"
 API_PORT = "8009"
 # STP = "127.0.0.1:8082"
 # bike-forever club
-
+LEAGUE_ID = "f24794c7e1d511e68c0aa45e60efbf2d"
+CLUB_ID = "702c87d4f73111e69a3c00163e023e51"
+VENDOR_ID = "b9f1ffe612aa11e6a4f6a45e60efbf2d"
 # mongodb
 MONGO_HOST = "123.56.165.59"
 MONGO_PORT = 3717
@@ -40,7 +42,9 @@ WX_APP_ID = "wxaa328c83d3132bfb"
 WX_APP_SECRET = "32bbf99a46d80b24bae81e8c8558c42f"
 WX_MCH_ID = "1340430801"
 WX_MCH_KEY = "b9f1ffe612aa11e6a4f6a45e60efbf2d"
-WX_NOTIFY_DOMAIN = "http://planc2c.com"
+# WX_NOTIFY_DOMAIN = "http://planc2c.com"
+WX_NOTIFY_DOMAIN='http://club.activity.7x24hs.com'
+
 
 QRCODE_CREATE_URL = "http://qrcode.7x24hs.com/api/qrcode"
 
