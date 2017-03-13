@@ -234,6 +234,7 @@ def map():
         (r"/bf/wx/vendors/([a-z0-9]*)/pc/certs/([a-z0-9]*)", getattr(wx_personal_center, 'WxPcCertInfoHandler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/pc/tasks", getattr(wx_personal_center, 'WxPcTaskListHandler')),
 
+        (r"/MP_verify_rZAV6WH7J2WhqAIs.txt", getattr(comm, 'WxMpVerifyHandler')),
 
         # comm
         ('.*', getattr(comm, 'PageNotFoundHandler'))

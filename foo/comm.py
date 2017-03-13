@@ -30,6 +30,12 @@ import markdown
 import re
 
 
+class WxMpVerifyHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.finish('rZAV6WH7J2WhqAIs')
+        return
+
+
 class singleton(object):
     _singleton = None;
     def __new__(cls):

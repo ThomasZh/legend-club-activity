@@ -43,7 +43,7 @@ WX_APP_SECRET = "32bbf99a46d80b24bae81e8c8558c42f"
 WX_MCH_ID = "1340430801"
 WX_MCH_KEY = "b9f1ffe612aa11e6a4f6a45e60efbf2d"
 # WX_NOTIFY_DOMAIN = "http://planc2c.com"
-WX_NOTIFY_DOMAIN='http://club.activity.7x24hs.com'
+WX_NOTIFY_DOMAIN="http://7x24hs.com"
 
 
 QRCODE_CREATE_URL = "http://qrcode.7x24hs.com/api/qrcode"

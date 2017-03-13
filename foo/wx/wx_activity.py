@@ -239,13 +239,13 @@ class WxActivityQrcodeHandler(tornado.web.RequestHandler):
 class WxActivityApplyStep0Handler(tornado.web.RequestHandler):
     def get(self, vendor_id, activity_id):
 
-        redirect_url= 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='+WX_APP_ID
-        +'&redirect_uri='+WX_NOTIFY_DOMAIN+'/bf/wx/vendors/'+vendor_id+'/activitys/'+activity_id
-        +'/apply/step1&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect';
+        redirect_url= "https://open.weixin.qq.com/connect/oauth2/authorize?appid="+ WX_APP_ID +"&redirect_uri="+ WX_NOTIFY_DOMAIN +"/bf/wx/vendors/"+vendor_id+"/activitys/"+ activity_id +"/apply/step1&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
 
         # FIXME 这里应改为从缓存取自己的access_token然后查myinfo是否存在wx_openid
         # 存在就直接用，不存在再走微信授权并更新用户信息 /api/myinfo-as-wx-user
         access_token=self.get_secure_cookie("access_token")
+        logging.info("access_token %r======", access_token)
+
         if access_token:
             try:
                 url = "http://api.7x24hs.com/api/myinfo-as-wx-user"
@@ -342,16 +342,9 @@ class WxActivityApplyStep1Handler(tornado.web.RequestHandler):
             logging.error("got nickname=[%r]", nickname)
             nickname = "anonymous"
 
-        # 1604=wechat
-        stpSession = ssoLogin(1604, wx_openid, nickname, headimgurl, user_agent, lang)
-        session_ticket = stpSession["sessionToken"]
-        account_id = stpSession["accountId"]
-        logging.info("got account_id=[%r] from neuron-stp", account_id)
-        logging.info("got session_ticket=[%r] from neuron-stp", session_ticket)
-
         url = "http://api.7x24hs.com/api/auth/wx/register"
         http_client = HTTPClient()
-        radom = str(uuid.uuid1()).replace('-', '')
+        random = str(uuid.uuid1()).replace('-', '')
         headers = {"Authorization":"Bearer "+random}
         _json = json_encode({'wx_openid':wx_openid,'nickname':nickname,'avatar':headimgurl})
         response = http_client.fetch(url, method="POST", headers=headers, body=_json)
@@ -361,12 +354,12 @@ class WxActivityApplyStep1Handler(tornado.web.RequestHandler):
         account_id = session_ticket['account_id']
 
         self.set_secure_cookie("access_token", session_ticket['access_token'])
-        self.set_secure_cookie("expires_at", session_ticket['expires_at'])
+        self.set_secure_cookie("expires_at", str(session_ticket['expires_at']))
         self.set_secure_cookie("account_id",account_id)
 
 
         timestamp = time.time()
-        vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, tmp_account_id)
+        vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
         if not vendor_member:
             memeber_id = str(uuid.uuid1()).replace('-', '')
             _json = {'_id':memeber_id, 'vendor_id':vendor_id,
@@ -391,7 +384,7 @@ class WxActivityApplyStep1Handler(tornado.web.RequestHandler):
         # 金额转换成元
         # activity['amount'] = float(activity['amount']) / 100
 
-        customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, tmp_account_id)
+        customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
         try:
             customer_profile['bonus']
         except:
