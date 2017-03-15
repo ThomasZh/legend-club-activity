@@ -316,6 +316,11 @@ class WxActivityApplyStep1Handler(tornado.web.RequestHandler):
         wx_code = self.get_argument("code", "")
         logging.info("got wx_code=[%r] from argument", wx_code)
 
+        # if not wx_code:
+        #     redirect_url= "https://open.weixin.qq.com/connect/oauth2/authorize?appid="+ WX_APP_ID +"&redirect_uri="+ WX_NOTIFY_DOMAIN +"/bf/wx/vendors/"+vendor_id+"/activitys/"+ activity_id +"/apply/step1&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
+        #     self.redirect(redirect_url)
+        #     return
+
         accessToken = getAccessToken(WX_APP_ID, WX_APP_SECRET, wx_code);
         access_token = accessToken["access_token"];
         logging.info("got access_token %r", access_token)
@@ -356,7 +361,7 @@ class WxActivityApplyStep1Handler(tornado.web.RequestHandler):
         self.set_secure_cookie("access_token", session_ticket['access_token'])
         self.set_secure_cookie("expires_at", str(session_ticket['expires_at']))
         self.set_secure_cookie("account_id",account_id)
-
+        self.set_secure_cookie("wx_openid",wx_openid)
 
         timestamp = time.time()
         vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
