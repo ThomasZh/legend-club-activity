@@ -49,7 +49,7 @@ from dao import insurance_template_dao
 from dao import vendor_member_dao
 from dao import voucher_order_dao
 
- 
+
 from global_const import STP
 from global_const import PAGE_SIZE_LIMIT
 
@@ -58,6 +58,7 @@ class VendorOrderListHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
+        access_token = self.get_access_token()
 
         ops = self.get_ops_info()
 
@@ -116,6 +117,7 @@ class VendorOrderListHandler(AuthorizationHandler):
         self.render('vendor/orders.html',
                 vendor_id=vendor_id,
                 ops=ops,
+                access_token=access_token,
                 budge_num=budge_num,
                 orders=_array)
 
@@ -124,7 +126,7 @@ class VendorApplyListHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
-
+        access_token = self.get_access_token()
         ops = self.get_ops_info()
 
         before = time.time()
@@ -146,6 +148,7 @@ class VendorApplyListHandler(AuthorizationHandler):
         self.render('vendor/applys.html',
                 vendor_id=vendor_id,
                 ops=ops,
+                access_token=access_token,
                 budge_num=budge_num,
                 applys=_array)
 
@@ -154,6 +157,7 @@ class VendorVoucherOrderListHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
+        access_token = self.get_access_token()
 
         ops = self.get_ops_info()
 
@@ -168,6 +172,7 @@ class VendorVoucherOrderListHandler(AuthorizationHandler):
         self.render('vendor/voucher-orders.html',
                 vendor_id=vendor_id,
                 ops=ops,
+                access_token=access_token,
                 budge_num=budge_num,
                 voucher_orders= _array)
 
@@ -177,6 +182,7 @@ class VendorOrderInfoHandler(AuthorizationHandler):
     def get(self, vendor_id, order_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got order_id %r in uri", order_id)
+        access_token = self.get_access_token()
 
         ops = self.get_ops_info()
 
@@ -254,5 +260,6 @@ class VendorOrderInfoHandler(AuthorizationHandler):
         self.render('vendor/order-detail.html',
                 vendor_id=vendor_id,
                 ops=ops,
+                access_token=access_token,
                 budge_num=budge_num,
                 activity=_activity, order=order, applys=_applys)

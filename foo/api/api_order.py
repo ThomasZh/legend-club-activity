@@ -33,12 +33,8 @@ from tornado.httpclient import HTTPClient
 from tornado.httputil import url_concat
 from bson import json_util
 
-from comm import BaseHandler
-from comm import timestamp_datetime
-from comm import datetime_timestamp
-from comm import timestamp_date
-from comm import date_timestamp
-from comm import timestamp_friendly_date
+from comm import *
+
 
 from dao import budge_num_dao
 from dao import category_dao
@@ -53,21 +49,14 @@ from dao import cret_dao
 from dao import vendor_member_dao
 from dao import voucher_order_dao
 
-from global_const import ACTIVITY_STATUS_DRAFT
-from global_const import ACTIVITY_STATUS_POP
-from global_const import ACTIVITY_STATUS_DOING
-from global_const import ACTIVITY_STATUS_RECRUIT
-from global_const import ACTIVITY_STATUS_COMPLETED
-from global_const import ACTIVITY_STATUS_CANCELED
-from global_const import STP
-from global_const import PAGE_SIZE_LIMIT
+from global_const import *
 
-class ApiOrderListXHR(BaseHandler):
+class ApiOrderListXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        _session_ticket = self.get_secure_cookie("session_ticket")
+        # _session_ticket = self.get_secure_cookie("session_ticket")
 
         iBefore = 0
         sBefore = self.get_argument("before", "") #格式 2016-06-01 22:36
@@ -169,7 +158,8 @@ class ApiOrderListXHR(BaseHandler):
         _json = json_encode(_array)
         logging.info("got _json %r", _json)
 
-        self.finish(_json)
+        self.write(JSON.dumps(_json, default=json_util.default))
+        self.finish()
 
 
 # 查询订单详情
@@ -211,7 +201,7 @@ class ApiApplyListXHR(BaseHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        _session_ticket = self.get_secure_cookie("session_ticket")
+        # _session_ticket = self.get_secure_cookie("session_ticket")
 
         iBefore = 0
         sBefore = self.get_argument("before", "") #格式 2016-06-01 22:36
@@ -268,7 +258,8 @@ class ApiApplyListXHR(BaseHandler):
 
         _json = json_encode(_array)
         logging.info("got _json %r", _json)
-        self.finish(_json)
+        self.write(JSON.dumps(_json, default=json_util.default))
+        self.finish()
 
 
 class ApiOrderReviewXHR(BaseHandler):
@@ -325,7 +316,7 @@ class ApiActivityExportXHR(BaseHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        _session_ticket = self.get_secure_cookie("session_ticket")
+        # _session_ticket = self.get_secure_cookie("session_ticket")
 
         # utf8,gbk,gb2312
         _unicode = 'utf8'
@@ -394,7 +385,7 @@ class ApiVoucherOrderListXHR(BaseHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        _session_ticket = self.get_secure_cookie("session_ticket")
+        # _session_ticket = self.get_secure_cookie("session_ticket")
 
         iBefore = 0
         sBefore = self.get_argument("before", "") #格式 2016-06-01 22:36
@@ -412,14 +403,15 @@ class ApiVoucherOrderListXHR(BaseHandler):
 
         _json = json_encode(_array)
         logging.info("got _json %r", _json)
-        self.finish(_json)
+        self.write(JSON.dumps(_json, default=json_util.default))
+        self.finish()
 
 class ApiApplySearchXHR(BaseHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        _session_ticket = self.get_secure_cookie("session_ticket")
+        # _session_ticket = self.get_secure_cookie("session_ticket")
 
         _keys = self.get_argument("keysValue", "")
         _type = self.get_argument("searchType","")
@@ -470,14 +462,15 @@ class ApiApplySearchXHR(BaseHandler):
 
         _json = json_encode(_array)
         logging.info("got _json %r", _json)
-        self.finish(_json)
+        self.write(JSON.dumps(_json, default=json_util.default))
+        self.finish()
 
 class ApiOrderSearchXHR(BaseHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        _session_ticket = self.get_secure_cookie("session_ticket")
+        # _session_ticket = self.get_secure_cookie("session_ticket")
 
         _keys = self.get_argument("keysValue", "")
         _type = self.get_argument("searchType","")
@@ -582,4 +575,5 @@ class ApiOrderSearchXHR(BaseHandler):
 
         _json = json_encode(_array)
         logging.info("got _json %r", _json)
-        self.finish(_json)
+        self.write(JSON.dumps(_json, default=json_util.default))
+        self.finish()

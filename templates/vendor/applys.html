@@ -213,78 +213,93 @@
 		preAllow = true;   // when ajax not completed, cannot do the next request
 		lastTimestamp = "";
 
-		function query() {
-			$.get("/bf/api/vendors/{{ vendor_id }}/applys?before="+lastTimestamp,function(data,status){
-        console.log(lastTimestamp);
-				var ajaxobj = eval("("+data+")");
+    function query() {
+      console.log(lastTimestamp);
+      $.ajax({
+        type: "GET",
+        url: "/bf/api/vendors/{{ vendor_id }}/applys?before="+lastTimestamp,
+        headers: {
+          "Authorization": "Bearer {{access_token}}"
+        },
+        dataType: "json",
+        contentType: 'application/json',
+        success: function(data, status, xhr) {
+          var ajaxobj = eval("("+data+")");
 
-				for (var i in ajaxobj) {
-          var inner_html = '<tr class="even pointer">';
-            inner_html += '<td class="a-center">';
-              if (ajaxobj[i].review == true)
-                inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
-              else
-                inner_html += '<input type="checkbox" class="tableflat" value="'+ajaxobj[i]._id+'" onclick="OnReviewApply(this);">';
-            inner_html += '</td>';
+          for (var i in ajaxobj) {
+            var inner_html = '<tr class="even pointer">';
+              inner_html += '<td class="a-center">';
+                if (ajaxobj[i].review == true)
+                  inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
+                else
+                  inner_html += '<input type="checkbox" class="tableflat" value="'+ajaxobj[i]._id+'" onclick="OnReviewApply(this);">';
+              inner_html += '</td>';
 
-            inner_html += '<td class=" ">';
-              inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/'+ajaxobj[i].activity_id+'/detail/step1">'+ajaxobj[i].activity_title+'</a></td>';
-            inner_html += '</td>';
+              inner_html += '<td class=" ">';
+                inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/'+ajaxobj[i].activity_id+'/detail/step1">'+ajaxobj[i].activity_title+'</a></td>';
+              inner_html += '</td>';
 
-            inner_html += '<td class=" ">';
-              inner_html += '<ul class="list-inline">';
-                inner_html += '<li>';
-                  inner_html += '<img src="'+ajaxobj[i].account_avatar+'" class="avatar" alt="Avatar">';
-                inner_html += '</li>';
-              inner_html += '</ul>';
-              inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ajaxobj[i].account_id+'">'+ajaxobj[i].account_nickname+'</a>';
-              inner_html += '<br />';
-            inner_html += '</td>';
+              inner_html += '<td class=" ">';
+                inner_html += '<ul class="list-inline">';
+                  inner_html += '<li>';
+                    inner_html += '<img src="'+ajaxobj[i].account_avatar+'" class="avatar" alt="Avatar">';
+                  inner_html += '</li>';
+                inner_html += '</ul>';
+                inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ajaxobj[i].account_id+'">'+ajaxobj[i].account_nickname+'</a>';
+                inner_html += '<br />';
+              inner_html += '</td>';
 
-            inner_html += '<td class=" ">';
-              inner_html += ajaxobj[i].name;
-            inner_html += '</td>';
+              inner_html += '<td class=" ">';
+                inner_html += ajaxobj[i].name;
+              inner_html += '</td>';
 
-            inner_html += '<td class=" ">';
-              inner_html += ajaxobj[i].gender;
-            inner_html += '</td>';
+              inner_html += '<td class=" ">';
+                inner_html += ajaxobj[i].gender;
+              inner_html += '</td>';
 
-            inner_html += '<td class=" ">';
-              inner_html += ajaxobj[i].id_code;
-            inner_html += '</td>';
+              inner_html += '<td class=" ">';
+                inner_html += ajaxobj[i].id_code;
+              inner_html += '</td>';
 
-            inner_html += '<td class=" ">';
-              inner_html += ajaxobj[i].phone;
-            inner_html += '</td>';
+              inner_html += '<td class=" ">';
+                inner_html += ajaxobj[i].phone;
+              inner_html += '</td>';
 
-            inner_html += '<td class=" ">';
-              inner_html += ajaxobj[i].height;
-            inner_html += '</td>';
+              inner_html += '<td class=" ">';
+                inner_html += ajaxobj[i].height;
+              inner_html += '</td>';
 
-            inner_html += '<td class=" ">';
-              inner_html += ajaxobj[i].note;
-            inner_html += '</td>';
+              inner_html += '<td class=" ">';
+                inner_html += ajaxobj[i].note;
+              inner_html += '</td>';
 
-            inner_html += '<td class=" ">';
-              inner_html += ajaxobj[i].create_time;
-            inner_html += '</td>';
+              inner_html += '<td class=" ">';
+                inner_html += ajaxobj[i].create_time;
+              inner_html += '</td>';
 
-            inner_html += '<td class=" ">';
-              inner_html += '<a href="#" class="btn btn-success btn-xs"> 成功 </a>';
-            inner_html += '</td>';
+              inner_html += '<td class=" ">';
+                inner_html += '<a href="#" class="btn btn-success btn-xs"> 成功 </a>';
+              inner_html += '</td>';
 
-            inner_html += '<td class=" ">';
-              inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+ajaxobj[i].order_id+'" class="btn btn-info btn-xs"><i class="fa fa-eye"></i> 订单 </a>';
-            inner_html += '</td>';
+              inner_html += '<td class=" ">';
+                inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+ajaxobj[i].order_id+'" class="btn btn-info btn-xs"><i class="fa fa-eye"></i> 订单 </a>';
+              inner_html += '</td>';
 
-            inner_html += '</tr>';
-          $('#tbody').append(inner_html);
-          lastTimestamp = ajaxobj[i].create_time;
-				}
+              inner_html += '</tr>';
+            $('#tbody').append(inner_html);
+            lastTimestamp = ajaxobj[i].create_time;
+          }
 
-				preAllow = true;
-			});
-		}
+          preAllow = true;
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+          console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+        },
+        complete: function(XMLHttpRequest, textStatus) {
+          this; // 调用本次AJAX请求时传递的options参数
+        }
+      });
+    }
 
 		$("#OnGetMore").click(function(){ // This event fires when a button is clicked
 			if(preAllow){

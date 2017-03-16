@@ -206,103 +206,118 @@
 
 		function query() {
       console.log(lastTimestamp);
-			$.get("/bf/api/vendors/{{ vendor_id }}/orders?before="+lastTimestamp,function(data,status){
-				var ajaxobj = eval("("+data+")");
-				for (var i in ajaxobj) {
-          var inner_html = '<tr class="even pointer">';
-            inner_html += '<td class="a-center">';
-              if (ajaxobj[i].review == true)
-                inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
-              else
-                inner_html += '<input type="checkbox" class="tableflat" value="'+ajaxobj[i]._id+'" onclick="OnReviewOrder(this);">';
-            inner_html += '</td>';
+      $.ajax({
+        type: "GET",
+        url: "/bf/api/vendors/{{ vendor_id }}/orders?before="+lastTimestamp,
+        headers: {
+          "Authorization": "Bearer {{access_token}}"
+        },
+        dataType: "json",
+        contentType: 'application/json',
+        success: function(data, status, xhr) {
+          var ajaxobj = eval("("+data+")");
+          for (var i in ajaxobj) {
+            var inner_html = '<tr class="even pointer">';
+              inner_html += '<td class="a-center">';
+                if (ajaxobj[i].review == true)
+                  inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
+                else
+                  inner_html += '<input type="checkbox" class="tableflat" value="'+ajaxobj[i]._id+'" onclick="OnReviewOrder(this);">';
+              inner_html += '</td>';
 
-            inner_html += '<td class=" ">';
-              inner_html += ajaxobj[i]._id;
-              if (ajaxobj[i].status == 20)
-                inner_html += '<br />' + ajaxobj[i].prepay_id;
-              else if (ajaxobj[i].status > 20) {
-                inner_html += '<br />' + ajaxobj[i].prepay_id;
-                inner_html += '<br />' + ajaxobj[i].transaction_id;
-              }
-            inner_html += '</td>';
+              inner_html += '<td class=" ">';
+                inner_html += ajaxobj[i]._id;
+                if (ajaxobj[i].status == 20)
+                  inner_html += '<br />' + ajaxobj[i].prepay_id;
+                else if (ajaxobj[i].status > 20) {
+                  inner_html += '<br />' + ajaxobj[i].prepay_id;
+                  inner_html += '<br />' + ajaxobj[i].transaction_id;
+                }
+              inner_html += '</td>';
 
-            inner_html += '<td class=" ">';
-              inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/' + ajaxobj[i].activity_id + '/detail/step1">'+ajaxobj[i].activity_title+'</a>';
-            inner_html += '</td>';
+              inner_html += '<td class=" ">';
+                inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/' + ajaxobj[i].activity_id + '/detail/step1">'+ajaxobj[i].activity_title+'</a>';
+              inner_html += '</td>';
 
-            inner_html += '<td class=" ">';
-              inner_html += '<ul class="list-inline">';
-                inner_html += '<li>';
-                  inner_html += '<img src="'+ajaxobj[i].account_avatar+'" class="avatar" alt="Avatar">';
-                inner_html += '</li>';
-              inner_html += '</ul>';
-              inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ajaxobj[i].account_id+'">'+ajaxobj[i].account_nickname+'</a>';
-              inner_html += '<br />';
-            inner_html += '</td>';
+              inner_html += '<td class=" ">';
+                inner_html += '<ul class="list-inline">';
+                  inner_html += '<li>';
+                    inner_html += '<img src="'+ajaxobj[i].account_avatar+'" class="avatar" alt="Avatar">';
+                  inner_html += '</li>';
+                inner_html += '</ul>';
+                inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ajaxobj[i].account_id+'">'+ajaxobj[i].account_nickname+'</a>';
+                inner_html += '<br />';
+              inner_html += '</td>';
 
-            inner_html += '<td class=" ">';
-              inner_html += ajaxobj[i].applicant_num;
-            inner_html += '</td>';
+              inner_html += '<td class=" ">';
+                inner_html += ajaxobj[i].applicant_num;
+              inner_html += '</td>';
 
-            inner_html += '<td class=" ">';
-              inner_html += '活动费用: '+ajaxobj[i].activity_amount+'元<br />';
-              for (var j in ajaxobj[i].ext_fees) {
-                inner_html += ajaxobj[i].ext_fees[j].name + ': ' + ajaxobj[i].ext_fees[j].fee + '元<br />';
-              }
-              for (var k in ajaxobj[i].insurances) {
-                inner_html += ajaxobj[i].insurances[k].name + ': ' + ajaxobj[i].insurances[k].fee + '元<br />';
-              }
-              for (var k in ajaxobj[i].vouchers) {
-                inner_html += '使用代金券抵: ' + ajaxobj[i].vouchers[k].fee + '元<br />';
-              }
-              if (ajaxobj[i].bonus < 0) {
-                inner_html += '使用积分抵: ' + ajaxobj[i].bonus + '元';
-              }
-            inner_html += '</td>';
+              inner_html += '<td class=" ">';
+                inner_html += '活动费用: '+ajaxobj[i].activity_amount+'元<br />';
+                for (var j in ajaxobj[i].ext_fees) {
+                  inner_html += ajaxobj[i].ext_fees[j].name + ': ' + ajaxobj[i].ext_fees[j].fee + '元<br />';
+                }
+                for (var k in ajaxobj[i].insurances) {
+                  inner_html += ajaxobj[i].insurances[k].name + ': ' + ajaxobj[i].insurances[k].fee + '元<br />';
+                }
+                for (var k in ajaxobj[i].vouchers) {
+                  inner_html += '使用代金券抵: ' + ajaxobj[i].vouchers[k].fee + '元<br />';
+                }
+                if (ajaxobj[i].bonus < 0) {
+                  inner_html += '使用积分抵: ' + ajaxobj[i].bonus + '元';
+                }
+              inner_html += '</td>';
 
-            inner_html += '<td class=" ">';
-              inner_html += '订单总额: ' + ajaxobj[i].total_amount + '元';
-              if (ajaxobj[i].status > 20)
-                inner_html += '<br />实际支付: ' + ajaxobj[i].payed_total_fee + '元';
-            inner_html += '</td>';
+              inner_html += '<td class=" ">';
+                inner_html += '订单总额: ' + ajaxobj[i].total_amount + '元';
+                if (ajaxobj[i].status > 20)
+                  inner_html += '<br />实际支付: ' + ajaxobj[i].payed_total_fee + '元';
+              inner_html += '</td>';
 
-            inner_html += '<td class=" ">';
-              inner_html += ajaxobj[i].create_time;
-            inner_html += '</td>';
+              inner_html += '<td class=" ">';
+                inner_html += ajaxobj[i].create_time;
+              inner_html += '</td>';
 
-            inner_html += '<td class=" ">';
+              inner_html += '<td class=" ">';
 
-              if (ajaxobj[i].status == 20)
-                inner_html += '<a href="#" class="btn btn-warning btn-xs"> 待付款 </a>';
-              else if(ajaxobj[i].status == 21)
-                inner_html += '<a href="#" class="btn btn-warning btn-xs"> 下单失败 </a>';
-              else if (ajaxobj[i].status == 31)
-                inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a>';
-              else if (ajaxobj[i].status == 30)
-                inner_html += '<a href="#" class="btn btn-warning btn-xs"> 待报名 </a>';
-              else if (ajaxobj[i].status == 50)
-                inner_html += '<a href="#" class="btn btn-info btn-xs"> 待骑行 </a>';
-              else if (ajaxobj[i].status == 60)
-                inner_html += '<a href="#" class="btn btn-info btn-xs"> 待评价 </a>';
-              else if (ajaxobj[i].status == 70)
-                inner_html += '<a href="#" class="btn btn-success btn-xs"> 活动完成 </a>';
-              else
-                inner_html += '<a href="#" class="btn btn-success btn-xs">'+ ajaxobj[i].status +'</a>';
+                if (ajaxobj[i].status == 20)
+                  inner_html += '<a href="#" class="btn btn-warning btn-xs"> 待付款 </a>';
+                else if(ajaxobj[i].status == 21)
+                  inner_html += '<a href="#" class="btn btn-warning btn-xs"> 下单失败 </a>';
+                else if (ajaxobj[i].status == 31)
+                  inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a>';
+                else if (ajaxobj[i].status == 30)
+                  inner_html += '<a href="#" class="btn btn-warning btn-xs"> 待报名 </a>';
+                else if (ajaxobj[i].status == 50)
+                  inner_html += '<a href="#" class="btn btn-info btn-xs"> 待骑行 </a>';
+                else if (ajaxobj[i].status == 60)
+                  inner_html += '<a href="#" class="btn btn-info btn-xs"> 待评价 </a>';
+                else if (ajaxobj[i].status == 70)
+                  inner_html += '<a href="#" class="btn btn-success btn-xs"> 活动完成 </a>';
+                else
+                  inner_html += '<a href="#" class="btn btn-success btn-xs">'+ ajaxobj[i].status +'</a>';
 
-            inner_html += '</td>';
+              inner_html += '</td>';
 
-            inner_html += '<td class=" ">';
-              inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+ajaxobj[i]._id+'" class="btn btn-info btn-xs"><i class="fa fa-eye"></i> 报名 </a>';
-            inner_html += '</td>';
+              inner_html += '<td class=" ">';
+                inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+ajaxobj[i]._id+'" class="btn btn-info btn-xs"><i class="fa fa-eye"></i> 报名 </a>';
+              inner_html += '</td>';
 
-            inner_html += '</tr>';
-          $('#tbody').append(inner_html);
-          lastTimestamp = ajaxobj[i].create_time;
-				}
+              inner_html += '</tr>';
+            $('#tbody').append(inner_html);
+            lastTimestamp = ajaxobj[i].create_time;
+          }
 
-				preAllow = true;
-			});
+          preAllow = true;
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+          console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+        },
+        complete: function(XMLHttpRequest, textStatus) {
+          this; // 调用本次AJAX请求时传递的options参数
+        }
+      });
 		}
 
 		$("#OnGetMore").click(function(){ // This event fires when a button is clicked

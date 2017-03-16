@@ -49,7 +49,6 @@ from dao import apply_dao
 from dao import order_dao
 from dao import group_qrcode_dao
 
- 
 from global_const import ACTIVITY_STATUS_DRAFT
 from global_const import ACTIVITY_STATUS_POP
 from global_const import ACTIVITY_STATUS_DOING
