@@ -316,10 +316,10 @@ class WxActivityApplyStep1Handler(tornado.web.RequestHandler):
         wx_code = self.get_argument("code", "")
         logging.info("got wx_code=[%r] from argument", wx_code)
 
-        # if not wx_code:
-        #     redirect_url= "https://open.weixin.qq.com/connect/oauth2/authorize?appid="+ WX_APP_ID +"&redirect_uri="+ WX_NOTIFY_DOMAIN +"/bf/wx/vendors/"+vendor_id+"/activitys/"+ activity_id +"/apply/step1&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
-        #     self.redirect(redirect_url)
-        #     return
+        if not wx_code:
+            redirect_url= "https://open.weixin.qq.com/connect/oauth2/authorize?appid="+ WX_APP_ID +"&redirect_uri="+ WX_NOTIFY_DOMAIN +"/bf/wx/vendors/"+vendor_id+"/activitys/"+ activity_id +"/apply/step1&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
+            self.redirect(redirect_url)
+            return
 
         accessToken = getAccessToken(WX_APP_ID, WX_APP_SECRET, wx_code);
         access_token = accessToken["access_token"];
@@ -331,8 +331,8 @@ class WxActivityApplyStep1Handler(tornado.web.RequestHandler):
         nickname = wx_userInfo["nickname"]
         #nickname = unicode(nickname).encode('utf-8')
         logging.info("got nickname=[%r]", nickname)
-        headimgurl = wx_userInfo["headimgurl"]
-        logging.info("got headimgurl=[%r]", headimgurl)
+        avatar = wx_userInfo["headimgurl"]
+        logging.info("got avatar=[%r]", avatar)
 
         # 表情符号乱码，无法存入数据库，所以过滤掉
         try:
@@ -351,7 +351,7 @@ class WxActivityApplyStep1Handler(tornado.web.RequestHandler):
         http_client = HTTPClient()
         random = str(uuid.uuid1()).replace('-', '')
         headers = {"Authorization":"Bearer "+random}
-        _json = json_encode({'wx_openid':wx_openid,'nickname':nickname,'avatar':headimgurl})
+        _json = json_encode({'wx_openid':wx_openid,'nickname':nickname,'avatar':avatar})
         response = http_client.fetch(url, method="POST", headers=headers, body=_json)
         logging.info("got response.body %r", response.body)
         session_ticket = json_decode(response.body)
@@ -368,7 +368,7 @@ class WxActivityApplyStep1Handler(tornado.web.RequestHandler):
         if not vendor_member:
             memeber_id = str(uuid.uuid1()).replace('-', '')
             _json = {'_id':memeber_id, 'vendor_id':vendor_id,
-                'account_id':account_id, 'account_nickname':nickname, 'account_avatar':headimgurl,
+                'account_id':account_id, 'account_nickname':nickname, 'account_avatar':avatar,
                 'comment':'...',
                 'bonus':0, 'history_bonus':0, 'vouchers':0, 'crets':0,
                 'rank':0, 'tour_leader':False,
@@ -378,7 +378,7 @@ class WxActivityApplyStep1Handler(tornado.web.RequestHandler):
             logging.info("create vendor member %r", account_id)
         else:
             _json = {'vendor_id':vendor_id,
-                'account_id':account_id, 'account_nickname':nickname, 'account_avatar':headimgurl,
+                'account_id':account_id, 'account_nickname':nickname, 'account_avatar':avatar,
                 'last_update_time':timestamp}
             vendor_member_dao.vendor_member_dao().update(_json)
 
@@ -1004,88 +1004,136 @@ class WxVoucherOrderNotifyHandler(tornado.web.RequestHandler):
 
 
 # 点击购买优惠券 先检查用户 再创建订单 然后返回确认再微信支付 最后提示成功
+class WxVoucherBuyStep0Handler(tornado.web.RequestHandler):
+    def get(self, vendor_id, voucher_id):
+        redirect_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + WX_APP_ID + "&redirect_uri=" + WX_NOTIFY_DOMAIN + "/bf/wx/vendors/" + vendor_id + "/vouchers/"+voucher_id+"/buy/step1&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
+        # FIXME 这里应改为从缓存取自己的access_token然后查myinfo是否存在wx_openid
+        # 存在就直接用，不存在再走微信授权并更新用户信息 /api/myinfo-as-wx-user
+        access_token=self.get_secure_cookie("access_token")
+        logging.info("access_token %r======", access_token)
+
+        if access_token:
+            try:
+                url = "http://api.7x24hs.com/api/myinfo-as-wx-user"
+                http_client = HTTPClient()
+                headers = {"Authorization":"Bearer "+access_token}
+                response = http_client.fetch(url, method="GET", headers=headers)
+                logging.info("got response.body %r", response.body)
+                user = json_decode(response.body)
+                tmp_account_id=user['_id']
+                tmp_account_avatar=user['avatar']
+                tmp_account_nickname=user['nickname']
+
+                timestamp = time.time()
+                vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, tmp_account_id)
+                if not vendor_member:
+                    memeber_id = str(uuid.uuid1()).replace('-', '')
+                    _json = {'_id':memeber_id, 'vendor_id':vendor_id,
+                        'account_id':tmp_account_id, 'account_nickname':tmp_account_nickname, 'account_avatar':tmp_account_avatar,
+                        'comment':'...',
+                        'bonus':0, 'history_bonus':0, 'vouchers':0, 'crets':0,
+                        'rank':0, 'tour_leader':False,
+                        'distance':0,
+                        'create_time':timestamp, 'last_update_time':timestamp}
+                    vendor_member_dao.vendor_member_dao().create(_json)
+                    logging.info("create vendor member %r", account_id)
+                else:
+                    _json = {'vendor_id':vendor_id,
+                        'account_id':account_id, 'account_nickname':tmp_account_nickname, 'account_avatar':tmp_account_avatar,
+                        'last_update_time':timestamp}
+                    vendor_member_dao.vendor_member_dao().update(_json)
+
+                _voucher = voucher_pay_dao.voucher_pay_dao().query_not_safe(voucher_id);
+                _voucher['amount'] = float(_voucher['amount']) / 100
+                _voucher['price'] = float(_voucher['price']) / 100
+
+                vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
+                if(vendor_member):
+                    try:
+                        vendor_member['account_nickname']
+                    except:
+                        vendor_member['account_nickname'] = ''
+                    try:
+                        vendor_member['account_avatar']
+                    except:
+                        vendor_member['account_avatar'] = ''
+                _avatar = vendor_member['account_avatar']
+                _nickname = vendor_member['account_nickname']
+
+                self.render('wx/voucher-order-confirm.html',
+                        vendor_id=vendor_id,
+                        voucher=_voucher)
+
+            except:
+                self.redirect(redirect_url)
+        else:
+            self.redirect(redirect_url)
+
+
 class WxVoucherBuyStep1Handler(tornado.web.RequestHandler):
     def get(self, vendor_id, voucher_id):
+
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got voucher_id %r in uri", voucher_id)
-
-        tmp_session_ticket = None
-        tmp_account_id = None
-        tmp_account_nickname = None
-        tmp_account_avatar = None
-        tmp_wx_openid = None
-
         user_agent = self.request.headers["User-Agent"]
         lang = self.request.headers["Accept-Language"]
-        wx_openid = self.get_secure_cookie("wx_openid")
-        logging.info("got wx_openid=[%r] from cookie", wx_openid)
 
-        if not wx_openid:
-            wx_code = self.get_argument("code", "")
-            logging.info("got wx_code=[%r] from argument", wx_code)
+        wx_code = self.get_argument("code", "")
+        logging.info("got wx_code=[%r] from argument", wx_code)
 
-            accessToken = getAccessToken(WX_APP_ID, WX_APP_SECRET, wx_code);
-            access_token = accessToken["access_token"];
-            logging.info("got access_token %r", access_token)
-            wx_openid = accessToken["openid"];
-            logging.info("got wx_openid %r", wx_openid)
+        if not wx_code:
+            redirect_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + WX_APP_ID + "&redirect_uri=" + WX_NOTIFY_DOMAIN + "/bf/wx/vendors/" + vendor_id + "/vouchers/"+voucher_id+"/buy/step1&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
+            self.redirect(redirect_url)
+            return
 
-            wx_userInfo = getUserInfo(access_token, wx_openid)
-            nickname = wx_userInfo["nickname"]
-            nickname = unicode(nickname).encode('utf-8')
+        accessToken = getAccessToken(WX_APP_ID, WX_APP_SECRET, wx_code);
+        access_token = accessToken["access_token"];
+        logging.info("got access_token %r", access_token)
+        wx_openid = accessToken["openid"];
+        logging.info("got wx_openid %r", wx_openid)
+
+        wx_userInfo = getUserInfo(access_token, wx_openid)
+        nickname = wx_userInfo["nickname"]
+        #nickname = unicode(nickname).encode('utf-8')
+        logging.info("got nickname=[%r]", nickname)
+        avatar = wx_userInfo['headimgurl']
+        logging.info("got avatar=[%r]", avatar)
+
+        # 表情符号乱码，无法存入数据库，所以过滤掉
+        try:
+            # UCS-4
+            Emoji = re.compile(u'[\U00010000-\U0010ffff]')
+            nickname = Emoji.sub(u'\u25FD', nickname)
+            # UCS-2
+            Emoji = re.compile(u'[\uD800-\uDBFF][\uDC00-\uDFFF]')
+            nickname = Emoji.sub(u'\u25FD', nickname)
             logging.info("got nickname=[%r]", nickname)
-            headimgurl = wx_userInfo["headimgurl"]
-            logging.info("got headimgurl=[%r]", headimgurl)
+        except re.error:
+            logging.error("got nickname=[%r]", nickname)
+            nickname = "anonymous"
 
-            # 1604=wechat
-            stpSession = ssoLogin(1604, wx_openid, nickname, headimgurl, user_agent, lang)
-            session_ticket = stpSession["sessionToken"]
-            account_id = stpSession["accountId"]
-            logging.info("got account_id=[%r] from neuron-stp", account_id)
-            logging.info("got session_ticket=[%r] from neuron-stp", session_ticket)
+        url = "http://api.7x24hs.com/api/auth/wx/register"
+        http_client = HTTPClient()
+        random = str(uuid.uuid1()).replace('-', '')
+        headers = {"Authorization":"Bearer "+random}
+        _json = json_encode({'wx_openid':wx_openid,'nickname':nickname,'avatar':avatar})
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("got response.body %r", response.body)
+        session_ticket = json_decode(response.body)
 
-            tmp_session_ticket = session_ticket
-            tmp_account_id = account_id
-            tmp_account_nickname = nickname
-            tmp_account_avatar = headimgurl
-            tmp_wx_openid = wx_openid
+        account_id = session_ticket['account_id']
 
-            self.set_secure_cookie("session_ticket", session_ticket)
-            self.set_secure_cookie("account_id", account_id)
-            self.set_secure_cookie("account_nickname", nickname)
-            self.set_secure_cookie("account_avatar", headimgurl)
-            self.set_secure_cookie("wx_openid", wx_openid)
-        else:
-            account_nickname = self.get_secure_cookie("account_nickname")
-            account_avatar = self.get_secure_cookie("account_avatar")
-            # 1604=wechat
-            stpSession = ssoLogin(1604, wx_openid, account_nickname, account_avatar, user_agent, lang)
-            session_ticket = stpSession["sessionToken"]
-            account_id = stpSession["accountId"]
-            logging.info("got account_id=[%r] from neuron-stp", account_id)
-            logging.info("got session_ticket=[%r] from neuron-stp", session_ticket)
-
-            tmp_session_ticket = session_ticket
-            tmp_account_id = account_id
-            tmp_account_nickname = account_nickname
-            tmp_account_avatar = account_avatar
-            tmp_wx_openid = wx_openid
-
-            self.set_secure_cookie("session_ticket", session_ticket)
-            self.set_secure_cookie("account_id", account_id)
-
-        logging.info("got account_id %r", tmp_account_id)
-        logging.info("got session_ticket %r", tmp_session_ticket)
-        logging.info("got account_avatar %r", tmp_account_avatar)
-        logging.info("got account_nickname %r", tmp_account_nickname)
-        logging.info("got wx_openid %r", tmp_wx_openid)
+        self.set_secure_cookie("access_token", session_ticket['access_token'])
+        self.set_secure_cookie("expires_at", str(session_ticket['expires_at']))
+        self.set_secure_cookie("account_id",account_id)
+        self.set_secure_cookie("wx_openid",wx_openid)
 
         timestamp = time.time()
-        vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, tmp_account_id)
+        vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
         if not vendor_member:
             memeber_id = str(uuid.uuid1()).replace('-', '')
             _json = {'_id':memeber_id, 'vendor_id':vendor_id,
-                'account_id':tmp_account_id, 'account_nickname':tmp_account_nickname, 'account_avatar':tmp_account_avatar,
+                'account_id':account_id, 'account_nickname':nickname, 'account_avatar':avatar,
                 'comment':'...',
                 'bonus':0, 'history_bonus':0, 'vouchers':0, 'crets':0,
                 'rank':0, 'tour_leader':False,
@@ -1095,7 +1143,7 @@ class WxVoucherBuyStep1Handler(tornado.web.RequestHandler):
             logging.info("create vendor member %r", account_id)
         else:
             _json = {'vendor_id':vendor_id,
-                'account_id':tmp_account_id, 'account_nickname':tmp_account_nickname, 'account_avatar':tmp_account_avatar,
+                'account_id':account_id, 'account_nickname':nickname, 'account_avatar':avatar,
                 'last_update_time':timestamp}
             vendor_member_dao.vendor_member_dao().update(_json)
 
@@ -1103,8 +1151,7 @@ class WxVoucherBuyStep1Handler(tornado.web.RequestHandler):
         _voucher['amount'] = float(_voucher['amount']) / 100
         _voucher['price'] = float(_voucher['price']) / 100
 
-        _account_id = tmp_account_id
-        vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, _account_id)
+        vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
         if(vendor_member):
             try:
                 vendor_member['account_nickname']

@@ -208,7 +208,6 @@
       console.log(lastTimestamp);
 			$.get("/bf/api/vendors/{{ vendor_id }}/orders?before="+lastTimestamp,function(data,status){
 				var ajaxobj = eval("("+data+")");
-
 				for (var i in ajaxobj) {
           var inner_html = '<tr class="even pointer">';
             inner_html += '<td class="a-center">';

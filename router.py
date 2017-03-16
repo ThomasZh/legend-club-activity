@@ -209,6 +209,7 @@ def map():
 
         # 由俱乐部分享出的有偿代金券
         (r"/bf/wx/vendors/([a-z0-9]*)/vouchers/([a-z0-9]*)", getattr(wx_activity, 'WxVoucherShareHandler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/vouchers/([a-z0-9]*)/buy/step0", getattr(wx_activity, 'WxVoucherBuyStep0Handler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/vouchers/([a-z0-9]*)/buy/step1", getattr(wx_activity, 'WxVoucherBuyStep1Handler')),
         (r"/bf/voucher-pay", getattr(wx_activity, 'WxVoucherBuyStep2Handler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/vouchers/([a-z0-9]*)/buy/step3", getattr(wx_activity, 'WxVoucherBuyStep3Handler')),
@@ -222,6 +223,7 @@ def map():
 
         # bike-forever wexin personal-center
         (r"/bf/wx/pc", getattr(wx_personal_center, 'WxPcHandler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/pc0", getattr(wx_personal_center, 'WxPersonalCenter0Handler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/pc", getattr(wx_personal_center, 'WxPersonalCenterHandler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/pc/orders", getattr(wx_personal_center, 'WxPcOrderListHandler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/pc/orders/([a-z0-9]*)", getattr(wx_personal_center, 'WxPcOrderInfoHandler')),
