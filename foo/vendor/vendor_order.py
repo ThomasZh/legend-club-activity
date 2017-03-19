@@ -59,7 +59,7 @@ class VendorOrderListHandler(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         access_token = self.get_access_token()
-
+        logging.info("got access_token----------- %r in uri",access_token)
         ops = self.get_ops_info()
 
         before = time.time()

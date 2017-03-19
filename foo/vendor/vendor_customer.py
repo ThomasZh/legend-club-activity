@@ -55,6 +55,8 @@ class VendorCustomerListHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id,):
         logging.info("got vendor_id %r in uri", vendor_id)
+        access_token = self.get_access_token()
+        logging.info("got access_token %r in uri",access_token)
 
         ops = self.get_ops_info()
 
@@ -107,6 +109,7 @@ class VendorCustomerListHandler(AuthorizationHandler):
         self.render('vendor/customers.html',
                 vendor_id=vendor_id,
                 ops=ops,
+                access_token=access_token,
                 budge_num=budge_num,
                 customers=customers,
                 keys_value="")
@@ -225,7 +228,8 @@ class VendorCustomerProfileHandler(AuthorizationHandler):
 
         _contacts = contact_dao.contact_dao().query_by_account(vendor_id, account_id)
         before = time.time()
-        _orders = order_dao.order_dao().query_pagination_by_vendor_account(vendor_id, account_id, before, PAGE_SIZE_LIMIT)
+        _orders = order_dao.order_dao().query_pagination_by_account(account_id, before, PAGE_SIZE_LIMIT)
+        logging.info("got personal_orders----------- %r in uri", len(_orders))
         for order in _orders:
             _activity = activity_dao.activity_dao().query(order['activity_id'])
             order['activity_title'] = _activity['title']

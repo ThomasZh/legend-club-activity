@@ -32,12 +32,7 @@ from tornado.httpclient import HTTPClient
 from tornado.httputil import url_concat
 from bson import json_util
 
-from comm import BaseHandler
-from comm import timestamp_datetime
-from comm import datetime_timestamp
-from comm import timestamp_date
-from comm import date_timestamp
-from comm import timestamp_friendly_date
+from comm import *
 
 from dao import budge_num_dao
 from dao import category_dao
@@ -54,7 +49,7 @@ from dao import contact_dao
 from dao import insurance_template_dao
 from dao import cret_dao
 
- 
+
 from global_const import ACTIVITY_STATUS_DRAFT
 from global_const import ACTIVITY_STATUS_POP
 from global_const import ACTIVITY_STATUS_DOING
@@ -65,7 +60,7 @@ from global_const import STP
 from global_const import PAGE_SIZE_LIMIT
 
 
-class ApiCustomerListXHR(BaseHandler):
+class ApiCustomerListXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id,):
         logging.info("got vendor_id %r in uri", vendor_id)
@@ -243,12 +238,15 @@ class ApiCustomerProfileMyContactListXHR(tornado.web.RequestHandler):
 # 获取当前用户的历史活动
 class ApiCustomerProfileHistoryActivityXHR(tornado.web.RequestHandler):
     def get(self,vender_id):
-        before = float(datetime_timestamp(self.get_argument("before", "")))
         account_id = self.get_argument("account_id")
         logging.info("got _account_id %r", account_id)
-        logging.info("got BEFORE %r",before)
-
-        _orders = order_dao.order_dao().query_pagination_by_account(account_id, before, PAGE_SIZE_LIMIT)
+        sBefore = self.get_argument("before", "")
+        if sBefore != "":
+          iBefore = float(datetime_timestamp(sBefore))
+        else:
+          iBefore = time.time()
+        logging.info("got iBefore>>>> %r in uri", iBefore)
+        _orders = order_dao.order_dao().query_pagination_by_account(account_id, iBefore, PAGE_SIZE_LIMIT)
         for order in _orders:
             _activity = activity_dao.activity_dao().query(order['activity_id'])
             order['activity_title'] = _activity['title']

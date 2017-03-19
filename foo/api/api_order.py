@@ -163,7 +163,8 @@ class ApiOrderListXHR(AuthorizationHandler):
 
 
 # 查询订单详情
-class ApiOrderInfoXHR(tornado.web.RequestHandler):
+class ApiOrderInfoXHR(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, order_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got order_id %r in uri", order_id)
@@ -196,7 +197,7 @@ class ApiOrderInfoXHR(tornado.web.RequestHandler):
         self.finish()
 
 
-class ApiApplyListXHR(BaseHandler):
+class ApiApplyListXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
@@ -262,7 +263,7 @@ class ApiApplyListXHR(BaseHandler):
         self.finish()
 
 
-class ApiOrderReviewXHR(BaseHandler):
+class ApiOrderReviewXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, order_id):
         logging.info("got vendor_id %r in uri", vendor_id)
@@ -278,7 +279,7 @@ class ApiOrderReviewXHR(BaseHandler):
         self.finish("ok")
 
 
-class ApiOrderDeleteXHR(BaseHandler):
+class ApiOrderDeleteXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def post(self, vendor_id, order_id):
         logging.info("got vendor_id %r in uri", vendor_id)
@@ -292,7 +293,7 @@ class ApiOrderDeleteXHR(BaseHandler):
         self.finish("ok")
 
 
-class ApiApplyReviewXHR(BaseHandler):
+class ApiApplyReviewXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, apply_id):
         logging.info("got vendor_id %r in uri", vendor_id)
@@ -310,7 +311,7 @@ class ApiApplyReviewXHR(BaseHandler):
 
 # 报名报表导出excel格式文件,
 # 使用时必须先生成文件，然后再下载
-class ApiActivityExportXHR(BaseHandler):
+class ApiActivityExportXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, activity_id):
         logging.info("got vendor_id %r in uri", vendor_id)
@@ -365,7 +366,7 @@ class ApiActivityExportXHR(BaseHandler):
         _file.save('static/report/'+activity_id+'.xls')     # Save file
         self.finish(JSON.dumps("http://riding.time2box.com/static/report/"+activity_id+".xls"))
 
-class ApiVoucherOrderReviewXHR(BaseHandler):
+class ApiVoucherOrderReviewXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, voucher_order_id):
         logging.info("got vendor_id %r in uri", vendor_id)
@@ -380,7 +381,7 @@ class ApiVoucherOrderReviewXHR(BaseHandler):
 
         self.finish("ok")
 
-class ApiVoucherOrderListXHR(BaseHandler):
+class ApiVoucherOrderListXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
@@ -406,7 +407,7 @@ class ApiVoucherOrderListXHR(BaseHandler):
         self.write(JSON.dumps(_json, default=json_util.default))
         self.finish()
 
-class ApiApplySearchXHR(BaseHandler):
+class ApiApplySearchXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
@@ -465,7 +466,7 @@ class ApiApplySearchXHR(BaseHandler):
         self.write(JSON.dumps(_json, default=json_util.default))
         self.finish()
 
-class ApiOrderSearchXHR(BaseHandler):
+class ApiOrderSearchXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
