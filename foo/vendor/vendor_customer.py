@@ -314,7 +314,7 @@ class VendorCustomerProfileHandler(AuthorizationHandler):
         logging.info("got _rank %r", _rank)
 
         _timestamp = time.time()
-        _json = {'vendor_id':VENDOR_ID, 'account_id':account_id, 'last_update_time':_timestamp,
+        _json = {'vendor_id':ops['club_id'], 'account_id':account_id, 'last_update_time':_timestamp,
                 'bonus':_bonus, 'history_bonus':_history_bonus, 'vouchers':_vouchers,
                 'rank':_rank, 'comment':_comment, 'distance':_distance}
         vendor_member_dao.vendor_member_dao().update(_json)

@@ -192,18 +192,17 @@ def map():
 
 
         # bike-forever wexin activity
-        (r"/bf/wx/activitys", getattr(wx_activity, 'WxActivityIndexHandler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/activitys", getattr(wx_activity, 'WxActivityListHandler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)", getattr(wx_activity, 'WxActivityInfoHandler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/qrcode", getattr(wx_activity, 'WxActivityQrcodeHandler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/apply/step0", getattr(wx_activity, 'WxActivityApplyStep0Handler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/apply/step01", getattr(wx_activity, 'WxActivityApplyStep01Handler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/apply/step1", getattr(wx_activity, 'WxActivityApplyStep1Handler')),
         (r"/bf/wxpay", getattr(wx_activity, 'WxActivityApplyStep2Handler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/apply/step3", getattr(wx_activity, 'WxActivityApplyStep3Handler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/hha", getattr(wx_activity, 'WxHhaHandler')),
 
         # 开放线路市场
-        (r"/bf/wx/triprouters", getattr(wx_activity, 'WxTriprouterIndexHandler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/triprouters", getattr(wx_activity, 'WxTriprouterMarketHandler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/triprouters/([a-z0-9]*)", getattr(wx_activity, 'WxTriprouterInfoHandler')),
 
@@ -222,8 +221,8 @@ def map():
         (r"/bf/wx/voucher-orders/notify", getattr(wx_activity, 'WxVoucherOrderNotifyHandler')),
 
         # bike-forever wexin personal-center
-        (r"/bf/wx/pc", getattr(wx_personal_center, 'WxPcHandler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/pc0", getattr(wx_personal_center, 'WxPersonalCenter0Handler')),
+        (r"/bf/wx/vendors/([a-z0-9]*)/pc1", getattr(wx_personal_center, 'WxPersonalCenter1Handler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/pc", getattr(wx_personal_center, 'WxPersonalCenterHandler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/pc/orders", getattr(wx_personal_center, 'WxPcOrderListHandler')),
         (r"/bf/wx/vendors/([a-z0-9]*)/pc/orders/([a-z0-9]*)", getattr(wx_personal_center, 'WxPcOrderInfoHandler')),

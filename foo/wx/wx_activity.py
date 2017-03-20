@@ -71,12 +71,6 @@ from xml_parser import parseWxOrderReturn, parseWxPayReturn
 from global_const import *
 
 
-# 活动首页
-class WxActivityIndexHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.set_secure_cookie("vendor_id", VENDOR_ID)
-        self.redirect('/bf/wx/vendors/' + VENDOR_ID + '/activitys')
-
 
 # 活动首页
 class WxActivityListHandler(tornado.web.RequestHandler):
@@ -87,6 +81,7 @@ class WxActivityListHandler(tornado.web.RequestHandler):
         # 查询结果，不包含隐藏的活动
         _array = activity_dao.activity_dao().query_not_hidden_pagination_by_status(
                 vendor_id, ACTIVITY_STATUS_RECRUIT, _now, PAGE_SIZE_LIMIT)
+        logging.info("got activity>>>>>>>>> %r",len(_array))
 
         # 按报名状况查询每个活动的当前状态：
         # 0: 报名中, 1: 已成行, 2: 已满员, 3: 已结束
@@ -98,25 +93,26 @@ class WxActivityListHandler(tornado.web.RequestHandler):
         # 小于member_min, 报名中
         # 大于member_min，小于member_max，已成行
         # 大于等于member_max，已满员
-        for _activity in _array:
-            _member_min = int(_activity['member_min'])
-            _member_max = int(_activity['member_max'])
-            if _now > _activity['end_time']:
-                _activity['phase'] = '3'
-            else:
-                _applicant_num = apply_dao.apply_dao().count_by_activity(_activity['_id'])
-                _activity['phase'] = '2' if _applicant_num >= _member_max else '1'
-                _activity['phase'] = '0' if _applicant_num < _member_min else '1'
-            # 格式化显示时间
-            _activity['begin_time'] = timestamp_friendly_date(_activity['begin_time']) # timestamp -> %m月%d 星期%w
-            _activity['end_time'] = timestamp_friendly_date(_activity['end_time']) # timestamp -> %m月%d 星期%w
-            # 金额转换成元
-            if not _activity['base_fee_template']:
-                _activity['amount'] = 0
-            else:
-                for base_fee_template in _activity['base_fee_template']:
-                    _activity['amount'] = float(base_fee_template['fee']) / 100
-                    break
+        if len(_array) > 0 :
+            for _activity in _array:
+                _member_min = int(_activity['member_min'])
+                _member_max = int(_activity['member_max'])
+                if _now > _activity['end_time']:
+                    _activity['phase'] = '3'
+                else:
+                    _applicant_num = apply_dao.apply_dao().count_by_activity(_activity['_id'])
+                    _activity['phase'] = '2' if _applicant_num >= _member_max else '1'
+                    _activity['phase'] = '0' if _applicant_num < _member_min else '1'
+                # 格式化显示时间
+                _activity['begin_time'] = timestamp_friendly_date(_activity['begin_time']) # timestamp -> %m月%d 星期%w
+                _activity['end_time'] = timestamp_friendly_date(_activity['end_time']) # timestamp -> %m月%d 星期%w
+                # 金额转换成元
+                if not _activity['base_fee_template']:
+                    _activity['amount'] = 0
+                else:
+                    for base_fee_template in _activity['base_fee_template']:
+                        _activity['amount'] = float(base_fee_template['fee']) / 100
+                        break
 
         self.render('wx/activity-index.html',
                 vendor_id=vendor_id,
@@ -239,7 +235,7 @@ class WxActivityQrcodeHandler(tornado.web.RequestHandler):
 class WxActivityApplyStep0Handler(tornado.web.RequestHandler):
     def get(self, vendor_id, activity_id):
 
-        redirect_url= "https://open.weixin.qq.com/connect/oauth2/authorize?appid="+ WX_APP_ID +"&redirect_uri="+ WX_NOTIFY_DOMAIN +"/bf/wx/vendors/"+vendor_id+"/activitys/"+ activity_id +"/apply/step1&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
+        redirect_url= "https://open.weixin.qq.com/connect/oauth2/authorize?appid="+ WX_APP_ID +"&redirect_uri="+ WX_NOTIFY_DOMAIN +"/bf/wx/vendors/"+vendor_id+"/activitys/"+ activity_id +"/apply/step01&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
 
         # FIXME 这里应改为从缓存取自己的access_token然后查myinfo是否存在wx_openid
         # 存在就直接用，不存在再走微信授权并更新用户信息 /api/myinfo-as-wx-user
@@ -305,7 +301,7 @@ class WxActivityApplyStep0Handler(tornado.web.RequestHandler):
             self.redirect(redirect_url)
 
 
-class WxActivityApplyStep1Handler(tornado.web.RequestHandler):
+class WxActivityApplyStep01Handler(tornado.web.RequestHandler):
     def get(self, vendor_id, activity_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
@@ -317,7 +313,7 @@ class WxActivityApplyStep1Handler(tornado.web.RequestHandler):
         logging.info("got wx_code=[%r] from argument", wx_code)
 
         if not wx_code:
-            redirect_url= "https://open.weixin.qq.com/connect/oauth2/authorize?appid="+ WX_APP_ID +"&redirect_uri="+ WX_NOTIFY_DOMAIN +"/bf/wx/vendors/"+vendor_id+"/activitys/"+ activity_id +"/apply/step1&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
+            redirect_url= "https://open.weixin.qq.com/connect/oauth2/authorize?appid="+ WX_APP_ID +"&redirect_uri="+ WX_NOTIFY_DOMAIN +"/bf/wx/vendors/"+vendor_id+"/activitys/"+ activity_id +"/apply/step01&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
             self.redirect(redirect_url)
             return
 
@@ -361,7 +357,22 @@ class WxActivityApplyStep1Handler(tornado.web.RequestHandler):
         self.set_secure_cookie("access_token", session_ticket['access_token'])
         self.set_secure_cookie("expires_at", str(session_ticket['expires_at']))
         self.set_secure_cookie("account_id",account_id)
-        self.set_secure_cookie("wx_openid",wx_openid)
+        # self.set_secure_cookie("wx_openid",wx_openid)
+
+        self.set_secure_cookie("nickname",nickname)
+        self.set_secure_cookie("avatar",avatar)
+
+        self.redirect('/bf/wx/vendors/' + vendor_id + '/activitys/'+activity_id+'/apply/step1')
+
+
+class WxActivityApplyStep1Handler(tornado.web.RequestHandler):
+    def get(self, vendor_id, activity_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+        logging.info("got activity_id %r in uri", activity_id)
+
+        account_id = self.get_secure_cookie("account_id")
+        nickname = self.get_secure_cookie("nickname")
+        avatar = self.get_secure_cookie("avatar")
 
         timestamp = time.time()
         vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
@@ -658,7 +669,7 @@ class WxActivityApplyStep2Handler(tornado.web.RequestHandler):
                     logging.info("got bonus %r", _customer_profile['bonus'])
 
                     # 消费积分纪录
-                    _json = {'vendor_id':vendor_id, 'account_id':_order['account_id'], 'group_id':_order['activity_id'],
+                    _json = {'vendor_id':vendor_id, 'account_id':_order['account_id'], 'res_id':_order['activity_id'],
                             'create_time':_timestamp, 'bonus':_bonus, 'type':3}
                     bonus_dao.bonus_dao().create(_json)
 
@@ -847,6 +858,8 @@ class WxOrderNotifyHandler(tornado.web.RequestHandler):
         if _result_code == 'SUCCESS' :
             # 查询过去是否填报，有则跳过此步骤。主要是防止用户操作回退键，重新回到此页面
             _old_order = order_dao.order_dao().query(_order_id)
+            # 用于更新积分、优惠券
+            vendor_id = _old_order['vendor_id']
             if _old_order['status'] > 30:
                 return
             else:
@@ -861,7 +874,7 @@ class WxOrderNotifyHandler(tornado.web.RequestHandler):
                 if _bonus < 0:
                     _old_bonus = bonus_dao.bonus_dao().query_not_safe(_old_order['activity_id'], _old_order['account_id'], 3)
                     if not _old_bonus:
-                        _customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(VENDOR_ID, _old_order['account_id'])
+                        _customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, _old_order['account_id'])
                         try:
                             _customer_profile['bonus']
                         except:
@@ -869,7 +882,7 @@ class WxOrderNotifyHandler(tornado.web.RequestHandler):
                         logging.info("got bonus %r", _customer_profile['bonus'])
 
                         # 消费积分纪录
-                        _json = {'vendor_id':VENDOR_ID, 'account_id':_old_order['account_id'], 'group_id':_old_order['activity_id'],
+                        _json = {'vendor_id':vendor_id, 'account_id':_old_order['account_id'], 'res_id':_old_order['activity_id'],
                             'create_time':_timestamp, 'bonus':_bonus, 'type':3}
                         bonus_dao.bonus_dao().create(_json)
 
@@ -877,7 +890,7 @@ class WxOrderNotifyHandler(tornado.web.RequestHandler):
                         _bonus = int(_customer_profile['bonus']) + int(_bonus)
                         if _bonus < 0:
                             _bonus = 0
-                        _json = {'vendor_id':VENDOR_ID, 'account_id':_old_order['account_id'], 'last_update_time':_timestamp,
+                        _json = {'vendor_id':vendor_id, 'account_id':_old_order['account_id'], 'last_update_time':_timestamp,
                             'bonus':_bonus}
                         vendor_member_dao.vendor_member_dao().update(_json)
 
@@ -886,12 +899,12 @@ class WxOrderNotifyHandler(tornado.web.RequestHandler):
                 for _voucher in _vouchers:
                     # status=2, 已使用
                     voucher_dao.voucher_dao().update({'_id':_voucher['_id'], 'status':2, 'last_update_time':_timestamp})
-                    _customer_profile = mongodao().query_vendor_member_not_safe(VENDOR_ID, _old_order['account_id'])
+                    _customer_profile = mongodao().query_vendor_member_not_safe(vendor_id, _old_order['account_id'])
                     # 修改个人代金券信息
                     _voucher_amount = int(_customer_profile['vouchers']) - int(_voucher['fee'])
                     if _voucher_amount < 0:
                         _voucher_amount = 0
-                    _json = {'vendor_id':VENDOR_ID, 'account_id':_old_order['account_id'], 'last_update_time':_timestamp,
+                    _json = {'vendor_id':vendor_id, 'account_id':_old_order['account_id'], 'last_update_time':_timestamp,
                         'vouchers':_voucher_amount}
                     vendor_member_dao.vendor_member_dao().update(_json)
         else:
@@ -1235,7 +1248,7 @@ class WxVoucherBuyStep2Handler(tornado.web.RequestHandler):
             logging.info("got _openid %r", _openid)
             _store_id = 'Aplan'
             logging.info("got _store_id %r", _store_id)
-            _product_description = "voucherbymuyu"
+            _product_description = "voucher"
             logging.info("got _product_description %r", _product_description)
             key = WX_MCH_KEY
             nonceA = getNonceStr();
@@ -1348,11 +1361,6 @@ class WxVoucherBuyStep3Handler(tornado.web.RequestHandler):
 
 
 # 线路市场首页
-class WxTriprouterIndexHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.set_secure_cookie("vendor_id", VENDOR_ID)
-        self.redirect('/bf/wx/vendors/' + VENDOR_ID + '/triprouters')
-
 class WxTriprouterMarketHandler(tornado.web.RequestHandler):
     def get(self,vendor_id):
 

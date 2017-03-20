@@ -119,7 +119,7 @@ class VendorSetupInsuranceCreateHandler(AuthorizationHandler):
         logging.info("got _title %r", _title)
 
         _uuid = str(uuid.uuid1()).replace('-', '')
-        _insurance = {"_id":_uuid, "title":_title, "amount":_amount, "vendor_id":VENDOR_ID}
+        _insurance = {"_id":_uuid, "title":_title, "amount":_amount, "vendor_id":vendor_id}
         insurance_template_dao.insurance_template_dao().create(_insurance);
 
         self.redirect('/vendors/' + vendor_id + '/setup/insurances')

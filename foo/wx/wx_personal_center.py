@@ -61,18 +61,11 @@ from xml_parser import parseWxOrderReturn, parseWxPayReturn
 from global_const import *
 
 
-# 活动首页
-class WxPcHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.set_secure_cookie("vendor_id", VENDOR_ID)
-        self.redirect('/bf/wx/vendors/' + VENDOR_ID + '/pc0')
-
-
 # 个人中心首页
 class WxPersonalCenter0Handler(tornado.web.RequestHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
-        redirect_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + WX_APP_ID + "&redirect_uri=" + WX_NOTIFY_DOMAIN + "/bf/wx/vendors/" + vendor_id + "/pc&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
+        redirect_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + WX_APP_ID + "&redirect_uri=" + WX_NOTIFY_DOMAIN + "/bf/wx/vendors/" + vendor_id + "/pc1&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
         # FIXME 这里应改为从缓存取自己的access_token然后查myinfo是否存在wx_openid
         # 存在就直接用，不存在再走微信授权并更新用户信息 /api/myinfo-as-wx-user
         access_token=self.get_secure_cookie("access_token")
@@ -86,16 +79,16 @@ class WxPersonalCenter0Handler(tornado.web.RequestHandler):
                 response = http_client.fetch(url, method="GET", headers=headers)
                 logging.info("got response.body %r", response.body)
                 user = json_decode(response.body)
-                tmp_account_id=user['_id']
-                tmp_account_avatar=user['avatar']
-                tmp_account_nickname=user['nickname']
+                account_id=user['_id']
+                avatar=user['avatar']
+                nickname=user['nickname']
 
                 timestamp = time.time()
                 vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, tmp_account_id)
                 if not vendor_member:
                     memeber_id = str(uuid.uuid1()).replace('-', '')
                     _json = {'_id':memeber_id, 'vendor_id':vendor_id,
-                        'account_id':tmp_account_id, 'account_nickname':tmp_account_nickname, 'account_avatar':tmp_account_avatar,
+                        'account_id':account_id, 'account_nickname':nickname, 'account_avatar':avatar,
                         'comment':'...',
                         'bonus':0, 'history_bonus':0, 'vouchers':0, 'crets':0,
                         'rank':0, 'tour_leader':False,
@@ -105,18 +98,18 @@ class WxPersonalCenter0Handler(tornado.web.RequestHandler):
                     logging.info("create vendor member %r", account_id)
                 else:
                     _json = {'vendor_id':vendor_id,
-                        'account_id':tmp_account_id, 'account_nickname':tmp_account_nickname, 'account_avatar':tmp_account_avatar,
+                        'account_id':account_id, 'account_nickname':nickname, 'account_avatar':avatar,
                         'last_update_time':timestamp}
                     vendor_member_dao.vendor_member_dao().update(_json)
 
-                customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, tmp_account_id)
+                customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
                 try:
                     customer_profile['bonus']
                 except:
                     customer_profile['bonus'] = 0
                 # 金额转换成元
-                customer_profile['bonus'] = float(customer_profile['bonus']) / 100
-                logging.info("got bonus %r", customer_profile['bonus'])
+                # customer_profile['bonus'] = float(customer_profile['bonus']) / 100
+                # logging.info("got bonus %r", customer_profile['bonus'])
                 # 转换成元
                 try:
                     customer_profile['vouchers']
@@ -138,7 +131,7 @@ class WxPersonalCenter0Handler(tornado.web.RequestHandler):
             self.redirect(redirect_url)
 
 
-class WxPersonalCenterHandler(tornado.web.RequestHandler):
+class WxPersonalCenter1Handler(tornado.web.RequestHandler):
     def get(self, vendor_id):
 
         user_agent = self.request.headers["User-Agent"]
@@ -148,7 +141,7 @@ class WxPersonalCenterHandler(tornado.web.RequestHandler):
         logging.info("got wx_code=[%r] from argument", wx_code)
 
         if not wx_code:
-            redirect_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + WX_APP_ID + "&redirect_uri=" + WX_NOTIFY_DOMAIN + "/bf/wx/vendors/" + vendor_id + "/pc&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
+            redirect_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + WX_APP_ID + "&redirect_uri=" + WX_NOTIFY_DOMAIN + "/bf/wx/vendors/" + vendor_id + "/pc1&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
             self.redirect(redirect_url)
             return
 
@@ -194,6 +187,19 @@ class WxPersonalCenterHandler(tornado.web.RequestHandler):
         self.set_secure_cookie("account_id",account_id)
         self.set_secure_cookie("wx_openid",wx_openid)
 
+        self.set_secure_cookie("nickname",nickname)
+        self.set_secure_cookie("avatar",avatar)
+
+        self.redirect('/bf/wx/vendors/' + vendor_id + '/pc')
+
+
+class WxPersonalCenterHandler(tornado.web.RequestHandler):
+    def get(self, vendor_id):
+
+        account_id = self.get_secure_cookie("account_id")
+        nickname = self.get_secure_cookie("nickname")
+        avatar = self.get_secure_cookie("avatar")
+
         timestamp = time.time()
         vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
         if not vendor_member:
@@ -219,8 +225,8 @@ class WxPersonalCenterHandler(tornado.web.RequestHandler):
         except:
             customer_profile['bonus'] = 0
         # 金额转换成元
-        customer_profile['bonus'] = float(customer_profile['bonus']) / 100
-        logging.info("got bonus %r", customer_profile['bonus'])
+        # customer_profile['bonus'] = float(customer_profile['bonus']) / 100
+        # logging.info("got bonus %r", customer_profile['bonus'])
         # 转换成元
         try:
             customer_profile['vouchers']
@@ -292,6 +298,8 @@ class WxPcVoucherListHandler(tornado.web.RequestHandler):
         new_voucher_amount = 0 #新的有效代金券总数
         _vouchers = voucher_dao.voucher_dao().query_pagination_by_vendor(vendor_id, _account_id, _status, _before, PAGE_SIZE_LIMIT)
         for _data in _vouchers:
+            logging.info("got voucher======== %r", _data)
+
             new_voucher_amount = new_voucher_amount + _data['amount']
             # 转换成元
             _data['amount'] = float(_data['amount']) / 100
@@ -523,15 +531,18 @@ class WxPcBonusListHandler(tornado.web.RequestHandler):
 
         _before = time.time()
         _vendor_bonus = bonus_dao.bonus_dao().query_pagination_by_vendor(vendor_id, account_id, _before, PAGE_SIZE_LIMIT)
+
         for _bonus in _vendor_bonus:
             if _bonus['type'] == 1: # shared activity
                 _activity = activity_dao.activity_dao().query(_bonus['res_id'])
                 _bonus['title'] = _activity['title']
                 _bonus['bk_img_url'] = _activity['bk_img_url']
             elif _bonus['type'] == 3: # buy activity
-                _activity = activity_dao.activity_dao().query(_bonus['group_id'])
+                _activity = activity_dao.activity_dao().query(_bonus['res_id'])
                 _bonus['title'] = _activity['title']
                 _bonus['bk_img_url'] = _activity['bk_img_url']
+                logging.info("got bonus======== %r", _bonus)
+
             _bonus['create_time'] = timestamp_datetime(_bonus['create_time'])
             logging.info("got bonus type %r", _bonus['type'])
 
