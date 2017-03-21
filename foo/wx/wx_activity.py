@@ -250,16 +250,16 @@ class WxActivityApplyStep0Handler(tornado.web.RequestHandler):
                 response = http_client.fetch(url, method="GET", headers=headers)
                 logging.info("got response.body %r", response.body)
                 user = json_decode(response.body)
-                tmp_account_id=user['_id']
-                tmp_account_avatar=user['avatar']
-                tmp_account_nickname=user['nickname']
+                account_id=user['_id']
+                avatar=user['avatar']
+                nickname=user['nickname']
 
                 timestamp = time.time()
-                vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, tmp_account_id)
+                vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
                 if not vendor_member:
                     memeber_id = str(uuid.uuid1()).replace('-', '')
                     _json = {'_id':memeber_id, 'vendor_id':vendor_id,
-                        'account_id':tmp_account_id, 'account_nickname':tmp_account_nickname, 'account_avatar':tmp_account_avatar,
+                        'account_id':account_id, 'account_nickname':nickname, 'account_avatar':avatar,
                         'comment':'...',
                         'bonus':0, 'history_bonus':0, 'vouchers':0, 'crets':0,
                         'rank':0, 'tour_leader':False,
@@ -269,7 +269,7 @@ class WxActivityApplyStep0Handler(tornado.web.RequestHandler):
                     logging.info("create vendor member %r", account_id)
                 else:
                     _json = {'vendor_id':vendor_id,
-                        'account_id':tmp_account_id, 'account_nickname':tmp_account_nickname, 'account_avatar':tmp_account_avatar,
+                        'account_id':account_id, 'account_nickname':nickname, 'account_avatar':avatar,
                         'last_update_time':timestamp}
                     vendor_member_dao.vendor_member_dao().update(_json)
 
@@ -280,7 +280,7 @@ class WxActivityApplyStep0Handler(tornado.web.RequestHandler):
                 # 金额转换成元
                 # activity['amount'] = float(activity['amount']) / 100
 
-                customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, tmp_account_id)
+                customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
                 try:
                     customer_profile['bonus']
                 except:
@@ -358,9 +358,8 @@ class WxActivityApplyStep01Handler(tornado.web.RequestHandler):
         self.set_secure_cookie("expires_at", str(session_ticket['expires_at']))
         self.set_secure_cookie("account_id",account_id)
         # self.set_secure_cookie("wx_openid",wx_openid)
-
-        self.set_secure_cookie("nickname",nickname)
-        self.set_secure_cookie("avatar",avatar)
+        # self.set_secure_cookie("nickname",nickname)
+        # self.set_secure_cookie("avatar",avatar)
 
         self.redirect('/bf/wx/vendors/' + vendor_id + '/activitys/'+activity_id+'/apply/step1')
 
@@ -371,8 +370,17 @@ class WxActivityApplyStep1Handler(tornado.web.RequestHandler):
         logging.info("got activity_id %r in uri", activity_id)
 
         account_id = self.get_secure_cookie("account_id")
-        nickname = self.get_secure_cookie("nickname")
-        avatar = self.get_secure_cookie("avatar")
+        # nickname = self.get_secure_cookie("nickname")
+        # avatar = self.get_secure_cookie("avatar")
+        access_token = self.get_secure_cookie("access_token")
+        url = "http://api.7x24hs.com/api/myinfo?filter=login"
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer "+access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        res = json_decode(response.body)
+        nickname = res['nickname']
+        avatar = res['avatar']
 
         timestamp = time.time()
         vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
@@ -563,8 +571,17 @@ class WxActivityApplyStep2Handler(tornado.web.RequestHandler):
         _timestamp = (int)(time.time())
         if _total_amount != 0:
             # wechat 统一下单
-            _openid = self.get_secure_cookie("wx_openid")
-            logging.info("got _openid %r", _openid)
+            # _openid = self.get_secure_cookie("wx_openid")
+            # logging.info("got _openid %r", _openid)
+            access_token = self.get_secure_cookie("access_token")
+            url = "http://api.7x24hs.com/api/myinfo?filter=login"
+            http_client = HTTPClient()
+            headers = {"Authorization":"Bearer "+access_token}
+            response = http_client.fetch(url, method="GET", headers=headers)
+            logging.info("got response.body %r", response.body)
+            res = json_decode(response.body)
+            _openid = res['login']
+
             _store_id = 'Aplan'
             logging.info("got _store_id %r", _store_id)
             _activity = activity_dao.activity_dao().query(activity_id)
@@ -1033,16 +1050,16 @@ class WxVoucherBuyStep0Handler(tornado.web.RequestHandler):
                 response = http_client.fetch(url, method="GET", headers=headers)
                 logging.info("got response.body %r", response.body)
                 user = json_decode(response.body)
-                tmp_account_id=user['_id']
-                tmp_account_avatar=user['avatar']
-                tmp_account_nickname=user['nickname']
+                account_id=user['_id']
+                avatar=user['avatar']
+                nickname=user['nickname']
 
                 timestamp = time.time()
-                vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, tmp_account_id)
+                vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
                 if not vendor_member:
                     memeber_id = str(uuid.uuid1()).replace('-', '')
                     _json = {'_id':memeber_id, 'vendor_id':vendor_id,
-                        'account_id':tmp_account_id, 'account_nickname':tmp_account_nickname, 'account_avatar':tmp_account_avatar,
+                        'account_id':account_id, 'account_nickname':nickname, 'account_avatar':avatar,
                         'comment':'...',
                         'bonus':0, 'history_bonus':0, 'vouchers':0, 'crets':0,
                         'rank':0, 'tour_leader':False,
@@ -1052,7 +1069,7 @@ class WxVoucherBuyStep0Handler(tornado.web.RequestHandler):
                     logging.info("create vendor member %r", account_id)
                 else:
                     _json = {'vendor_id':vendor_id,
-                        'account_id':account_id, 'account_nickname':tmp_account_nickname, 'account_avatar':tmp_account_avatar,
+                        'account_id':account_id, 'account_nickname':nickname, 'account_avatar':avatar,
                         'last_update_time':timestamp}
                     vendor_member_dao.vendor_member_dao().update(_json)
 
@@ -1139,7 +1156,7 @@ class WxVoucherBuyStep1Handler(tornado.web.RequestHandler):
         self.set_secure_cookie("access_token", session_ticket['access_token'])
         self.set_secure_cookie("expires_at", str(session_ticket['expires_at']))
         self.set_secure_cookie("account_id",account_id)
-        self.set_secure_cookie("wx_openid",wx_openid)
+        # self.set_secure_cookie("wx_openid",wx_openid)
 
         timestamp = time.time()
         vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
@@ -1244,8 +1261,17 @@ class WxVoucherBuyStep2Handler(tornado.web.RequestHandler):
         _timestamp = (int)(time.time())
         if _total_amount != 0:
             # wechat 统一下单
-            _openid = self.get_secure_cookie("wx_openid")
-            logging.info("got _openid %r", _openid)
+            # _openid = self.get_secure_cookie("wx_openid")
+            # logging.info("got _openid %r", _openid)
+            access_token = self.get_secure_cookie("access_token")
+            url = "http://api.7x24hs.com/api/myinfo?filter=login"
+            http_client = HTTPClient()
+            headers = {"Authorization":"Bearer "+access_token}
+            response = http_client.fetch(url, method="GET", headers=headers)
+            logging.info("got response.body %r", response.body)
+            res = json_decode(response.body)
+            _openid = res['login']
+
             _store_id = 'Aplan'
             logging.info("got _store_id %r", _store_id)
             _product_description = "voucher"
