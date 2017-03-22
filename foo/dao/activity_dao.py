@@ -90,6 +90,17 @@ class activity_dao(singleton):
             array.append(i)
         return array
 
+    # 查询结果，不包含隐藏的活动
+    def query_by_recommend(self, status, before):
+        cursor = self.__activity_collection.find({
+                "status":status,
+                "hidden":False,
+                "create_time":{"$lt":before}}).sort("create_time",-1);
+        array = []
+        for i in cursor:
+            array.append(i)
+        return array
+
     def query_by_popular(self, vendor_id):
         cursor = self.__activity_collection.find({"vendor_id":vendor_id,"popular":True})
         array = []

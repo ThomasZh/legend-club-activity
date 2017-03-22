@@ -83,7 +83,8 @@ class AuthPhoneLoginHandler(BaseHandler):
                 # logging.info("got response %r", response.body)
 
                 # 校验是否为俱乐部管理员
-                url = "http://api.7x24hs.com/api/myinfo-as-ops"
+                params = {"filter":"ops"}
+                url = url_concat("http://api.7x24hs.com/api/myinfo", params)
                 http_client = HTTPClient()
                 headers={"Authorization":"Bearer "+session_ticket['access_token']}
                 response = http_client.fetch(url, method="GET", headers=headers)

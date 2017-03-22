@@ -133,6 +133,10 @@ def time_span(ts):
 
 
 class BaseHandler(tornado.web.RequestHandler):
+    # def get_club(self):
+    #
+    #     return
+
     def get_code(self):
         url = "http://api.7x24hs.com/api/auth/codes"
         http_client = HTTPClient()

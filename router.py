@@ -190,6 +190,8 @@ def map():
         (r"/bf/api/vendors/([a-z0-9]*)/customer-profile/orders", getattr(api_customer_profile, 'ApiCustomerProfileHistoryActivityXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/customer-profile/customers", getattr(api_customer_profile, 'ApiCustomerListXHR')),
 
+        # 推荐活动列表
+        (r"/bf/wx/vendors/([a-z0-9]*)/activitys/recommend", getattr(wx_activity, 'WxRecommendActivityHandler')),
 
         # bike-forever wexin activity
         (r"/bf/wx/vendors/([a-z0-9]*)/activitys", getattr(wx_activity, 'WxActivityListHandler')),

@@ -118,9 +118,54 @@ class WxActivityListHandler(tornado.web.RequestHandler):
                 vendor_id=vendor_id,
                 activitys=_array)
 
+#推荐活动列表
+class WxRecommendActivityHandler(tornado.web.RequestHandler):
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        _now = time.time()
+        # 查询结果，不包含隐藏的活动
+        _array = activity_dao.activity_dao().query_by_recommend(ACTIVITY_STATUS_RECRUIT,_now)
+        logging.info("got recommend activity>>>>>>>>> %r",_array)
+
+        # 按报名状况查询每个活动的当前状态：
+        # 0: 报名中, 1: 已成行, 2: 已满员, 3: 已结束
+        # @2016/06/06
+        #
+        # 当前时间大于活动结束时间 end_time， 已结束
+        # 否则
+        # member_max: 最大成行人数, member_min: 最小成行人数
+        # 小于member_min, 报名中
+        # 大于member_min，小于member_max，已成行
+        # 大于等于member_max，已满员
+        if len(_array) > 0 :
+            for _activity in _array:
+                _member_min = int(_activity['member_min'])
+                _member_max = int(_activity['member_max'])
+                if _now > _activity['end_time']:
+                    _activity['phase'] = '3'
+                else:
+                    _applicant_num = apply_dao.apply_dao().count_by_activity(_activity['_id'])
+                    _activity['phase'] = '2' if _applicant_num >= _member_max else '1'
+                    _activity['phase'] = '0' if _applicant_num < _member_min else '1'
+                # 格式化显示时间
+                _activity['begin_time'] = timestamp_friendly_date(_activity['begin_time']) # timestamp -> %m月%d 星期%w
+                _activity['end_time'] = timestamp_friendly_date(_activity['end_time']) # timestamp -> %m月%d 星期%w
+                # 金额转换成元
+                if not _activity['base_fee_template']:
+                    _activity['amount'] = 0
+                else:
+                    for base_fee_template in _activity['base_fee_template']:
+                        _activity['amount'] = float(base_fee_template['fee']) / 100
+                        break
+
+        self.render('wx/recommend-activity.html',
+                vendor_id=vendor_id,
+                activitys=_array)
+
 
 # 活动详情
-class WxActivityInfoHandler(tornado.web.RequestHandler):
+class WxActivityInfoHandler(BaseHandler):
     def get(self, vendor_id, activity_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)

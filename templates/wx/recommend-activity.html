@@ -1,0 +1,52 @@
+<!-- 移动端活动首页 -->
+<!-- @2016/05/19 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="format-detection" content="telephone=no">
+  <title>推荐活动列表</title>
+  <!-- <script type="text/javascript" src="http://tajs.qq.com/stats?sId=37342703" charset="UTF-8"></script> -->
+  <link rel="stylesheet" href="{{ static_url('frozenui-1.3.0/css/frozen.css') }}">
+  <link rel="stylesheet" href="{{ static_url('customer/css/customer.css') }}">
+</head>
+<body ontouchstart>
+
+  <section>
+    {% set phases = {'0':'招募中','1':'已成行','2':'已满员','3':'已结束'} %}
+    {% set themes = {'0':'green','1':'orange','2':'red','3':'gray'} %}
+    {% for activity in activitys %}
+    <a href="/bf/wx/vendors/{{activity['vendor_id']}}/activitys/{{activity['_id']}}">
+      <div class="bot_con"><!--start of card-->
+        <div class="imger">
+          <img src="{{activity['bk_img_url']}}">
+          <div class="bookmarks {{themes[activity['phase']]}}">{{phases[activity['phase']]}}</div>
+          <span class="shadow-black">¥{{activity['amount']}}</span>
+        </div>
+        <div class="card-footer">
+          <span class="card-footer-title">{{activity['title']}}</span>
+          <span class="card-footer-title right"></span>
+          <div class="card-footer-desc">
+            <span>
+              {% if activity['begin_time'] == activity['end_time'] %}
+                {{activity['begin_time']}}
+              {% else %}
+                {{activity['begin_time']}} ~ {{activity['end_time']}}
+              {% end %}
+            </span>
+            <span class="right">{{activity['distance']}}公里</span>
+          </div>
+        </div>
+      </div><!--end of card-->
+    </a>
+    {% end %}
+  </section>
+
+  <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+  <script src="{{ static_url('frozenui-1.3.0/lib/zepto.min.js') }}"></script>
+  <script src="{{ static_url('frozenui-1.3.0/js/frozen.js') }}"></script>
+
+</body>
+
+</html>
