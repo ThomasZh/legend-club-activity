@@ -36,6 +36,12 @@ class WxMpVerifyHandler(tornado.web.RequestHandler):
         return
 
 
+class WxMpVerify2Handler(tornado.web.RequestHandler):
+    def get(self):
+        self.finish('UwBwsF7uHi57Xd6e')
+        return
+
+
 class singleton(object):
     _singleton = None;
     def __new__(cls):
