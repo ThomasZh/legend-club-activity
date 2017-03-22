@@ -48,6 +48,7 @@ from dao import group_qrcode_dao
 from dao import cret_dao
 from dao import vendor_member_dao
 from dao import voucher_order_dao
+from dao import club_dao
 
 from global_const import *
 
@@ -67,6 +68,15 @@ class ApiOrderListXHR(AuthorizationHandler):
 
         _array = order_dao.order_dao().query_pagination_by_vendor(vendor_id, iBefore, PAGE_SIZE_LIMIT);
         for order in _array:
+            if order.has_key('guest_club_id'):
+                if order['guest_club_id']:
+                    guest_club_id = order["guest_club_id"]
+                    order['guest_club_name'] = get_club_name(guest_club_id)
+                else:
+                    order['guest_club_name'] = ""
+            else:
+                order['guest_club_name'] = ""
+
             _activity = activity_dao.activity_dao().query(order['activity_id'])
             order['activity_title'] = _activity['title']
             # order['activity_amount'] = _activity['amount']

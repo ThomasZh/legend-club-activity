@@ -125,7 +125,8 @@ class WxRecommendActivityHandler(tornado.web.RequestHandler):
 
         _now = time.time()
         # 查询结果，不包含隐藏的活动
-        _array = activity_dao.activity_dao().query_by_recommend(ACTIVITY_STATUS_RECRUIT,_now)
+        _array = activity_dao.activity_dao().query_activitys_notme(
+                vendor_id, ACTIVITY_STATUS_RECRUIT, _now, PAGE_SIZE_LIMIT)
         logging.info("got recommend activity>>>>>>>>> %r",_array)
 
         # 按报名状况查询每个活动的当前状态：
@@ -163,13 +164,110 @@ class WxRecommendActivityHandler(tornado.web.RequestHandler):
                 vendor_id=vendor_id,
                 activitys=_array)
 
+# 推荐活动详情
+class WxRecommendActivityInfoHandler(BaseHandler):
+    def get(self, vendor_id, activity_id, guest_club_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+        logging.info("got activity_id %r in uri", activity_id)
+        logging.info("got guest_club_id %r in uri", guest_club_id)
+
+        _activity = activity_dao.activity_dao().query(activity_id)
+
+        # 按报名状况查询每个活动的当前状态：
+        # 0: 报名中, 1: 已成行, 2: 已满员, 3: 已结束
+        # @2016/06/06
+        #
+        # 当前时间大于活动结束时间 end_time， 已结束
+        # 否则
+        # member_max: 最大成行人数, member_min: 最小成行人数
+        # 小于member_min, 报名中
+        # 大于member_min，小于member_max，已成行
+        # 大于等于member_max，已满员
+        _now = time.time();
+        _member_min = int(_activity['member_min'])
+        _member_max = int(_activity['member_max'])
+        logging.info("got _member_min %r in uri", _member_min)
+        logging.info("got _member_max %r in uri", _member_max)
+
+        if _now > _activity['end_time']:
+            _activity['phase'] = '3'
+        else:
+            _applicant_num = apply_dao.apply_dao().count_by_activity(_activity['_id'])
+            logging.info("got _applicant_num %r in uri", _applicant_num)
+            _activity['phase'] = '2' if _applicant_num >= _member_max else '1'
+            _activity['phase'] = '0' if _applicant_num < _member_min else '1'
+
+        # 格式化时间显示
+        _activity['begin_time'] = timestamp_friendly_date(float(_activity['begin_time'])) # timestamp -> %m月%d 星期%w
+        _activity['end_time'] = timestamp_friendly_date(float(_activity['end_time'])) # timestamp -> %m月%d 星期%w
+
+        # 金额转换成元 默认将第一个基本服务的费用显示为活动价格
+        # _activity['amount'] = float(_activity['amount']) / 100
+        if not _activity['base_fee_template']:
+            _activity['amount'] = 0
+        else:
+            for base_fee_template in _activity['base_fee_template']:
+                _activity['amount'] = float(base_fee_template['fee']) / 100
+                break
+
+        # 判断是否有article_id
+        try:
+            _activity['article_id']
+        except:
+            _activity['article_id']=''
+
+        if(_activity['article_id']!=''):
+
+            url = "http://"+STP+"/blogs/my-articles/" + _activity['article_id'] + "/paragraphs"
+            http_client = HTTPClient()
+            response = http_client.fetch(url, method="GET")
+            logging.info("got response %r", response.body)
+            _paragraphs = json_decode(response.body)
+
+            _activity_desc = ""
+            for _paragraph in _paragraphs:
+                if _paragraph["type"] == 'raw':
+                    _activity_desc = _paragraph['content']
+                    break
+            _activity_desc = _activity_desc.replace('&', "").replace('mdash;', "").replace('<p>', "").replace("</p>"," ").replace("<section>","").replace("</section>"," ").replace("\n"," ")
+            _activity['desc'] = _activity_desc + '...'
+
+        else:
+            _activity['desc'] = '...'
+
+        logging.info("------------------------------------uri: "+self.request.uri)
+        _access_token = getAccessTokenByClientCredential(WX_APP_ID, WX_APP_SECRET)
+        _jsapi_ticket = getJsapiTicket(_access_token)
+        _sign = Sign(_jsapi_ticket, WX_NOTIFY_DOMAIN+self.request.uri).sign()
+        logging.info("------------------------------------nonceStr: "+_sign['nonceStr'])
+        logging.info("------------------------------------jsapi_ticket: "+_sign['jsapi_ticket'])
+        logging.info("------------------------------------timestamp: "+str(_sign['timestamp']))
+        logging.info("------------------------------------url: "+_sign['url'])
+        logging.info("------------------------------------signature: "+_sign['signature'])
+
+        # _logined = False
+        # wechat_open_id = self.get_secure_cookie("wechat_open_id")
+        # if wechat_open_id:
+        #     _logined = True
+
+        _account_id = self.get_secure_cookie("account_id")
+        _bonus_template = bonus_template_dao.bonus_template_dao().query(_activity['_id'])
+
+        self.render('wx/activity-info.html',
+                guest_club_id = guest_club_id,
+                vendor_id=vendor_id,
+                activity=_activity,
+                wx_app_id=WX_APP_ID,
+                wx_notify_domain=WX_NOTIFY_DOMAIN,
+                sign=_sign, account_id=_account_id,
+                bonus_template=_bonus_template)
+
 
 # 活动详情
 class WxActivityInfoHandler(BaseHandler):
     def get(self, vendor_id, activity_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
-
         _activity = activity_dao.activity_dao().query(activity_id)
         # 按报名状况查询每个活动的当前状态：
         # 0: 报名中, 1: 已成行, 2: 已满员, 3: 已结束
@@ -252,6 +350,7 @@ class WxActivityInfoHandler(BaseHandler):
         _bonus_template = bonus_template_dao.bonus_template_dao().query(_activity['_id'])
 
         self.render('wx/activity-info.html',
+                guest_club_id = GUEST_CLUB_ID,
                 vendor_id=vendor_id,
                 activity=_activity,
                 wx_app_id=WX_APP_ID,
@@ -278,9 +377,9 @@ class WxActivityQrcodeHandler(tornado.web.RequestHandler):
 
 
 class WxActivityApplyStep0Handler(tornado.web.RequestHandler):
-    def get(self, vendor_id, activity_id):
+    def get(self, vendor_id, activity_id, guest_club_id):
 
-        redirect_url= "https://open.weixin.qq.com/connect/oauth2/authorize?appid="+ WX_APP_ID +"&redirect_uri="+ WX_NOTIFY_DOMAIN +"/bf/wx/vendors/"+vendor_id+"/activitys/"+ activity_id +"/apply/step01&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
+        redirect_url= "https://open.weixin.qq.com/connect/oauth2/authorize?appid="+ WX_APP_ID +"&redirect_uri="+ WX_NOTIFY_DOMAIN +"/bf/wx/vendors/"+vendor_id+"/activitys/"+ activity_id+"_"+ guest_club_id +"/apply/step01&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
 
         # FIXME 这里应改为从缓存取自己的access_token然后查myinfo是否存在wx_openid
         # 存在就直接用，不存在再走微信授权并更新用户信息 /api/myinfo-as-wx-user
@@ -335,6 +434,7 @@ class WxActivityApplyStep0Handler(tornado.web.RequestHandler):
                 logging.info("got bonus %r", customer_profile['bonus'])
 
                 self.render('wx/activity-apply-step1.html',
+                        guest_club_id = guest_club_id,
                         vendor_id=vendor_id,
                         wx_app_id=WX_APP_ID,
                         activity=activity,
@@ -347,7 +447,7 @@ class WxActivityApplyStep0Handler(tornado.web.RequestHandler):
 
 
 class WxActivityApplyStep01Handler(tornado.web.RequestHandler):
-    def get(self, vendor_id, activity_id):
+    def get(self, vendor_id, activity_id, guest_club_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
@@ -358,7 +458,7 @@ class WxActivityApplyStep01Handler(tornado.web.RequestHandler):
         logging.info("got wx_code=[%r] from argument", wx_code)
 
         if not wx_code:
-            redirect_url= "https://open.weixin.qq.com/connect/oauth2/authorize?appid="+ WX_APP_ID +"&redirect_uri="+ WX_NOTIFY_DOMAIN +"/bf/wx/vendors/"+vendor_id+"/activitys/"+ activity_id +"/apply/step01&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
+            redirect_url= "https://open.weixin.qq.com/connect/oauth2/authorize?appid="+ WX_APP_ID +"&redirect_uri="+ WX_NOTIFY_DOMAIN +"/bf/wx/vendors/"+vendor_id+"/activitys/"+ activity_id +"_"+ guest_club_id +"/apply/step01&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
             self.redirect(redirect_url)
             return
 
@@ -406,11 +506,11 @@ class WxActivityApplyStep01Handler(tornado.web.RequestHandler):
         # self.set_secure_cookie("nickname",nickname)
         # self.set_secure_cookie("avatar",avatar)
 
-        self.redirect('/bf/wx/vendors/' + vendor_id + '/activitys/'+activity_id+'/apply/step1')
+        self.redirect('/bf/wx/vendors/' + vendor_id + '/activitys/'+activity_id+'_'+guest_club_id+'/apply/step1')
 
 
 class WxActivityApplyStep1Handler(BaseHandler):
-    def get(self, vendor_id, activity_id):
+    def get(self, vendor_id, activity_id, guest_club_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
@@ -456,6 +556,7 @@ class WxActivityApplyStep1Handler(BaseHandler):
         logging.info("got bonus %r", customer_profile['bonus'])
 
         self.render('wx/activity-apply-step1.html',
+                guest_club_id = guest_club_id,
                 vendor_id=vendor_id,
                 wx_app_id=WX_APP_ID,
                 activity=activity,
@@ -469,6 +570,8 @@ class WxActivityApplyStep2Handler(BaseHandler):
         activity_id = self.get_argument("activity_id", "")
         logging.info("got activity_id %r", activity_id)
         _account_id = self.get_secure_cookie("account_id")
+        guest_club_id = self.get_argument("guest_club_id")
+        logging.info("got guest_club_id %r", guest_club_id)
 
         vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, _account_id)
         if(vendor_member):
@@ -581,6 +684,7 @@ class WxActivityApplyStep2Handler(BaseHandler):
         # pay_type: wxpay, alipay, paypal, applepay, huaweipay, ...
         _order = {
             "_id": _order_id,
+            "guest_club_id": guest_club_id,
             "activity_id": activity_id,
             "account_id": _account_id,
             "account_avatar": _avatar,

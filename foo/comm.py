@@ -139,9 +139,6 @@ def time_span(ts):
 
 
 class BaseHandler(tornado.web.RequestHandler):
-    # def get_club(self):
-    #
-    #     return
 
     def get_code(self):
         url = "http://api.7x24hs.com/api/auth/codes"
@@ -212,7 +209,6 @@ class AuthorizationHandler(BaseHandler):
                 return
             logging.info("got access_token=[%r] from headers", access_token)
         return access_token
-
 
     def get_ops_info(self):
         access_token = self.get_secure_cookie("access_token")
@@ -313,3 +309,11 @@ def html_markdown(html):
     markdown_content = h.handle(html)
     logging.info("got markdown content %r", markdown_content)
     return markdown_content
+
+def get_club_name(club_id):
+    url = "http://api.7x24hs.com/api/clubs/"+club_id
+    http_client = HTTPClient()
+    response = http_client.fetch(url, method="GET")
+    club = json_decode(response.body)
+    club_name = club['name']
+    return club_name

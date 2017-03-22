@@ -91,6 +91,18 @@ class activity_dao(singleton):
         return array
 
     # 查询结果，不包含隐藏的活动
+    def query_activitys_notme(self, vendor_id, status, before, limit):
+        cursor = self.__activity_collection.find({
+                "vendor_id":{"$ne":vendor_id},
+                "status":status,
+                "hidden":False,
+                "create_time":{"$lt":before}}).sort("create_time",-1).limit(limit);
+        array = []
+        for i in cursor:
+            array.append(i)
+        return array
+
+    # 查询结果，不包含隐藏的活动
     def query_by_recommend(self, status, before):
         cursor = self.__activity_collection.find({
                 "status":status,

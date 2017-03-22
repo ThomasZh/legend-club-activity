@@ -47,7 +47,7 @@
 
   <!-- 报名表单 -->
   <form id="apply-form" method="POST"
-    action="/bf/wxpay?vendor_id={{ vendor_id }}&activity_id={{activity['_id']}}" >
+    action="/bf/wxpay?vendor_id={{ vendor_id }}&activity_id={{activity['_id']}}&guest_club_id={{guest_club_id}}" >
     {% raw xsrf_form_html() %}
 
     <div class="white-bg margin-bottom-10 ui-border-tb">

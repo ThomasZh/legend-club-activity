@@ -142,6 +142,7 @@
                         <th class=" no-link last">
                           <span class="nobr">操作</span>
                         </th>
+                        <th>俱乐部</th>
                       </tr>
                     </thead>
 
@@ -303,6 +304,10 @@
               inner_html += '<td class=" ">';
                 inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+ajaxobj[i]._id+'" class="btn btn-info btn-xs"><i class="fa fa-eye"></i> 报名 </a>';
               inner_html += '</td>';
+              inner_html += '<td class=" ">';
+              inner_html += ajaxobj[i].guest_club_name;
+              inner_html += '</td>';
+
 
               inner_html += '</tr>';
             $('#tbody').append(inner_html);

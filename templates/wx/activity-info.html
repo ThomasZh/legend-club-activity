@@ -283,7 +283,7 @@
       // 报名中 or 已成行
       if (phase == "0" || phase == "1") {
         // redirect http for test(A计划公众号)
-        location.href = '/bf/wx/vendors/{{ vendor_id }}/activitys/'+ activityID+'/apply/step0'
+        location.href = '/bf/wx/vendors/{{ vendor_id }}/activitys/'+ activityID+'_{{guest_club_id}}/apply/step0'
         // redirect https for 沐雨户外公众号
       }
 
