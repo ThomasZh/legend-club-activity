@@ -364,23 +364,16 @@ class WxActivityApplyStep01Handler(tornado.web.RequestHandler):
         self.redirect('/bf/wx/vendors/' + vendor_id + '/activitys/'+activity_id+'/apply/step1')
 
 
-class WxActivityApplyStep1Handler(tornado.web.RequestHandler):
+class WxActivityApplyStep1Handler(BaseHandler):
     def get(self, vendor_id, activity_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        account_id = self.get_secure_cookie("account_id")
-        # nickname = self.get_secure_cookie("nickname")
-        # avatar = self.get_secure_cookie("avatar")
-        access_token = self.get_secure_cookie("access_token")
-        url = "http://api.7x24hs.com/api/myinfo?filter=login"
-        http_client = HTTPClient()
-        headers = {"Authorization":"Bearer "+access_token}
-        response = http_client.fetch(url, method="GET", headers=headers)
-        logging.info("got response.body %r", response.body)
-        res = json_decode(response.body)
-        nickname = res['nickname']
-        avatar = res['avatar']
+        # 从comm中统一取
+        myinfo = self.get_myinfo_login()
+        account_id = myinfo['account_id']
+        nickname = myinfo['nickname']
+        avatar =myinfo['avatar']
 
         timestamp = time.time()
         vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
@@ -424,7 +417,7 @@ class WxActivityApplyStep1Handler(tornado.web.RequestHandler):
                 customer_profile=customer_profile)
 
 
-class WxActivityApplyStep2Handler(tornado.web.RequestHandler):
+class WxActivityApplyStep2Handler(BaseHandler):
     def post(self):
         vendor_id = self.get_argument("vendor_id", "")
         logging.info("got vendor_id %r", vendor_id)
@@ -573,14 +566,9 @@ class WxActivityApplyStep2Handler(tornado.web.RequestHandler):
             # wechat 统一下单
             # _openid = self.get_secure_cookie("wx_openid")
             # logging.info("got _openid %r", _openid)
-            access_token = self.get_secure_cookie("access_token")
-            url = "http://api.7x24hs.com/api/myinfo?filter=login"
-            http_client = HTTPClient()
-            headers = {"Authorization":"Bearer "+access_token}
-            response = http_client.fetch(url, method="GET", headers=headers)
-            logging.info("got response.body %r", response.body)
-            res = json_decode(response.body)
-            _openid = res['login']
+            # 从comm中统一取
+            myinfo = self.get_myinfo_login()
+            _openid = myinfo['login']
 
             _store_id = 'Aplan'
             logging.info("got _store_id %r", _store_id)
@@ -1199,7 +1187,7 @@ class WxVoucherBuyStep1Handler(tornado.web.RequestHandler):
                 voucher=_voucher)
 
 
-class WxVoucherBuyStep2Handler(tornado.web.RequestHandler):
+class WxVoucherBuyStep2Handler(BaseHandler):
     def post(self):
         vendor_id = self.get_argument("vendor_id", "")
         logging.info("got vendor_id %r", vendor_id)
@@ -1263,14 +1251,9 @@ class WxVoucherBuyStep2Handler(tornado.web.RequestHandler):
             # wechat 统一下单
             # _openid = self.get_secure_cookie("wx_openid")
             # logging.info("got _openid %r", _openid)
-            access_token = self.get_secure_cookie("access_token")
-            url = "http://api.7x24hs.com/api/myinfo?filter=login"
-            http_client = HTTPClient()
-            headers = {"Authorization":"Bearer "+access_token}
-            response = http_client.fetch(url, method="GET", headers=headers)
-            logging.info("got response.body %r", response.body)
-            res = json_decode(response.body)
-            _openid = res['login']
+            # 从comm中统一取
+            myinfo = self.get_myinfo_login()
+            _openid = myinfo['login']
 
             _store_id = 'Aplan'
             logging.info("got _store_id %r", _store_id)

@@ -192,22 +192,14 @@ class WxPersonalCenter1Handler(tornado.web.RequestHandler):
         self.redirect('/bf/wx/vendors/' + vendor_id + '/pc')
 
 
-class WxPersonalCenterHandler(tornado.web.RequestHandler):
+class WxPersonalCenterHandler(BaseHandler):
     def get(self, vendor_id):
 
-        account_id = self.get_secure_cookie("account_id")
-        logging.info("got account_id %r", account_id)
-        # nickname = self.get_secure_cookie("nickname")
-        # avatar = self.get_secure_cookie("avatar")
-        access_token = self.get_secure_cookie("access_token")
-        url = "http://api.7x24hs.com/api/myinfo?filter=login"
-        http_client = HTTPClient()
-        headers = {"Authorization":"Bearer "+access_token}
-        response = http_client.fetch(url, method="GET", headers=headers)
-        logging.info("got response.body %r", response.body)
-        res = json_decode(response.body)
-        nickname = res['nickname']
-        avatar = res['avatar']
+        # 从comm中统一取
+        myinfo = self.get_myinfo_login()
+        account_id = myinfo['account_id']
+        nickname = myinfo['nickname']
+        avatar =myinfo['avatar']
 
         timestamp = time.time()
         vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
