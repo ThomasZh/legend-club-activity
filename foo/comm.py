@@ -145,16 +145,19 @@ class BaseHandler(tornado.web.RequestHandler):
         code = session_code['code']
         return code
 
-    def get_myinfo_basic(self):
+
+    def get_myinfo_login(self):
         access_token = self.get_secure_cookie("access_token")
 
-        url = "http://api.7x24hs.com/api/myinfo?filter=basic"
+        url = "http://api.7x24hs.com/api/myinfo?filter=login"
         http_client = HTTPClient()
         headers={"Authorization":"Bearer "+access_token}
         response = http_client.fetch(url, method="GET", headers=headers)
         myinfo = json_decode(response.body)
         logging.info("got myinfo %r", myinfo)
+        # myinfo['login']: wx_openid
         return myinfo
+
 
     def write_error(self, status_code, **kwargs):
         host = self.request.headers['Host']
@@ -199,12 +202,14 @@ class AuthorizationHandler(BaseHandler):
                 return
             logging.info("got access_token=[%r] from headers", access_token)
         return access_token
-        
+
+
     def get_ops_info(self):
         access_token = self.get_secure_cookie("access_token")
 
         try:
-            url = "http://api.7x24hs.com/api/myinfo-as-ops"
+            params = {"filter":"ops"}
+            url = url_concat("http://api.7x24hs.com/api/myinfo", params)
             http_client = HTTPClient()
             headers={"Authorization":"Bearer "+access_token}
             response = http_client.fetch(url, method="GET", headers=headers)
