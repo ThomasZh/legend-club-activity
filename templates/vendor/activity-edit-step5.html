@@ -220,6 +220,7 @@
                         <th>日期</th>
                         <th>状态</th>
                         <th>操作</th>
+                        <th>俱乐部</th>
                       </tr>
                     </thead>
                     <tbody id="tbody{{ vendor_id }}">
@@ -311,6 +312,9 @@
                             <button onclick="OnDeleteOrder(this);" value="{{order['_id']}}" class="btn btn-danger btn-xs">
                               <i class="fa fa-trash"></i> 删除 </button>
                           {% end %}
+                        </td>
+                        <td>
+                          {{ order['guest_club_name'] }}
                         </td>
                       </tr>
                     {% end %}

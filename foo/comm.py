@@ -193,6 +193,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
 
 class AuthorizationHandler(BaseHandler):
+
     def get_access_token(self):
         access_token = self.get_secure_cookie("access_token")
         if access_token:
@@ -278,7 +279,6 @@ class AuthorizationHandler(BaseHandler):
                             return None
                     return None
 
-
 def markdown_html(markdown_content):
     html = markdown.markdown(markdown_content)
     html = html.replace('\n','')
@@ -310,10 +310,7 @@ def html_markdown(html):
     logging.info("got markdown content %r", markdown_content)
     return markdown_content
 
-def get_club_name(club_id):
-    url = "http://api.7x24hs.com/api/clubs/"+club_id
-    http_client = HTTPClient()
-    response = http_client.fetch(url, method="GET")
-    club = json_decode(response.body)
-    club_name = club['name']
-    return club_name
+
+def get_wx_app_info(vendor_id):
+    wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
+    return wx_app_info

@@ -674,6 +674,22 @@ class VendorActivityDetailStep5Handler(AuthorizationHandler):
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
 
         for order in orders:
+            # 访客俱乐部名称
+            if order.has_key('guest_club_id'):
+                if order['guest_club_id']:
+                    guest_club_id = order["guest_club_id"]
+                    access_token = self.get_secure_cookie("access_token")
+                    headers={"Authorization":"Bearer "+access_token}
+                    url = "http://api.7x24hs.com/api/clubs/"+guest_club_id
+                    http_client = HTTPClient()
+                    response = http_client.fetch(url, method="GET", headers=headers)
+                    club = json_decode(response.body)
+                    order['guest_club_name'] = club['name']
+                else:
+                    order['guest_club_name'] = ""
+            else:
+                order['guest_club_name'] = ""
+
             for ext_fee in order['ext_fees']:
                 # 价格转换成元
                 ext_fee['fee'] = float(ext_fee['fee']) / 100

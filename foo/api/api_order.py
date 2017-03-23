@@ -57,7 +57,6 @@ class ApiOrderListXHR(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
-        # _session_ticket = self.get_secure_cookie("session_ticket")
 
         iBefore = 0
         sBefore = self.get_argument("before", "") #格式 2016-06-01 22:36
@@ -71,7 +70,15 @@ class ApiOrderListXHR(AuthorizationHandler):
             if order.has_key('guest_club_id'):
                 if order['guest_club_id']:
                     guest_club_id = order["guest_club_id"]
-                    order['guest_club_name'] = get_club_name(guest_club_id)
+                    # 取俱乐部名称
+                    ccess_token = self.get_secure_cookie("access_token")
+                    headers={"Authorization":"Bearer "+access_token}
+                    url = "http://api.7x24hs.com/api/clubs/"+guest_club_id
+                    http_client = HTTPClient()
+                    response = http_client.fetch(url, method="GET", headers=headers)
+                    club = json_decode(response.body)
+                    order['guest_club_name'] = club['name']
+
                 else:
                     order['guest_club_name'] = ""
             else:
