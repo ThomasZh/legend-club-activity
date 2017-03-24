@@ -56,16 +56,23 @@ from dao import task_dao
 from dao import personal_task_dao
 from dao import trip_router_dao
 from dao import evaluation_dao
+from dao import vendor_wx_dao
+
 from wx_wrap import *
 from xml_parser import parseWxOrderReturn, parseWxPayReturn
 from global_const import *
 
 
 # 个人中心首页
-class WxPersonalCenter0Handler(tornado.web.RequestHandler):
+class WxPersonalCenter0Handler(BaseHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
-        redirect_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + WX_APP_ID + "&redirect_uri=" + WX_NOTIFY_DOMAIN + "/bf/wx/vendors/" + vendor_id + "/pc1&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
+
+        wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
+        wx_app_id = wx_app_info['wx_app_id']
+        logging.info("got wx_app_id %r in uri", wx_app_id)
+
+        redirect_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + wx_app_id + "&redirect_uri=" + WX_NOTIFY_DOMAIN + "/bf/wx/vendors/" + vendor_id + "/pc1&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
         # FIXME 这里应改为从缓存取自己的access_token然后查myinfo是否存在wx_openid
         # 存在就直接用，不存在再走微信授权并更新用户信息 /api/myinfo-as-wx-user
         access_token=self.get_secure_cookie("access_token")
@@ -140,12 +147,17 @@ class WxPersonalCenter1Handler(tornado.web.RequestHandler):
         wx_code = self.get_argument("code", "")
         logging.info("got wx_code=[%r] from argument", wx_code)
 
+        wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
+        wx_app_id = wx_app_info['wx_app_id']
+        logging.info("got wx_app_id %r in uri", wx_app_id)
+        wx_app_secret = wx_app_info['wx_app_secret']
+
         if not wx_code:
-            redirect_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + WX_APP_ID + "&redirect_uri=" + WX_NOTIFY_DOMAIN + "/bf/wx/vendors/" + vendor_id + "/pc1&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
+            redirect_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + wx_app_id + "&redirect_uri=" + WX_NOTIFY_DOMAIN + "/bf/wx/vendors/" + vendor_id + "/pc1&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
             self.redirect(redirect_url)
             return
 
-        accessToken = getAccessToken(WX_APP_ID, WX_APP_SECRET, wx_code);
+        accessToken = getAccessToken(wx_app_id, wx_app_secret, wx_code);
         access_token = accessToken["access_token"];
         logging.info("got access_token %r", access_token)
         wx_openid = accessToken["openid"];
@@ -503,15 +515,21 @@ class WxPcOrderRepayHandler(tornado.web.RequestHandler):
 
             _timestamp = (int)(_old_order['create_time'])
             prepay_id = _old_order['prepay_id']
-            key = WX_MCH_KEY
+
+            wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
+            wx_app_id = wx_app_info['wx_app_id']
+            logging.info("got wx_app_id %r in uri", wx_app_id)
+            wx_mch_key = wx_app_info['wx_mch_key']
+
+            # key = wx_mch_key
             nonceB = getNonceStr();
             logging.info("got nonceB %r", nonceB)
-            signB = getPaySign(_timestamp, WX_APP_ID, nonceB, prepay_id, key)
+            signB = getPaySign(_timestamp, wx_app_id, nonceB, prepay_id, wx_mch_key)
             _order_return = {'timestamp': _timestamp,
                     'nonce_str': nonceB,
                     'prepay_id': prepay_id,
                     'pay_sign': signB,
-                    'app_id': WX_APP_ID,
+                    'app_id': wx_app_id,
                     'return_msg': 'OK'}
 
             self.render('wx/order-confirm.html',

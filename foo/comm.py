@@ -309,8 +309,3 @@ def html_markdown(html):
     markdown_content = h.handle(html)
     logging.info("got markdown content %r", markdown_content)
     return markdown_content
-
-
-def get_wx_app_info(vendor_id):
-    wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
-    return wx_app_info

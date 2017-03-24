@@ -71,7 +71,7 @@ class ApiOrderListXHR(AuthorizationHandler):
                 if order['guest_club_id']:
                     guest_club_id = order["guest_club_id"]
                     # 取俱乐部名称
-                    ccess_token = self.get_secure_cookie("access_token")
+                    access_token = self.get_secure_cookie("access_token")
                     headers={"Authorization":"Bearer "+access_token}
                     url = "http://api.7x24hs.com/api/clubs/"+guest_club_id
                     http_client = HTTPClient()
