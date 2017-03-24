@@ -36,6 +36,8 @@
             <li><a href="/vendors/{{ vendor_id }}/orders"> 活动订单 </a>
             </li>
           {% end %}
+          <li><a href="/vendors/{{ vendor_id }}/league/orders-me"> 联盟活动 我的订单 </a>
+          <li><a href="/vendors/{{ vendor_id }}/league/orders-other"> 我的活动 联盟订单 </a>
 
           {% if budge_num['application'] > 0 %}
           <li><a href="/vendors/{{ vendor_id }}/applys">报名 <span class="badge bg-green">{{budge_num['application']}}</span></a>

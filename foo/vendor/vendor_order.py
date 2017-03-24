@@ -121,6 +121,143 @@ class VendorOrderListHandler(AuthorizationHandler):
                 budge_num=budge_num,
                 orders=_array)
 
+# 联盟里别人活动我的订单
+class VendorLeagueMyOrderListHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+        access_token = self.get_access_token()
+        logging.info("got access_token----------- %r in uri",access_token)
+        ops = self.get_ops_info()
+
+        before = time.time()
+        _array = order_dao.order_dao().query_pagination_by_vendor_me(vendor_id, before, PAGE_SIZE_LIMIT);
+        for order in _array:
+
+            _activity = activity_dao.activity_dao().query(order['activity_id'])
+            order['activity_title'] = _activity['title']
+
+            try:
+                order['base_fees']
+            except:
+                order['base_fees'] = _activity['base_fee_template']
+                # 数据库apply无base_fees时，取order的赋值给它，并更新其数据库字段
+                _json = {"_id":order['_id'],"base_fees":order['base_fees']}
+                logging.info("got base_fees json %r in uri", _json)
+                order_dao.order_dao().update(_json)
+
+            order['activity_amount'] = 0
+            if order['base_fees']:
+                for base_fee in order['base_fees']:
+                    # 价格转换成元
+                    order['activity_amount'] = float(base_fee['fee']) / 100
+
+            order_fees = []
+            for ext_fee_id in order['ext_fees']:
+                for template in _activity['ext_fee_template']:
+                    if ext_fee_id == template['_id']:
+                        json = {"_id":ext_fee_id, "name":template['name'], "fee":template['fee']}
+                        order_fees.append(json)
+                        break
+            order['fees'] = order_fees
+
+            order_insurances = []
+            for insurance_id in order['insurances']:
+                _insurance = insurance_template_dao.insurance_template_dao().query(insurance_id)
+                order_insurances.append(_insurance)
+            order['insurances'] = order_insurances
+
+            for _voucher in order['vouchers']:
+                # 价格转换成元
+                _voucher['fee'] = float(_voucher['fee']) / 100
+
+            try:
+                order['bonus']
+            except:
+                order['bonus'] = 0
+            # 价格转换成元
+            order['bonus'] = float(order['bonus']) / 100
+            try:
+                order['payed_total_fee'] = float(order['payed_total_fee']) / 100
+            except:
+                order['payed_total_fee'] = 0
+
+        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        self.render('vendor/orders-league-me.html',
+                vendor_id=vendor_id,
+                ops=ops,
+                access_token=access_token,
+                budge_num=budge_num,
+                orders=_array)
+
+# 联盟里我的活动别人订单
+class VendorLeagueOtherOrderListHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+        access_token = self.get_access_token()
+        logging.info("got access_token----------- %r in uri",access_token)
+        ops = self.get_ops_info()
+
+        before = time.time()
+        _array = order_dao.order_dao().query_pagination_by_vendor_notme(vendor_id, before, PAGE_SIZE_LIMIT);
+        for order in _array:
+            _activity = activity_dao.activity_dao().query(order['activity_id'])
+            order['activity_title'] = _activity['title']
+
+            try:
+                order['base_fees']
+            except:
+                order['base_fees'] = _activity['base_fee_template']
+                # 数据库apply无base_fees时，取order的赋值给它，并更新其数据库字段
+                _json = {"_id":order['_id'],"base_fees":order['base_fees']}
+                logging.info("got base_fees json %r in uri", _json)
+                order_dao.order_dao().update(_json)
+
+            order['activity_amount'] = 0
+            if order['base_fees']:
+                for base_fee in order['base_fees']:
+                    # 价格转换成元
+                    order['activity_amount'] = float(base_fee['fee']) / 100
+
+            order_fees = []
+            for ext_fee_id in order['ext_fees']:
+                for template in _activity['ext_fee_template']:
+                    if ext_fee_id == template['_id']:
+                        json = {"_id":ext_fee_id, "name":template['name'], "fee":template['fee']}
+                        order_fees.append(json)
+                        break
+            order['fees'] = order_fees
+
+            order_insurances = []
+            for insurance_id in order['insurances']:
+                _insurance = insurance_template_dao.insurance_template_dao().query(insurance_id)
+                order_insurances.append(_insurance)
+            order['insurances'] = order_insurances
+
+            for _voucher in order['vouchers']:
+                # 价格转换成元
+                _voucher['fee'] = float(_voucher['fee']) / 100
+
+            try:
+                order['bonus']
+            except:
+                order['bonus'] = 0
+            # 价格转换成元
+            order['bonus'] = float(order['bonus']) / 100
+            try:
+                order['payed_total_fee'] = float(order['payed_total_fee']) / 100
+            except:
+                order['payed_total_fee'] = 0
+
+        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        self.render('vendor/orders-league-others.html',
+                vendor_id=vendor_id,
+                ops=ops,
+                access_token=access_token,
+                budge_num=budge_num,
+                orders=_array)
+
 
 class VendorApplyListHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page

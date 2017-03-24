@@ -66,23 +66,25 @@ class ApiOrderListXHR(AuthorizationHandler):
             iBefore = time.time()
 
         _array = order_dao.order_dao().query_pagination_by_vendor(vendor_id, iBefore, PAGE_SIZE_LIMIT);
-        for order in _array:
-            if order.has_key('guest_club_id'):
-                if order['guest_club_id']:
-                    guest_club_id = order["guest_club_id"]
-                    # 取俱乐部名称
-                    access_token = self.get_secure_cookie("access_token")
-                    headers={"Authorization":"Bearer "+access_token}
-                    url = "http://api.7x24hs.com/api/clubs/"+guest_club_id
-                    http_client = HTTPClient()
-                    response = http_client.fetch(url, method="GET", headers=headers)
-                    club = json_decode(response.body)
-                    order['guest_club_name'] = club['name']
 
-                else:
-                    order['guest_club_name'] = ""
-            else:
-                order['guest_club_name'] = ""
+        for order in _array:
+            # if order.has_key('guest_club_id'):
+            #     if order['guest_club_id']:
+            #         guest_club_id = order["guest_club_id"]
+            #         # 取俱乐部名称
+            #         access_token = self.get_access_token()
+            #         headers={"Authorization":"Bearer "+access_token}
+            #         logging.info("%r==========%r",access_token,guest_club_id)
+            #         url = "http://api.7x24hs.com/api/clubs/"+guest_club_id
+            #         http_client = HTTPClient()
+            #         response = http_client.fetch(url, method="GET", headers=headers)
+            #         club = json_decode(response.body)
+            #         order['guest_club_name'] = club['name']
+            #
+            #     else:
+            #         order['guest_club_name'] = ""
+            # else:
+            order['guest_club_name'] = ""
 
             _activity = activity_dao.activity_dao().query(order['activity_id'])
             order['activity_title'] = _activity['title']
@@ -171,6 +173,177 @@ class ApiOrderListXHR(AuthorizationHandler):
 
             order['total_amount'] = float(order['total_amount']) / 100
             order['payed_total_fee'] = float(order['payed_total_fee']) / 100
+
+        _json = json_encode(_array)
+        logging.info("got _json %r", _json)
+
+        self.write(JSON.dumps(_json, default=json_util.default))
+        self.finish()
+
+
+class ApiLeagueOtherOrderListXHR(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+
+        iBefore = 0
+        sBefore = self.get_argument("before", "") #格式 2016-06-01 22:36
+        if sBefore != "":
+            iBefore = float(datetime_timestamp(sBefore))
+        else:
+            iBefore = time.time()
+
+        _array = order_dao.order_dao().query_pagination_by_vendor_notme(vendor_id, iBefore, PAGE_SIZE_LIMIT);
+        for order in _array:
+            # 这里要处理一下俱乐部名称
+            # if order.has_key('guest_club_id'):
+            #     if order['guest_club_id']:
+            #         guest_club_id = order["guest_club_id"]
+            #         # 取俱乐部名称
+            #         access_token = self.get_access_token()
+            #         headers={"Authorization":"Bearer "+access_token}
+            #         logging.info("%r==========%r",access_token,guest_club_id)
+            #         url = "http://api.7x24hs.com/api/clubs/"+guest_club_id
+            #         http_client = HTTPClient()
+            #         response = http_client.fetch(url, method="GET", headers=headers)
+            #         club = json_decode(response.body)
+            #         order['guest_club_name'] = club['name']
+            #
+            #     else:
+            #         order['guest_club_name'] = ""
+            # else:
+            order['guest_club_name'] = ""
+
+            _activity = activity_dao.activity_dao().query(order['activity_id'])
+            order['activity_title'] = _activity['title']
+
+            try:
+                order['base_fees']
+            except:
+                order['base_fees'] = _activity['base_fee_template']
+                # 数据库apply无base_fees时，取order的赋值给它，并更新其数据库字段
+                _json = {"_id":order['_id'],"base_fees":order['base_fees']}
+                logging.info("got base_fees json %r in uri", _json)
+                order_dao.order_dao().update(_json)
+
+            order['activity_amount'] = 0
+            if order['base_fees']:
+                for base_fee in order['base_fees']:
+                    # 价格转换成元
+                    order['activity_amount'] = float(base_fee['fee']) / 100
+
+            order_fees = []
+            for ext_fee_id in order['ext_fees']:
+                for template in _activity['ext_fee_template']:
+                    if ext_fee_id == template['_id']:
+                        json = {"_id":ext_fee_id, "name":template['name'], "fee":template['fee']}
+                        order_fees.append(json)
+                        break
+            order['fees'] = order_fees
+
+            order_insurances = []
+            for insurance_id in order['insurances']:
+                _insurance = insurance_template_dao.insurance_template_dao().query(insurance_id)
+                order_insurances.append(_insurance)
+            order['insurances'] = order_insurances
+
+            for _voucher in order['vouchers']:
+                # 价格转换成元
+                _voucher['fee'] = float(_voucher['fee']) / 100
+
+            try:
+                order['bonus']
+            except:
+                order['bonus'] = 0
+            # 价格转换成元
+            order['bonus'] = float(order['bonus']) / 100
+            try:
+                order['payed_total_fee'] = float(order['payed_total_fee']) / 100
+            except:
+                order['payed_total_fee'] = 0
+
+
+        _json = json_encode(_array)
+        logging.info("got _json %r", _json)
+
+        self.write(JSON.dumps(_json, default=json_util.default))
+        self.finish()
+
+class ApiLeagueMyOrderListXHR(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        iBefore = 0
+        sBefore = self.get_argument("before", "") #格式 2016-06-01 22:36
+        if sBefore != "":
+            iBefore = float(datetime_timestamp(sBefore))
+        else:
+            iBefore = time.time()
+
+        _array = order_dao.order_dao().query_pagination_by_vendor_me(vendor_id, iBefore, PAGE_SIZE_LIMIT);
+
+        for order in _array:
+            # 取俱乐部名称
+            club_id = order['vendor_id']
+            access_token = self.get_access_token()
+            headers={"Authorization":"Bearer "+access_token}
+            logging.info("%r==========%r",access_token,club_id)
+
+            url = "http://api.7x24hs.com/api/clubs/"+club_id
+            http_client = HTTPClient()
+            response = http_client.fetch(url, method="GET", headers=headers)
+            club = json_decode(response.body)
+            order['club_name'] = club['name']
+
+            _activity = activity_dao.activity_dao().query(order['activity_id'])
+            order['activity_title'] = _activity['title']
+
+            try:
+                order['base_fees']
+            except:
+                order['base_fees'] = _activity['base_fee_template']
+                # 数据库apply无base_fees时，取order的赋值给它，并更新其数据库字段
+                _json = {"_id":order['_id'],"base_fees":order['base_fees']}
+                logging.info("got base_fees json %r in uri", _json)
+                order_dao.order_dao().update(_json)
+
+            order['activity_amount'] = 0
+            if order['base_fees']:
+                for base_fee in order['base_fees']:
+                    # 价格转换成元
+                    order['activity_amount'] = float(base_fee['fee']) / 100
+
+            order_fees = []
+            for ext_fee_id in order['ext_fees']:
+                for template in _activity['ext_fee_template']:
+                    if ext_fee_id == template['_id']:
+                        json = {"_id":ext_fee_id, "name":template['name'], "fee":template['fee']}
+                        order_fees.append(json)
+                        break
+            order['fees'] = order_fees
+
+            order_insurances = []
+            for insurance_id in order['insurances']:
+                _insurance = insurance_template_dao.insurance_template_dao().query(insurance_id)
+                order_insurances.append(_insurance)
+            order['insurances'] = order_insurances
+
+            for _voucher in order['vouchers']:
+                # 价格转换成元
+                _voucher['fee'] = float(_voucher['fee']) / 100
+
+            try:
+                order['bonus']
+            except:
+                order['bonus'] = 0
+            # 价格转换成元
+            order['bonus'] = float(order['bonus']) / 100
+            try:
+                order['payed_total_fee'] = float(order['payed_total_fee']) / 100
+            except:
+                order['payed_total_fee'] = 0
 
         _json = json_encode(_array)
         logging.info("got _json %r", _json)

@@ -106,6 +106,27 @@ class order_dao(singleton):
             array.append(i)
         return array
 
+    # 我的活动 别人订单
+    def query_pagination_by_vendor_notme(self, vendor_id, before, limit):
+        cursor = self.__order_collection.find({
+                "vendor_id":vendor_id,
+                "guest_club_id":{"$ne":vendor_id},
+                "create_time":{"$lt":before}}).sort("create_time",-1).limit(limit);
+        array = []
+        for i in cursor:
+            array.append(i)
+        return array
+
+    # 别人活动我的订单
+    def query_pagination_by_vendor_me(self, vendor_id, before, limit):
+        cursor = self.__order_collection.find({
+                "guest_club_id":vendor_id,
+                "vendor_id":{"$ne":vendor_id},
+                "create_time":{"$lt":before}}).sort("create_time",-1).limit(limit);
+        array = []
+        for i in cursor:
+            array.append(i)
+        return array
 
     def query_pagination_by_account(self, account_id, before, limit):
         cursor = self.__order_collection.find({
