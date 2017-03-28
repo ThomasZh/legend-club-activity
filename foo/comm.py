@@ -312,3 +312,16 @@ def html_markdown(html):
     markdown_content = h.handle(html)
     logging.info("got markdown content %r", markdown_content)
     return markdown_content
+
+def get_club_info(access_token,club_id):
+    try:
+        headers={"Authorization":"Bearer "+access_token}
+        url = API_DOMAIN+"/api/clubs/"+club_id
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="GET", headers=headers)
+        data = json_decode(response.body)
+        club = data['rs']
+        logging.info("got club info %r",club)
+        return club
+    except:
+        return

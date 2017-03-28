@@ -55,6 +55,7 @@ from dao import voucher_order_dao
 from dao import trip_router_dao
 from dao import triprouter_share_dao
 from dao import club_dao
+from dao import activity_share_dao
 
 from auth import auth_email
 from auth import auth_phone
@@ -125,6 +126,7 @@ class WxRecommendActivityHandler(tornado.web.RequestHandler):
 
         _now = time.time()
         # 查询结果，不包含隐藏的活动
+        # _arr = activity_share_dao.activity_share_dao().query
         _array = activity_dao.activity_dao().query_activitys_notme(
                 vendor_id, ACTIVITY_STATUS_RECRUIT, _now, PAGE_SIZE_LIMIT)
         logging.info("got recommend activity>>>>>>>>> %r",_array)

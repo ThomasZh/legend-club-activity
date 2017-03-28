@@ -128,7 +128,7 @@ class activity_dao(singleton):
             data = i
         return data
 
-        
+
     def query_by_vendor(self, vendor_id):
         cursor = self.__activity_collection.find({"vendor_id":vendor_id})
         array = []
@@ -143,7 +143,7 @@ class activity_dao(singleton):
             array.append(i)
         return array
 
-    def query_by_open(self, vendor_id):
+    def query_by_open(self):
         cursor = self.__activity_collection.find({"open":True})
         array = []
         for i in cursor:

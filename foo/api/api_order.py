@@ -56,7 +56,7 @@ class ApiOrderListXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
-
+        access_token = self.get_access_token()
 
         iBefore = 0
         sBefore = self.get_argument("before", "") #格式 2016-06-01 22:36
@@ -69,23 +69,15 @@ class ApiOrderListXHR(AuthorizationHandler):
 
         for order in _array:
 
-            # if order.has_key('guest_club_id'):
-            #     if order['guest_club_id']:
-            #         guest_club_id = order["guest_club_id"]
-            #         # 取俱乐部名称
-            #         access_token = self.get_access_token()
-            #         headers={"Authorization":"Bearer "+access_token}
-            #         logging.info("%r==========%r",access_token,guest_club_id)
-            #         url = "http://api.7x24hs.com/api/clubs/"+guest_club_id
-            #         http_client = HTTPClient()
-            #         response = http_client.fetch(url, method="GET", headers=headers)
-            #         club = json_decode(response.body)
-            #         order['guest_club_name'] = club['name']
-            #
-            #     else:
-            #         order['guest_club_name'] = ""
-            # else:
-            order['guest_club_name'] = ""
+            if order.has_key('guest_club_id'):
+                if order['guest_club_id']:
+                    guest_club_id = order["guest_club_id"]
+                    club = get_club_info(access_token,guest_club_id)
+                    order['guest_club_name'] = club['name']
+                else:
+                    order['guest_club_name'] = ""
+            else:
+                order['guest_club_name'] = ""
 
             _activity = activity_dao.activity_dao().query(order['activity_id'])
             order['activity_title'] = _activity['title']
@@ -187,6 +179,7 @@ class ApiLeagueOtherOrderListXHR(AuthorizationHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
+        access_token = self.get_access_token()
 
         iBefore = 0
         sBefore = self.get_argument("before", "") #格式 2016-06-01 22:36
@@ -197,25 +190,17 @@ class ApiLeagueOtherOrderListXHR(AuthorizationHandler):
 
         _array = order_dao.order_dao().query_pagination_by_vendor_notme(vendor_id, iBefore, PAGE_SIZE_LIMIT);
         for order in _array:
-            
+
             # 这里要处理一下俱乐部名称
-            # if order.has_key('guest_club_id'):
-            #     if order['guest_club_id']:
-            #         guest_club_id = order["guest_club_id"]
-            #         # 取俱乐部名称
-            #         access_token = self.get_access_token()
-            #         headers={"Authorization":"Bearer "+access_token}
-            #         logging.info("%r==========%r",access_token,guest_club_id)
-            #         url = "http://api.7x24hs.com/api/clubs/"+guest_club_id
-            #         http_client = HTTPClient()
-            #         response = http_client.fetch(url, method="GET", headers=headers)
-            #         club = json_decode(response.body)
-            #         order['guest_club_name'] = club['name']
-            #
-            #     else:
-            #         order['guest_club_name'] = ""
-            # else:
-            order['guest_club_name'] = ""
+            if order.has_key('guest_club_id'):
+                if order['guest_club_id']:
+                    guest_club_id = order["guest_club_id"]
+                    club = get_club_info(access_token,guest_club_id)
+                    order['guest_club_name'] = club['name']
+                else:
+                    order['guest_club_name'] = ""
+            else:
+                order['guest_club_name'] = ""
 
             _activity = activity_dao.activity_dao().query(order['activity_id'])
             order['activity_title'] = _activity['title']
@@ -276,6 +261,7 @@ class ApiLeagueMyOrderListXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
+        access_token = self.get_access_token()
 
         iBefore = 0
         sBefore = self.get_argument("before", "") #格式 2016-06-01 22:36
@@ -289,14 +275,7 @@ class ApiLeagueMyOrderListXHR(AuthorizationHandler):
         for order in _array:
             # 取俱乐部名称
             club_id = order['vendor_id']
-            access_token = self.get_access_token()
-            headers={"Authorization":"Bearer "+access_token}
-            logging.info("%r==========%r",access_token,club_id)
-
-            url = "http://api.7x24hs.com/api/clubs/"+club_id
-            http_client = HTTPClient()
-            response = http_client.fetch(url, method="GET", headers=headers)
-            club = json_decode(response.body)
+            club = get_club_info(access_token,club_id)
             order['club_name'] = club['name']
 
             _activity = activity_dao.activity_dao().query(order['activity_id'])

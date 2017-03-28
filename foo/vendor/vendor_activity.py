@@ -229,8 +229,9 @@ class VendorActivityLeagueShareHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
-        activitys = activity_dao.activity_dao().query_by_open(vendor_id)
+        activitys = activity_dao.activity_dao().query_by_open()
         activitys_share = activity_share_dao.activity_share_dao().query_by_vendor(vendor_id)
 
         # 在所有开放的活动中剔除掉自己开放的
@@ -241,8 +242,10 @@ class VendorActivityLeagueShareHandler(AuthorizationHandler):
 
         # 加share属性，区别一个自己是否已经分享了别人开放的这个活动
         for activity in activitys:
-            # club = club_dao.club_dao().query(activity['vendor_id'])
-            activity['club'] = activity['vendor_id']
+            # 取俱乐部名称
+            club_id = activity['vendor_id']
+            club = get_club_info(access_token,club_id)
+            activity['club'] = club['name']
             activity['share'] = False
 
             activity['begin_time'] = timestamp_date(float(activity['begin_time'])) # timestamp -> %m/%d/%Y
@@ -251,6 +254,7 @@ class VendorActivityLeagueShareHandler(AuthorizationHandler):
                 if(activity['_id']==activity_share['activity']):
                     activity['share'] = True
                     break
+            logging.info("===========%r",activity['share'])
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/activity-league-share.html',
@@ -273,7 +277,7 @@ class VendorActivityShareSetHandler(AuthorizationHandler):
 
         _id = str(uuid.uuid1()).replace('-', '')
         json = {"_id":_id, "activity":activity_id,
-                "share":True,"vendor_id":activity['vendor_id'], "bk_img_url":activity['bk_img_url'],
+                "share":True,"vendor_id":vendor_id, "bk_img_url":activity['bk_img_url'],
                 "title":activity['title'],"club":activity['vendor_id']}
 
         activity_share_dao.activity_share_dao().create(json)
@@ -301,6 +305,7 @@ class VendorActivityLeagueRecruitHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
 
@@ -312,13 +317,19 @@ class VendorActivityLeagueRecruitHandler(AuthorizationHandler):
             # club = club_dao.club_dao().query(activity['vendor_id'])
             activity['share'] = False
             activity['begin_time'] = timestamp_date(float(activity['begin_time'])) # timestamp -> %m/%d/%Y
-            activity['club'] = vendor_id
+            activity['club'] = ops['club_name']
 
         for activity in activitys_share:
-            # FIXME 这里要改
-            activity['begin_time'] = timestamp_date(float(time.time())) # timestamp -> %m/%d/%Y
+            _id = activity['activity']
+            acti = activity_dao.activity_dao().query(_id)
+            activity['begin_time'] = timestamp_date(float(acti['begin_time'])) # timestamp -> %m/%d/%Y
+            # 取俱乐部名称
+            club_id = activity['club']
+            club = get_club_info(access_token,club_id)
+            activity['club'] = club['name']
 
         activitys = activitys_me + activitys_share
+
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/activity-recruit-all.html',
