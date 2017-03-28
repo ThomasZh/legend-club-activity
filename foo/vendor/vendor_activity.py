@@ -47,6 +47,8 @@ from dao import group_qrcode_dao
 from dao import vendor_member_dao
 from dao import trip_router_dao
 from dao import evaluation_dao
+from dao import activity_share_dao
+
 from global_const import *
 
 
@@ -157,6 +159,173 @@ class VendorActivityRecruitHandler(AuthorizationHandler):
                 budge_num=budge_num,
                 activitys=activitys)
 
+
+class VendorActivityRecruitNotHiddenHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        ops = self.get_ops_info()
+
+        categorys = category_dao.category_dao().query_by_vendor(vendor_id)
+        before = time.time();
+        activitys = activity_dao.activity_dao().query_pagination_by_status(
+                vendor_id, ACTIVITY_STATUS_RECRUIT, before, PAGE_SIZE_LIMIT)
+
+        for activity in activitys:
+            # 剔除掉隐藏活动
+            if activity['hidden']:
+                activitys.remove(activity)
+            # 加open属性
+            if not activity.has_key('open'):
+                activity['open'] = False
+
+            activity['begin_time'] = timestamp_date(float(activity['begin_time'])) # timestamp -> %m/%d/%Y
+            for category in categorys:
+                if category['_id'] == activity['category']:
+                    activity['category'] = category['title']
+                    break
+
+        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        self.render('vendor/activity-recruit-nothidden.html',
+                vendor_id=vendor_id,
+                ops=ops,
+                budge_num=budge_num,
+                activitys=activitys)
+
+
+class VendorActivityOpenSetHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id, activity_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+        logging.info("got activity_id %r in uri", activity_id)
+
+        ops = self.get_ops_info()
+
+        json = {"_id":activity_id, "open":True}
+        activity_dao.activity_dao().updateOpenStatus(json)
+
+        self.redirect('/vendors/' + vendor_id + '/activitys/recruit-nothidden')
+
+
+class VendorActivityOpenCancelHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id, activity_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+        logging.info("got activity_id %r in uri", activity_id)
+
+        ops = self.get_ops_info()
+
+        json = {"_id":activity_id, "open":False}
+        activity_dao.activity_dao().updateOpenStatus(json)
+
+        self.redirect('/vendors/' + vendor_id + '/activitys/recruit-nothidden')
+
+
+# 联盟中其他俱乐部开放了的活动
+class VendorActivityLeagueShareHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        ops = self.get_ops_info()
+
+        activitys = activity_dao.activity_dao().query_by_open(vendor_id)
+        activitys_share = activity_share_dao.activity_share_dao().query_by_vendor(vendor_id)
+
+        # 在所有开放的活动中剔除掉自己开放的
+        for activity in activitys:
+            if(activity['vendor_id'] == vendor_id):
+                activitys.remove(activity)
+                break
+
+        # 加share属性，区别一个自己是否已经分享了别人开放的这个活动
+        for activity in activitys:
+            # club = club_dao.club_dao().query(activity['vendor_id'])
+            activity['club'] = activity['vendor_id']
+            activity['share'] = False
+
+            activity['begin_time'] = timestamp_date(float(activity['begin_time'])) # timestamp -> %m/%d/%Y
+
+            for activity_share in activitys_share:
+                if(activity['_id']==activity_share['activity']):
+                    activity['share'] = True
+                    break
+
+        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        self.render('vendor/activity-league-share.html',
+                vendor_id=vendor_id,
+                ops=ops,
+                budge_num=budge_num,
+                activitys=activitys)
+
+
+class VendorActivityShareSetHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id, activity_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+        logging.info("got activity_id %r in uri", activity_id)
+
+        ops = self.get_ops_info()
+
+        # 设置别人开放的活动为自己所用
+        activity = activity_dao.activity_dao().query(activity_id)
+
+        _id = str(uuid.uuid1()).replace('-', '')
+        json = {"_id":_id, "activity":activity_id,
+                "share":True,"vendor_id":activity['vendor_id'], "bk_img_url":activity['bk_img_url'],
+                "title":activity['title'],"club":activity['vendor_id']}
+
+        activity_share_dao.activity_share_dao().create(json)
+
+        self.redirect('/vendors/' + vendor_id + '/activitys/league/share')
+
+
+class VendorActivityShareCancelHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id, activity_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+        logging.info("got activity_id %r in uri", activity_id)
+
+        ops = self.get_ops_info()
+
+        activity_share = activity_share_dao.activity_share_dao().query_by_activity_vendor(activity_id,vendor_id)
+        activity_share_dao.activity_share_dao().delete(activity_share['_id'])
+
+        self.redirect('/vendors/' + vendor_id + '/activitys/league/share')
+
+
+class VendorActivityLeagueRecruitHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        ops = self.get_ops_info()
+
+        categorys = category_dao.category_dao().query_by_vendor(vendor_id)
+
+        activitys_me = activity_dao.activity_dao().query_by_vendor(vendor_id)
+        activitys_share = activity_share_dao.activity_share_dao().query_by_vendor(vendor_id)
+
+        # 处理一下自己活动
+        for activity in activitys_me:
+            # club = club_dao.club_dao().query(activity['vendor_id'])
+            activity['share'] = False
+            activity['begin_time'] = timestamp_date(float(activity['begin_time'])) # timestamp -> %m/%d/%Y
+            activity['club'] = vendor_id
+
+        for activity in activitys_share:
+            # FIXME 这里要改
+            activity['begin_time'] = timestamp_date(float(time.time())) # timestamp -> %m/%d/%Y
+
+        activitys = activitys_me + activitys_share
+
+        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        self.render('vendor/activity-recruit-all.html',
+                vendor_id=vendor_id,
+                ops=ops,
+                budge_num=budge_num,
+                activitys=activitys)
 
 # /vendors/<string:vendor_id>/activitys/canceled
 class VendorActivityCanceledHandler(AuthorizationHandler):

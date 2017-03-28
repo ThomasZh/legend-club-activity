@@ -85,6 +85,14 @@ def map():
         (r'/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/action/clone', getattr(vendor_activity, 'VendorActivityActionCloneHandler')),
         (r'/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/action/evaluate', getattr(vendor_activity, 'VendorActivityActionEvalHandler')),
 
+        # 联盟活动分享
+        (r'/vendors/([a-z0-9]*)/activitys/recruit-nothidden', getattr(vendor_activity, 'VendorActivityRecruitNotHiddenHandler')),
+        (r'/vendors/([a-z0-9]*)/activity/([a-z0-9]*)/open/set', getattr(vendor_activity, 'VendorActivityOpenSetHandler')),
+        (r'/vendors/([a-z0-9]*)/activity/([a-z0-9]*)/open/cancel', getattr(vendor_activity, 'VendorActivityOpenCancelHandler')),
+        (r'/vendors/([a-z0-9]*)/activitys/league/share', getattr(vendor_activity, 'VendorActivityLeagueShareHandler')),
+        (r'/vendors/([a-z0-9]*)/activity/([a-z0-9]*)/share/set', getattr(vendor_activity, 'VendorActivityShareSetHandler')),
+        (r'/vendors/([a-z0-9]*)/activity/([a-z0-9]*)/share/cancel', getattr(vendor_activity, 'VendorActivityShareCancelHandler')),
+        (r'/vendors/([a-z0-9]*)/activitys/league/recruit', getattr(vendor_activity, 'VendorActivityLeagueRecruitHandler')),
 
         # blog
         # 这四个没用
@@ -178,6 +186,7 @@ def map():
         (r"/bf/api/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/share", getattr(api_activity, 'ApiActivityShareXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/articles/([a-z0-9]*)/paragraphs", getattr(api_blog, 'ApiBlogParagraphListXHR')),
 
+        # 联盟订单
         (r"/bf/api/vendors/([a-z0-9]*)/league/orders-me", getattr(api_order, 'ApiLeagueMyOrderListXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/league/orders-other", getattr(api_order, 'ApiLeagueOtherOrderListXHR')),
 

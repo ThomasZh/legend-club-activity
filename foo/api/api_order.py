@@ -68,6 +68,7 @@ class ApiOrderListXHR(AuthorizationHandler):
         _array = order_dao.order_dao().query_pagination_by_vendor(vendor_id, iBefore, PAGE_SIZE_LIMIT);
 
         for order in _array:
+
             # if order.has_key('guest_club_id'):
             #     if order['guest_club_id']:
             #         guest_club_id = order["guest_club_id"]
@@ -196,6 +197,7 @@ class ApiLeagueOtherOrderListXHR(AuthorizationHandler):
 
         _array = order_dao.order_dao().query_pagination_by_vendor_notme(vendor_id, iBefore, PAGE_SIZE_LIMIT);
         for order in _array:
+            
             # 这里要处理一下俱乐部名称
             # if order.has_key('guest_club_id'):
             #     if order['guest_club_id']:

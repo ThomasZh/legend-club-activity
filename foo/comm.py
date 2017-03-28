@@ -21,7 +21,7 @@ import tornado.web
 import logging
 import time
 import sys
-from global_const import STP
+from global_const import *
 from tornado.escape import json_encode, json_decode
 from tornado.httpclient import HTTPClient
 from tornado.httputil import url_concat
@@ -141,13 +141,14 @@ def time_span(ts):
 class BaseHandler(tornado.web.RequestHandler):
 
     def get_code(self):
-        url = "http://api.7x24hs.com/api/auth/codes"
+        url = API_DOMAIN + "/api/auth/codes"
         http_client = HTTPClient()
         data = {"appid":"7x24hs:blog",
                 "app_secret":"2518e11b3bc89ebec594350d5739f29e"}
         _json = json_encode(data)
         response = http_client.fetch(url, method="POST", body=_json)
-        session_code = json_decode(response.body)
+        data = json_decode(response.body)
+        session_code = data['rs']
         logging.info("got session_code %r", session_code)
         code = session_code['code']
         return code
@@ -156,11 +157,12 @@ class BaseHandler(tornado.web.RequestHandler):
     def get_myinfo_login(self):
         access_token = self.get_secure_cookie("access_token")
 
-        url = "http://api.7x24hs.com/api/myinfo?filter=login"
+        url = API_DOMAIN +"/api/myinfo?filter=login"
         http_client = HTTPClient()
         headers={"Authorization":"Bearer "+access_token}
         response = http_client.fetch(url, method="GET", headers=headers)
-        myinfo = json_decode(response.body)
+        data = json_decode(response.body)
+        myinfo = data['rs']
         logging.info("got myinfo %r", myinfo)
         # myinfo['login']: wx_openid
         return myinfo
@@ -216,13 +218,14 @@ class AuthorizationHandler(BaseHandler):
 
         try:
             params = {"filter":"ops"}
-            url = url_concat("http://api.7x24hs.com/api/myinfo", params)
+            url = url_concat(API_DOMAIN+"/api/myinfo", params)
             http_client = HTTPClient()
             headers={"Authorization":"Bearer "+access_token}
             response = http_client.fetch(url, method="GET", headers=headers)
             logging.info("got response %r", response.body)
             # account_id,nickname,avatar,club_id,club_name,league_id,_rank
-            ops = json_decode(response.body)
+            data = json_decode(response.body)
+            ops = data['rs']
             return ops
         except:
             err_title = str( sys.exc_info()[0] );
@@ -261,7 +264,7 @@ class AuthorizationHandler(BaseHandler):
                         return None
                     else:
                         try:
-                            url = "http://api.7x24hs.com/api/auth/tokens"
+                            url = API_DOMAIN+"/api/auth/tokens"
                             http_client = HTTPClient()
                             headers={"Authorization":"Bearer "+refresh_token}
                             data = {"action":"refresh"}
@@ -269,8 +272,8 @@ class AuthorizationHandler(BaseHandler):
                             logging.info("request %r body %r", url, _json)
                             response = http_client.fetch(url, method="POST", headers=headers, body=_json)
                             logging.info("got response %r", response.body)
-                            session_ticket = json_decode(response.body)
-
+                            data = json_decode(response.body)
+                            session_ticket = data['rs']
                             self.set_secure_cookie("access_token", session_ticket['access_token'])
                             self.set_secure_cookie("expires_at", str(session_ticket['expires_at']))
                             self.set_secure_cookie("refresh_token", session_ticket['refresh_token'])

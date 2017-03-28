@@ -55,11 +55,11 @@ class AuthPhoneLoginHandler(BaseHandler):
         logging.info("try login as phone:[%r] pwd:[%r] remember:[%r]", phone, pwd, remember)
 
         code = self.get_code()
-        logging.info("try login as code", code)
+        # code = "2518e11b3bc89ebec594350d5739f29e"
 
         # login
         try:
-            url = "http://api.7x24hs.com/api/auth/tokens"
+            url = API_DOMAIN + "/api/auth/tokens"
             http_client = HTTPClient()
             headers={"Authorization":"Bearer "+code}
             data = {"action":"login",
@@ -70,7 +70,8 @@ class AuthPhoneLoginHandler(BaseHandler):
             logging.info("request %r body %r", url, _json)
             response = http_client.fetch(url, method="POST", headers=headers, body=_json)
             logging.info("got response %r", response.body)
-            session_ticket = json_decode(response.body)
+            data = json_decode(response.body)
+            session_ticket = data['rs']
 
             # is ops
             try:
@@ -84,7 +85,7 @@ class AuthPhoneLoginHandler(BaseHandler):
 
                 # 校验是否为俱乐部管理员
                 params = {"filter":"ops"}
-                url = url_concat("http://api.7x24hs.com/api/myinfo", params)
+                url = url_concat(API_DOMAIN + "/api/myinfo", params)
                 http_client = HTTPClient()
                 headers={"Authorization":"Bearer "+session_ticket['access_token']}
                 response = http_client.fetch(url, method="GET", headers=headers)
@@ -134,10 +135,11 @@ class AuthPhoneRegisterHandler(BaseHandler):
         logging.info("try register as phone:[%r] pwd:[%r]", phone, pwd)
 
         code = self.get_code()
+        # code = "2518e11b3bc89ebec594350d5739f29e"
 
         # register
         try:
-            url = "http://api.7x24hs.com/api/auth/accounts"
+            url = API_DOMAIN + "/api/auth/accounts"
             http_client = HTTPClient()
             headers={"Authorization":"Bearer "+code}
             data = {"login_type":"phone",
@@ -147,7 +149,9 @@ class AuthPhoneRegisterHandler(BaseHandler):
             logging.info("request %r body %r", url, _json)
             response = http_client.fetch(url, method="POST", headers=headers, body=_json)
             logging.info("got response %r", response.body)
-            session_ticket = json_decode(response.body)
+            # session_ticket = json_decode(response.body)
+            data = json_decode(response.body)
+            session_ticket = data['rs']
         except:
             err_title = str( sys.exc_info()[0] );
             err_detail = str( sys.exc_info()[1] );
@@ -175,9 +179,10 @@ class AuthPhoneLostPwdHandler(BaseHandler):
         logging.info("try to reset password phone=[%r] verify_code=[%r] pwd=[%r]", phone, verify_code, pwd)
 
         code = self.get_code()
+        # code = "2518e11b3bc89ebec594350d5739f29e"
 
         try:
-            url = "http://api.7x24hs.com/api/auth/pwds"
+            url = API_DOMAIN + "/api/auth/pwds"
             http_client = HTTPClient()
             headers={"Authorization":"Bearer "+code}
             data = {"login_type":"phone",
@@ -222,9 +227,10 @@ class AuthPhoneVerifyCodeHandler(BaseHandler):
         logging.info("try to send lost password sms to [%r]", phone)
 
         code = self.get_code()
+        # code = "2518e11b3bc89ebec594350d5739f29e"
 
         try:
-            url = "http://api.7x24hs.com/api/auth/verify-codes"
+            url = API_DOMAIN + "/api/auth/verify-codes"
             http_client = HTTPClient()
             headers={"Authorization":"Bearer "+code}
             data = {"action":"lost-pwd",
