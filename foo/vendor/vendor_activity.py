@@ -471,7 +471,8 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
         http_client = HTTPClient()
         response = http_client.fetch(url, method="POST", headers=headers, body=_json)
         logging.info("got response %r", response.body)
-        article = json_decode(response.body)
+        data = json_decode(response.body)
+        article = data['rs']
         article_id = article['_id']
         _paragraphs = ''
 
@@ -1024,7 +1025,8 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
             http_client = HTTPClient()
             response = http_client.fetch(url, method="GET")
             logging.info("got response %r", response.body)
-            article = json_decode(response.body)
+            data = json_decode(response.body)
+            article = data['rs']
             _paragraphs = article['paragraphs']
         else:
             article = {'title':activity['title'], 'subtitle':activity['location'], 'img':activity['bk_img_url'],'paragraphs':''}
@@ -1034,7 +1036,8 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
             http_client = HTTPClient()
             response = http_client.fetch(url, method="POST", headers=headers, body=_json)
             logging.info("got response %r", response.body)
-            article = json_decode(response.body)
+            data = json_decode(response.body)
+            article = data['rs']
             article_id = article['_id']
             _paragraphs = ''
 

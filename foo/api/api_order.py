@@ -73,7 +73,10 @@ class ApiOrderListXHR(AuthorizationHandler):
                 if order['guest_club_id']:
                     guest_club_id = order["guest_club_id"]
                     club = get_club_info(access_token,guest_club_id)
-                    order['guest_club_name'] = club['name']
+                    if club:
+                        order['guest_club_name'] = club['name']
+                    else:
+                        order['guest_club_name'] = ""
                 else:
                     order['guest_club_name'] = ""
             else:
@@ -196,7 +199,10 @@ class ApiLeagueOtherOrderListXHR(AuthorizationHandler):
                 if order['guest_club_id']:
                     guest_club_id = order["guest_club_id"]
                     club = get_club_info(access_token,guest_club_id)
-                    order['guest_club_name'] = club['name']
+                    if club:
+                        order['guest_club_name'] = club['name']
+                    else:
+                        order['guest_club_name'] = ""
                 else:
                     order['guest_club_name'] = ""
             else:
@@ -276,7 +282,10 @@ class ApiLeagueMyOrderListXHR(AuthorizationHandler):
             # 取俱乐部名称
             club_id = order['vendor_id']
             club = get_club_info(access_token,club_id)
-            order['club_name'] = club['name']
+            if club:
+                order['club_name'] = club['name']
+            else:
+                order['club_name'] = ""
 
             _activity = activity_dao.activity_dao().query(order['activity_id'])
             order['activity_title'] = _activity['title']

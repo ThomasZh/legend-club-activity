@@ -48,7 +48,7 @@
         <div class="left_col scroll-view">
 
           <!-- navigation title -->
-          {% module Template("vendor/nav-title-block.html") %}
+          {% module Template("vendor/nav-title-block.html", ops=ops) %}
           <!-- /navigation title -->
           <div class="clearfix"></div>
 
@@ -116,7 +116,7 @@
                                 {% if activity['share'] %}
                                     <img style="width: 100%; display: block;" src="{{activity['bk_img_url']}}" alt="image" />
                                 {% else %}
-                                    <a href="/vendors/{{ vendor_id }}/activity/{{activity['_id']}}/edit/step1">
+                                    <a href="/vendors/{{ vendor_id }}/activitys/{{activity['_id']}}/detail/step1">
                                       <img style="width: 100%; display: block;" src="{{activity['bk_img_url']}}" alt="image" />
                                     </a>
                                 {% end %}

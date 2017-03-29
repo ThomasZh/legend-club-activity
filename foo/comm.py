@@ -320,8 +320,12 @@ def get_club_info(access_token,club_id):
         http_client = HTTPClient()
         response = http_client.fetch(url, method="GET", headers=headers)
         data = json_decode(response.body)
-        club = data['rs']
-        logging.info("got club info %r",club)
+        err_code = data['err_code']
+        if err_code == 200:
+            club = data['rs']
+        else:
+            club =  None
+        logging.info("got club info>>>>>>>>>>> %r",club)
         return club
     except:
         return
