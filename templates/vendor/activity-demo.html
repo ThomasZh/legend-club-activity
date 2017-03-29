@@ -74,8 +74,7 @@ body {
   </div>
 
   <div class="ui-loading-wrap">
-    <p>正在加载中...</p>
-    <i class="ui-loading"></i>
+    {% raw paragraphs %}
   </div>
 
   <!-- TODO: 放活动的路线详情内容 -->
@@ -83,58 +82,6 @@ body {
     <!-- <span class="bm">活动介绍</span> -->
 	</div>
 
-
-
-  <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
-  <script src="{{ static_url('frozenui-1.3.0/lib/zepto.min.js') }}"></script>
-  <!-- 活动编号 -->
-	<script type='text/template', id='data-actID'>{{activity['_id']}}</script>
-  <!-- 活动对应的文章编号 -->
-	<script type='text/template', id='data-atcID'>{{activity.get('article_id','')}}</script>
-  <script>
-
-  /**
-   * 活动详情交互脚本
-   * @2016/05/25
-   */
-  $(function(){
-
-    var activityID = $('#data-actID').html();
-    var articleID = $('#data-atcID').html();
-    console.log('article: '+articleID);
-
-    // 再获取活动路线详情
-    // 活动内容可能为空，所以要判断下
-    if(articleID){
-      $('.ui-loading-wrap').addClass('hidden');//隐藏进度条
-      $.getJSON('/bf/api/vendors/{{ vendor_id }}/demo／articles/'+articleID+'/paragraphs', function(result){
-        console.log(result);
-        var paragraphs = '';
-        for(var i in result){
-          var p = result[i];
-          if(p.type=='heading'){//标题
-            paragraphs += '<span class="bm">'+p.content+'</span>';
-          }
-          if(p.type=='img'){//图片
-            paragraphs += '<div class="m1">';
-            paragraphs += ' <img src="'+p.content+'">';
-            paragraphs += '</div>';
-          }
-          if(p.type=='raw'){//文本
-            paragraphs += '<div class="m1">';
-            paragraphs +=   p.content;
-            paragraphs += '</div>';
-          }
-        }
-        // 添加到页面
-        $('.routines').html(paragraphs);
-      });
-    }else{
-      $('.ui-loading-wrap').addClass('hidden');//隐藏进度条
-    }
-  });
-
-  </script>
 
 </body>
 </html>

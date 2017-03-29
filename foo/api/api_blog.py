@@ -82,5 +82,7 @@ class ApiDemoActivityParagraphXHR(tornado.web.RequestHandler):
         data = json_decode(response.body)
         article = data['rs']
         _paragraphs = article['paragraphs']
+        logging.info("=========",_paragraphs)
+
         self.write(_paragraphs)
         self.finish()

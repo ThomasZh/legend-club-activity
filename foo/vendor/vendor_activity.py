@@ -277,6 +277,7 @@ class VendorActivityShareSetHandler(AuthorizationHandler):
         # 设置别人开放的活动为自己所用
         activity = activity_dao.activity_dao().query(activity_id)
 
+        # vendor_id是我 club是活动的创建者
         _id = str(uuid.uuid1()).replace('-', '')
         json = {"_id":_id, "activity":activity_id,
                 "share":True,"vendor_id":vendor_id, "bk_img_url":activity['bk_img_url'],
@@ -321,17 +322,17 @@ class VendorActivityLeagueRecruitHandler(AuthorizationHandler):
             activity['begin_time'] = timestamp_date(float(activity['begin_time'])) # timestamp -> %m/%d/%Y
             activity['club'] = ops['club_name']
 
-        for activity in activitys_share:
-            _id = activity['activity']
-            acti = activity_dao.activity_dao().query(_id)
-            activity['begin_time'] = timestamp_date(float(acti['begin_time'])) # timestamp -> %m/%d/%Y
+        for share in activitys_share:
+            _id = share['activity']
+            act = activity_dao.activity_dao().query(_id)
+            share['begin_time'] = timestamp_date(float(act['begin_time'])) # timestamp -> %m/%d/%Y
             # 取俱乐部名称
-            club_id = activity['club']
+            club_id = share['club']
             club = get_club_info(access_token,club_id)
             if club:
-                activity['club'] = club['name']
+                share['club'] = club['name']
             else:
-                activity['club'] = ""
+                share['club'] = ""
 
         activitys = activitys_me + activitys_share
 
@@ -349,6 +350,7 @@ class VendorActivityLeagueDemoHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
         _activity = activity_dao.activity_dao().query(activity_id)
         # 按报名状况查询每个活动的当前状态：
         # 0: 报名中, 1: 已成行, 2: 已满员, 3: 已结束
@@ -388,12 +390,40 @@ class VendorActivityLeagueDemoHandler(AuthorizationHandler):
 
         _bonus_template = bonus_template_dao.bonus_template_dao().query(_activity['_id'])
 
+        _article_id = None
+        _paragraphs = None
+        if _activity.has_key('article_id'):
+            _article_id = _activity['article_id']
+            url = "http://api.7x24hs.com/api/articles/" + _article_id
+            http_client = HTTPClient()
+            response = http_client.fetch(url, method="GET")
+            logging.info("got response %r", response.body)
+            data = json_decode(response.body)
+            article = data['rs']
+            _paragraphs = article['paragraphs']
+        else:
+            article = {'title':_activity['title'], 'subtitle':_activity['location'], 'img':_activity['bk_img_url'],'paragraphs':''}
+            _json = json_encode(article)
+            headers = {"Authorization":"Bearer "+access_token}
+            url = "http://api.7x24hs.com/api/articles"
+            http_client = HTTPClient()
+            response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+            logging.info("got response %r", response.body)
+            data = json_decode(response.body)
+            article = data['rs']
+            article_id = article['_id']
+            _paragraphs = ''
+
+            activity_dao.activity_dao().update({'_id':activity_id, 'article_id':article_id})
+        logging.info("//////////%r",_paragraphs)
+
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/activity-demo.html',
                     vendor_id=vendor_id,
                     ops=ops,
                     budge_num=budge_num,
                     bonus_template=_bonus_template,
+                    paragraphs=_paragraphs,
                     activity=_activity)
 
 # /vendors/<string:vendor_id>/activitys/canceled

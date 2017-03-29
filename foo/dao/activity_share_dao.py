@@ -74,3 +74,10 @@ class activity_share_dao(singleton):
         for i in cursor:
             data = i
         return data
+
+    def query_by_share(self, vendor_id):
+        cursor = self._activity_share_collection.find({"vendor_id":vendor_id,"club":{"$ne":vendor_id}})
+        array = []
+        for i in cursor:
+            array.append(i)
+        return array

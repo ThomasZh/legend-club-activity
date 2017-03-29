@@ -448,7 +448,7 @@ class VendorTriprouterOpenSetHandler(AuthorizationHandler):
         response = http_client.fetch(url, method="POST", headers=headers, body=_json)
         logging.info("got response %r", response.body)
 
-        ids = {'ids':['8853422e03a911e7998c00163e023e51']}
+        ids = {'ids':['b0569f58144f11e78d3400163e023e51']}
         _json = json_encode(ids)
         headers = {"Authorization":"Bearer "+access_token}
         url = "http://api.7x24hs.com/api/articles/" + _article_id + "/categories"
