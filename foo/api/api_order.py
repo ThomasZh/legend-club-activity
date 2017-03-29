@@ -68,7 +68,6 @@ class ApiOrderListXHR(AuthorizationHandler):
         _array = order_dao.order_dao().query_pagination_by_vendor(vendor_id, iBefore, PAGE_SIZE_LIMIT);
 
         for order in _array:
-
             if order.has_key('guest_club_id'):
                 if order['guest_club_id']:
                     guest_club_id = order["guest_club_id"]
@@ -176,7 +175,7 @@ class ApiOrderListXHR(AuthorizationHandler):
         self.write(JSON.dumps(_json, default=json_util.default))
         self.finish()
 
-
+# 我的活动 别人的订单
 class ApiLeagueOtherOrderListXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
@@ -193,7 +192,6 @@ class ApiLeagueOtherOrderListXHR(AuthorizationHandler):
 
         _array = order_dao.order_dao().query_pagination_by_vendor_notme(vendor_id, iBefore, PAGE_SIZE_LIMIT);
         for order in _array:
-
             # 这里要处理一下俱乐部名称
             if order.has_key('guest_club_id'):
                 if order['guest_club_id']:
@@ -256,6 +254,7 @@ class ApiLeagueOtherOrderListXHR(AuthorizationHandler):
             except:
                 order['payed_total_fee'] = 0
 
+            order['create_time'] = timestamp_datetime(order['create_time'])
 
         _json = json_encode(_array)
         logging.info("got _json %r", _json)
@@ -263,6 +262,7 @@ class ApiLeagueOtherOrderListXHR(AuthorizationHandler):
         self.write(JSON.dumps(_json, default=json_util.default))
         self.finish()
 
+#别人活动我的订单
 class ApiLeagueMyOrderListXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
@@ -334,6 +334,8 @@ class ApiLeagueMyOrderListXHR(AuthorizationHandler):
                 order['payed_total_fee'] = float(order['payed_total_fee']) / 100
             except:
                 order['payed_total_fee'] = 0
+
+            order['create_time'] = timestamp_datetime(order['create_time'])
 
         _json = json_encode(_array)
         logging.info("got _json %r", _json)
