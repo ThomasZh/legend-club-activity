@@ -324,7 +324,7 @@ def get_club_info(access_token,club_id):
         if err_code == 200:
             club = data['rs']
         else:
-            club =  None
+            club = None
         logging.info("got club info>>>>>>>>>>> %r",club)
         return club
     except:

@@ -245,7 +245,10 @@ class VendorActivityLeagueShareHandler(AuthorizationHandler):
             # 取俱乐部名称
             club_id = activity['vendor_id']
             club = get_club_info(access_token,club_id)
-            activity['club'] = club['name']
+            if club:
+                activity['club'] = club['name']
+            else:
+                activity['club'] = ""
             activity['share'] = False
 
             activity['begin_time'] = timestamp_date(float(activity['begin_time'])) # timestamp -> %m/%d/%Y
@@ -254,7 +257,6 @@ class VendorActivityLeagueShareHandler(AuthorizationHandler):
                 if(activity['_id']==activity_share['activity']):
                     activity['share'] = True
                     break
-            logging.info("===========%r",activity['share'])
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/activity-league-share.html',
@@ -326,10 +328,12 @@ class VendorActivityLeagueRecruitHandler(AuthorizationHandler):
             # 取俱乐部名称
             club_id = activity['club']
             club = get_club_info(access_token,club_id)
-            activity['club'] = club['name']
+            if club:
+                activity['club'] = club['name']
+            else:
+                activity['club'] = ""
 
         activitys = activitys_me + activitys_share
-
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/activity-recruit-all.html',
@@ -337,6 +341,60 @@ class VendorActivityLeagueRecruitHandler(AuthorizationHandler):
                 ops=ops,
                 budge_num=budge_num,
                 activitys=activitys)
+
+#查看别人分享活动的招募帖 VendorActivityLeagueDemoHandler
+class VendorActivityLeagueDemoHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id, activity_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        ops = self.get_ops_info()
+        _activity = activity_dao.activity_dao().query(activity_id)
+        # 按报名状况查询每个活动的当前状态：
+        # 0: 报名中, 1: 已成行, 2: 已满员, 3: 已结束
+        #
+        # 当前时间大于活动结束时间 end_time， 已结束
+        # 否则
+        # member_max: 最大成行人数, member_min: 最小成行人数
+        # 小于member_min, 报名中
+        # 大于member_min，小于member_max，已成行
+        # 大于等于member_max，已满员
+        _now = time.time();
+        _member_min = int(_activity['member_min'])
+        _member_max = int(_activity['member_max'])
+        logging.info("got _member_min %r in uri", _member_min)
+        logging.info("got _member_max %r in uri", _member_max)
+
+        if _now > _activity['end_time']:
+            _activity['phase'] = '3'
+        else:
+            _applicant_num = apply_dao.apply_dao().count_by_activity(_activity['_id'])
+            logging.info("got _applicant_num %r in uri", _applicant_num)
+            _activity['phase'] = '2' if _applicant_num >= _member_max else '1'
+            _activity['phase'] = '0' if _applicant_num < _member_min else '1'
+
+        # 格式化时间显示
+        _activity['begin_time'] = timestamp_friendly_date(float(_activity['begin_time'])) # timestamp -> %m月%d 星期%w
+        _activity['end_time'] = timestamp_friendly_date(float(_activity['end_time'])) # timestamp -> %m月%d 星期%w
+
+        # 金额转换成元 默认将第一个基本服务的费用显示为活动价格
+        # _activity['amount'] = float(_activity['amount']) / 100
+        if not _activity['base_fee_template']:
+            _activity['amount'] = 0
+        else:
+            for base_fee_template in _activity['base_fee_template']:
+                _activity['amount'] = float(base_fee_template['fee']) / 100
+                break
+
+        _bonus_template = bonus_template_dao.bonus_template_dao().query(_activity['_id'])
+
+        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        self.render('vendor/activity-demo.html',
+                    vendor_id=vendor_id,
+                    ops=ops,
+                    budge_num=budge_num,
+                    bonus_template=_bonus_template,
+                    activity=_activity)
 
 # /vendors/<string:vendor_id>/activitys/canceled
 class VendorActivityCanceledHandler(AuthorizationHandler):
@@ -844,6 +902,7 @@ class VendorActivityDetailStep5Handler(AuthorizationHandler):
         logging.info("got activity_id %r in uri", activity_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
@@ -859,13 +918,11 @@ class VendorActivityDetailStep5Handler(AuthorizationHandler):
             if order.has_key('guest_club_id'):
                 if order['guest_club_id']:
                     guest_club_id = order["guest_club_id"]
-                    access_token = self.get_secure_cookie("access_token")
-                    headers={"Authorization":"Bearer "+access_token}
-                    url = "http://api.7x24hs.com/api/clubs/"+guest_club_id
-                    http_client = HTTPClient()
-                    response = http_client.fetch(url, method="GET", headers=headers)
-                    club = json_decode(response.body)
-                    order['guest_club_name'] = club['name']
+                    club = get_club_info(access_token,guest_club_id)
+                    if club:
+                        order['guest_club_name'] = club['name']
+                    else:
+                        order['guest_club_name'] = ""
                 else:
                     order['guest_club_name'] = ""
             else:

@@ -196,6 +196,10 @@
                         <td>
                           <a href="#" class="btn btn-success btn-xs"> 活动完成 </a>
                         </td>
+                        {% elif order['status'] == 10 %}
+                        <td>
+                          <a href="#" class="btn btn-danger btn-xs"> 初始化成功 </a>
+                        </td>
                         {% else%}
                         <td>
                           <a href="#" class="btn btn-success btn-xs"> {{ order['status'] }} </a>

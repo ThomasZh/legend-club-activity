@@ -49,14 +49,8 @@ from dao import apply_dao
 from dao import order_dao
 from dao import group_qrcode_dao
 
- 
-from global_const import ACTIVITY_STATUS_DRAFT
-from global_const import ACTIVITY_STATUS_POP
-from global_const import ACTIVITY_STATUS_DOING
-from global_const import ACTIVITY_STATUS_RECRUIT
-from global_const import ACTIVITY_STATUS_COMPLETED
-from global_const import ACTIVITY_STATUS_CANCELED
-from global_const import STP
+
+from global_const import *
 
 
 # 查询blog中文章中的段落
@@ -70,4 +64,23 @@ class ApiBlogParagraphListXHR(tornado.web.RequestHandler):
         response = http_client.fetch(url, method="GET")
 
         self.write(response.body)
+        self.finish()
+
+# 查看别人分享的活动招募内容
+class ApiDemoActivityParagraphXHR(tornado.web.RequestHandler):
+    def get(self, vendor_id, article_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+        logging.info("got article_id %r in uri", article_id)
+
+        url = "http://"+STP+"/blogs/my-articles/" + article_id + "/paragraphs"
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="GET")
+        url = API_DOMAIN +"/api/articles/" + article_id
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="GET")
+        logging.info("got response %r", response.body)
+        data = json_decode(response.body)
+        article = data['rs']
+        _paragraphs = article['paragraphs']
+        self.write(_paragraphs)
         self.finish()

@@ -93,6 +93,7 @@ def map():
         (r'/vendors/([a-z0-9]*)/activity/([a-z0-9]*)/share/set', getattr(vendor_activity, 'VendorActivityShareSetHandler')),
         (r'/vendors/([a-z0-9]*)/activity/([a-z0-9]*)/share/cancel', getattr(vendor_activity, 'VendorActivityShareCancelHandler')),
         (r'/vendors/([a-z0-9]*)/activitys/league/recruit', getattr(vendor_activity, 'VendorActivityLeagueRecruitHandler')),
+        (r'/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/demo', getattr(vendor_activity, 'VendorActivityLeagueDemoHandler')),
 
         # blog
         # 这四个没用
@@ -185,6 +186,8 @@ def map():
         (r"/bf/api/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/members", getattr(api_activity, 'ApiActivityMemberListXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/share", getattr(api_activity, 'ApiActivityShareXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/articles/([a-z0-9]*)/paragraphs", getattr(api_blog, 'ApiBlogParagraphListXHR')),
+        (r"/bf/api/vendors/([a-z0-9]*)/demo/articles/([a-z0-9]*)/paragraphs", getattr(api_blog, 'ApiDemoActivityParagraphXHR')),
+
 
         # 联盟订单
         (r"/bf/api/vendors/([a-z0-9]*)/league/orders-me", getattr(api_order, 'ApiLeagueMyOrderListXHR')),
