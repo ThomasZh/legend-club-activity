@@ -25,6 +25,7 @@ from qrcode import *
 import sys
 import os
 import math
+import re
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../"))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../dao"))
 
@@ -401,6 +402,23 @@ class VendorActivityLeagueDemoHandler(AuthorizationHandler):
             data = json_decode(response.body)
             article = data['rs']
             _paragraphs = article['paragraphs']
+
+            # 为图片延迟加载准备数据
+            # < img alt="" src="http://bighorn.b0.upaiyun.com/blog/2016/11/2/758f7478-d406-4f2e-9566-306a963fb979" />
+            # < img data-original="真实图片" src="占位符图片">
+            ptn="(<img src=\"http[s]*://[\w\.\/\-]+\" />)"
+            img_ptn = re.compile(ptn)
+            imgs = img_ptn.findall(_paragraphs)
+            for img in imgs:
+                logging.info("got img %r", img)
+                ptn="<img src=\"(http[s]*://[\w\.\/\-]+)\" />"
+                url_ptn = re.compile(ptn)
+                urls = url_ptn.findall(_paragraphs)
+                url = urls[0]
+                logging.info("got url %r", url)
+                #html = html.replace(img, "< img class=\"lazy\" data-original=\""+url+"\" src=\"/static/images/weui.png\" width=\"100%\" height=\"480\" />")
+                _paragraphs = _paragraphs.replace(img, "<img width='100%' src='"+url+"' />")
+
         else:
             article = {'title':_activity['title'], 'subtitle':_activity['location'], 'img':_activity['bk_img_url'],'paragraphs':''}
             _json = json_encode(article)
