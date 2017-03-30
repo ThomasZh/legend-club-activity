@@ -125,10 +125,17 @@ class WxRecommendActivityHandler(tornado.web.RequestHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
 
         _now = time.time()
-        # 查询结果，不包含隐藏的活动
-        # _arr = activity_share_dao.activity_share_dao().query
-        _array = activity_dao.activity_dao().query_activitys_notme(
-                vendor_id, ACTIVITY_STATUS_RECRUIT, _now, PAGE_SIZE_LIMIT)
+        # # 查询结果，不包含隐藏的活动
+        # _array = [activity_dao.activity_dao().query_activitys_notme(
+        #         vendor_id, ACTIVITY_STATUS_RECRUIT, _now, PAGE_SIZE_LIMIT)]
+        _array = []
+
+        activitys_share = activity_share_dao.activity_share_dao().query_by_vendor(vendor_id)
+        for activity in activitys_share:
+            _id = activity['activity']
+            arr = activity_dao.activity_dao().query(_id)
+            _array.append(arr)
+
         logging.info("got recommend activity>>>>>>>>> %r",_array)
 
         # 按报名状况查询每个活动的当前状态：
@@ -219,12 +226,6 @@ class WxRecommendActivityInfoHandler(BaseHandler):
             _activity['article_id']=''
 
         if(_activity['article_id']!=''):
-
-            # url = "http://"+STP+"/blogs/my-articles/" + _activity['article_id'] + "/paragraphs"
-            # http_client = HTTPClient()
-            # response = http_client.fetch(url, method="GET")
-            # logging.info("got response %r", response.body)
-            # _paragraphs = json_decode(response.body)
 
             _article_id = _activity['article_id']
             url = API_DOMAIN + "/api/articles/" + _article_id
@@ -336,19 +337,32 @@ class WxActivityInfoHandler(BaseHandler):
 
         if(_activity['article_id']!=''):
 
-            url = "http://"+STP+"/blogs/my-articles/" + _activity['article_id'] + "/paragraphs"
+            _article_id = _activity['article_id']
+            url = API_DOMAIN + "/api/articles/" + _article_id
             http_client = HTTPClient()
             response = http_client.fetch(url, method="GET")
             logging.info("got response %r", response.body)
-            _paragraphs = json_decode(response.body)
+            data = json_decode(response.body)
+            article = data['rs']
+            _paragraphs = article['paragraphs']
 
-            _activity_desc = ""
-            for _paragraph in _paragraphs:
-                if _paragraph["type"] == 'raw':
-                    _activity_desc = _paragraph['content']
-                    break
-            _activity_desc = _activity_desc.replace('&', "").replace('mdash;', "").replace('<p>', "").replace("</p>"," ").replace("<section>","").replace("</section>"," ").replace("\n"," ")
-            _activity['desc'] = _activity_desc + '...'
+            # 为图片延迟加载准备数据
+            # < img alt="" src="http://bighorn.b0.upaiyun.com/blog/2016/11/2/758f7478-d406-4f2e-9566-306a963fb979" />
+            # < img data-original="真实图片" src="占位符图片">
+            ptn="(<img src=\"http[s]*://[\w\.\/\-]+\" />)"
+            img_ptn = re.compile(ptn)
+            imgs = img_ptn.findall(_paragraphs)
+            for img in imgs:
+                logging.info("got img %r", img)
+                ptn="<img src=\"(http[s]*://[\w\.\/\-]+)\" />"
+                url_ptn = re.compile(ptn)
+                urls = url_ptn.findall(_paragraphs)
+                url = urls[0]
+                logging.info("got url %r", url)
+                #html = html.replace(img, "< img class=\"lazy\" data-original=\""+url+"\" src=\"/static/images/weui.png\" width=\"100%\" height=\"480\" />")
+                _paragraphs = _paragraphs.replace(img, "<img width='100%' src='"+url+"' />")
+
+            _activity['desc'] = _paragraphs+'...'
 
         else:
             _activity['desc'] = '...'

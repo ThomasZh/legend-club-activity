@@ -88,6 +88,9 @@
   <!-- TODO: 放活动的路线详情内容 -->
 	<div class="main routines">
     <!-- <span class="bm">活动介绍</span> -->
+    <div class="m1">
+      {% raw activity['desc'] %}
+    </div>
 	</div>
 
   <!-- 分享获得积分提示对话窗口 -->
@@ -244,28 +247,20 @@
     // @2016/06/06
     if(articleID){
       console.log(articleID);
+      $('.ui-loading-wrap').addClass('hidden');//隐藏进度条
       $.getJSON('/bf/api/vendors/{{ vendor_id }}/articles/'+articleID+'/paragraphs', function(result){
         console.log(result);
         var paragraphs = '';
         for(var i in result){
           var p = result[i];
-          if(p.type=='heading'){//标题
-            paragraphs += '<span class="bm">'+p.content+'</span>';
-          }
-          if(p.type=='img'){//图片
-            paragraphs += '<div class="m1">';
-            paragraphs += ' <img src="'+p.content+'">';
-            paragraphs += '</div>';
-          }
-          if(p.type=='raw'){//文本
-            paragraphs += '<div class="m1">';
-            paragraphs +=   p.content;
-            paragraphs += '</div>';
-          }
+
+          paragraphs += '<div class="m1">';
+          paragraphs +=   p.content;
+          paragraphs += '</div>';
+
         }
         // 添加到页面
         $('.routines').html(paragraphs);
-        $('.ui-loading-wrap').addClass('hidden');//隐藏进度条
       });
     }else{
       $('.ui-loading-wrap').addClass('hidden');//隐藏进度条

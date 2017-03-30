@@ -24,6 +24,7 @@ import time
 import json as JSON # 启用别名，不会跟方法里的局部变量混淆
 import sys
 import os
+import re
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../"))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../dao"))
 
@@ -59,30 +60,34 @@ class ApiBlogParagraphListXHR(tornado.web.RequestHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got article_id %r in uri", article_id)
 
-        url = "http://"+STP+"/blogs/my-articles/" + article_id + "/paragraphs"
-        http_client = HTTPClient()
-        response = http_client.fetch(url, method="GET")
-
-        self.write(response.body)
-        self.finish()
-
-# 查看别人分享的活动招募内容
-class ApiDemoActivityParagraphXHR(tornado.web.RequestHandler):
-    def get(self, vendor_id, article_id):
-        logging.info("got vendor_id %r in uri", vendor_id)
-        logging.info("got article_id %r in uri", article_id)
-
-        url = "http://"+STP+"/blogs/my-articles/" + article_id + "/paragraphs"
-        http_client = HTTPClient()
-        response = http_client.fetch(url, method="GET")
-        url = API_DOMAIN +"/api/articles/" + article_id
+        # url = "http://"+STP+"/blogs/my-articles/" + article_id + "/paragraphs"
+        # http_client = HTTPClient()
+        # response = http_client.fetch(url, method="GET")
+        url = API_DOMAIN + "/api/articles/" + article_id
         http_client = HTTPClient()
         response = http_client.fetch(url, method="GET")
         logging.info("got response %r", response.body)
         data = json_decode(response.body)
         article = data['rs']
         _paragraphs = article['paragraphs']
-        logging.info("=========",_paragraphs)
+
+        # 为图片延迟加载准备数据
+        # < img alt="" src="http://bighorn.b0.upaiyun.com/blog/2016/11/2/758f7478-d406-4f2e-9566-306a963fb979" />
+        # < img data-original="真实图片" src="占位符图片">
+        ptn="(<img src=\"http[s]*://[\w\.\/\-]+\" />)"
+        img_ptn = re.compile(ptn)
+        imgs = img_ptn.findall(_paragraphs)
+        for img in imgs:
+            logging.info("got img %r", img)
+            ptn="<img src=\"(http[s]*://[\w\.\/\-]+)\" />"
+            url_ptn = re.compile(ptn)
+            urls = url_ptn.findall(_paragraphs)
+            url = urls[0]
+            logging.info("got url %r", url)
+            #html = html.replace(img, "< img class=\"lazy\" data-original=\""+url+"\" src=\"/static/images/weui.png\" width=\"100%\" height=\"480\" />")
+            _paragraphs = _paragraphs.replace(img, "<img width='100%' src='"+url+"' />")
+
+        logging.info("got _paragraphs>>>>>>>>>>> %r", _paragraphs)
 
         self.write(_paragraphs)
         self.finish()
