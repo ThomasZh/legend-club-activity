@@ -220,19 +220,38 @@ class WxRecommendActivityInfoHandler(BaseHandler):
 
         if(_activity['article_id']!=''):
 
-            url = "http://"+STP+"/blogs/my-articles/" + _activity['article_id'] + "/paragraphs"
+            # url = "http://"+STP+"/blogs/my-articles/" + _activity['article_id'] + "/paragraphs"
+            # http_client = HTTPClient()
+            # response = http_client.fetch(url, method="GET")
+            # logging.info("got response %r", response.body)
+            # _paragraphs = json_decode(response.body)
+
+            _article_id = _activity['article_id']
+            url = API_DOMAIN + "/api/articles/" + _article_id
             http_client = HTTPClient()
             response = http_client.fetch(url, method="GET")
             logging.info("got response %r", response.body)
-            _paragraphs = json_decode(response.body)
+            data = json_decode(response.body)
+            article = data['rs']
+            _paragraphs = article['paragraphs']
 
-            _activity_desc = ""
-            for _paragraph in _paragraphs:
-                if _paragraph["type"] == 'raw':
-                    _activity_desc = _paragraph['content']
-                    break
-            _activity_desc = _activity_desc.replace('&', "").replace('mdash;', "").replace('<p>', "").replace("</p>"," ").replace("<section>","").replace("</section>"," ").replace("\n"," ")
-            _activity['desc'] = _activity_desc + '...'
+            # 为图片延迟加载准备数据
+            # < img alt="" src="http://bighorn.b0.upaiyun.com/blog/2016/11/2/758f7478-d406-4f2e-9566-306a963fb979" />
+            # < img data-original="真实图片" src="占位符图片">
+            ptn="(<img src=\"http[s]*://[\w\.\/\-]+\" />)"
+            img_ptn = re.compile(ptn)
+            imgs = img_ptn.findall(_paragraphs)
+            for img in imgs:
+                logging.info("got img %r", img)
+                ptn="<img src=\"(http[s]*://[\w\.\/\-]+)\" />"
+                url_ptn = re.compile(ptn)
+                urls = url_ptn.findall(_paragraphs)
+                url = urls[0]
+                logging.info("got url %r", url)
+                #html = html.replace(img, "< img class=\"lazy\" data-original=\""+url+"\" src=\"/static/images/weui.png\" width=\"100%\" height=\"480\" />")
+                _paragraphs = _paragraphs.replace(img, "<img width='100%' src='"+url+"' />")
+
+            _activity['desc'] = _paragraphs
 
         else:
             _activity['desc'] = '...'
@@ -394,7 +413,7 @@ class WxActivityApplyStep0Handler(tornado.web.RequestHandler):
 
         if access_token:
             try:
-                url = "http://api.7x24hs.com/api/myinfo-as-wx-user"
+                url = API_DOMAIN + "/api/myinfo-as-wx-user"
                 http_client = HTTPClient()
                 headers = {"Authorization":"Bearer "+access_token}
                 response = http_client.fetch(url, method="GET", headers=headers)
@@ -499,14 +518,15 @@ class WxActivityApplyStep01Handler(tornado.web.RequestHandler):
             logging.error("got nickname=[%r]", nickname)
             nickname = "anonymous"
 
-        url = "http://api.7x24hs.com/api/auth/wx/register"
+        url = API_DOMAIN + "/api/auth/wx/register"
         http_client = HTTPClient()
         random = str(uuid.uuid1()).replace('-', '')
         headers = {"Authorization":"Bearer "+random}
         _json = json_encode({'wx_openid':wx_openid,'nickname':nickname,'avatar':avatar})
         response = http_client.fetch(url, method="POST", headers=headers, body=_json)
         logging.info("got response.body %r", response.body)
-        session_ticket = json_decode(response.body)
+        data = json_decode(response.body)
+        session_ticket = data['rs']
 
         account_id = session_ticket['account_id']
 
@@ -720,10 +740,15 @@ class WxActivityApplyStep2Handler(BaseHandler):
             "vendor_id":vendor_id
         }
         order_dao.order_dao().create(_order)
-
         num = order_dao.order_dao().count_not_review_by_vendor(vendor_id)
         budge_num_dao.budge_num_dao().update({"_id":vendor_id, "order":num})
         # TODO notify this message to vendor's administrator by SMS
+
+        wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
+        wx_app_id = wx_app_info['wx_app_id']
+        logging.info("got wx_app_id %r in uri", wx_app_id)
+        wx_mch_key = wx_app_info['wx_mch_key']
+        wx_mch_id = wx_app_info['wx_mch_id']
 
         _timestamp = (int)(time.time())
         if _total_amount != 0:
@@ -739,12 +764,6 @@ class WxActivityApplyStep2Handler(BaseHandler):
             _activity = activity_dao.activity_dao().query(activity_id)
             _product_description = _activity['title']
             logging.info("got _product_description %r", _product_description)
-
-            wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
-            wx_app_id = wx_app_info['wx_app_id']
-            logging.info("got wx_app_id %r in uri", wx_app_id)
-            wx_mch_key = wx_app_info['wx_mch_key']
-            wx_mch_id = wx_app_info['wx_mch_id']
 
             key = wx_mch_key
             nonceA = getNonceStr();
@@ -1205,12 +1224,13 @@ class WxVoucherBuyStep0Handler(tornado.web.RequestHandler):
 
         if access_token:
             try:
-                url = "http://api.7x24hs.com/api/myinfo-as-wx-user"
+                url = API_DOMAIN + "/api/myinfo-as-wx-user"
                 http_client = HTTPClient()
                 headers = {"Authorization":"Bearer "+access_token}
                 response = http_client.fetch(url, method="GET", headers=headers)
                 logging.info("got response.body %r", response.body)
-                user = json_decode(response.body)
+                data = json_decode(response.body)
+                user = data['rs']
                 account_id=user['_id']
                 avatar=user['avatar']
                 nickname=user['nickname']
@@ -1308,14 +1328,15 @@ class WxVoucherBuyStep1Handler(tornado.web.RequestHandler):
             logging.error("got nickname=[%r]", nickname)
             nickname = "anonymous"
 
-        url = "http://api.7x24hs.com/api/auth/wx/register"
+        url = API_DOMAIN + "/api/auth/wx/register"
         http_client = HTTPClient()
         random = str(uuid.uuid1()).replace('-', '')
         headers = {"Authorization":"Bearer "+random}
         _json = json_encode({'wx_openid':wx_openid,'nickname':nickname,'avatar':avatar})
         response = http_client.fetch(url, method="POST", headers=headers, body=_json)
         logging.info("got response.body %r", response.body)
-        session_ticket = json_decode(response.body)
+        data = json_decode(response.body)
+        session_ticket = data['rs']
 
         account_id = session_ticket['account_id']
 

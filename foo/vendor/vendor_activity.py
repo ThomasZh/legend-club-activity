@@ -395,7 +395,7 @@ class VendorActivityLeagueDemoHandler(AuthorizationHandler):
         _paragraphs = None
         if _activity.has_key('article_id'):
             _article_id = _activity['article_id']
-            url = "http://api.7x24hs.com/api/articles/" + _article_id
+            url = API_DOMAIN + "/api/articles/" + _article_id
             http_client = HTTPClient()
             response = http_client.fetch(url, method="GET")
             logging.info("got response %r", response.body)
@@ -423,7 +423,7 @@ class VendorActivityLeagueDemoHandler(AuthorizationHandler):
             article = {'title':_activity['title'], 'subtitle':_activity['location'], 'img':_activity['bk_img_url'],'paragraphs':''}
             _json = json_encode(article)
             headers = {"Authorization":"Bearer "+access_token}
-            url = "http://api.7x24hs.com/api/articles"
+            url = API_DOMAIN + "/api/articles"
             http_client = HTTPClient()
             response = http_client.fetch(url, method="POST", headers=headers, body=_json)
             logging.info("got response %r", response.body)
@@ -573,7 +573,7 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
         article = {'title':_title, 'subtitle':location, 'img':_bk_img_url,'paragraphs':''}
         _json = json_encode(article)
         headers = {"Authorization":"Bearer "+access_token}
-        url = "http://api.7x24hs.com/api/articles"
+        url = API_DOMAIN + "/api/articles"
         http_client = HTTPClient()
         response = http_client.fetch(url, method="POST", headers=headers, body=_json)
         logging.info("got response %r", response.body)
@@ -1126,7 +1126,7 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
         _paragraphs = None
         if activity.has_key('article_id'):
             _article_id = activity['article_id']
-            url = "http://api.7x24hs.com/api/articles/" + _article_id
+            url = API_DOMAIN + "/api/articles/" + _article_id
             http_client = HTTPClient()
             response = http_client.fetch(url, method="GET")
             logging.info("got response %r", response.body)
@@ -1137,7 +1137,7 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
             article = {'title':activity['title'], 'subtitle':activity['location'], 'img':activity['bk_img_url'],'paragraphs':''}
             _json = json_encode(article)
             headers = {"Authorization":"Bearer "+access_token}
-            url = "http://api.7x24hs.com/api/articles"
+            url = API_DOMAIN + "/api/articles"
             http_client = HTTPClient()
             response = http_client.fetch(url, method="POST", headers=headers, body=_json)
             logging.info("got response %r", response.body)
@@ -1184,7 +1184,7 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
         article = {'title':activity['title'], 'subtitle':activity['location'], 'img':activity['bk_img_url'],'paragraphs':content}
         _json = json_encode(article)
         headers = {"Authorization":"Bearer "+access_token}
-        url = "http://api.7x24hs.com/api/articles/"+_article_id
+        url = API_DOMAIN + "/api/articles/"+_article_id
         http_client = HTTPClient()
         response = http_client.fetch(url, method="PUT", headers=headers, body=_json)
         logging.info("got response %r", response.body)
@@ -1330,7 +1330,7 @@ class VendorActivityActionPublishHandler(AuthorizationHandler):
             if activity.has_key('article_id'):
                 _article_id = activity['article_id']
             headers = {"Authorization":"Bearer "+access_token}
-            url = "http://api.7x24hs.com/api/articles/" + _article_id + "/publish"
+            url = API_DOMAIN + "/api/articles/" + _article_id + "/publish"
             http_client = HTTPClient()
             _json = json_encode(headers)
             response = http_client.fetch(url, method="POST", headers=headers, body=_json)
@@ -1339,7 +1339,7 @@ class VendorActivityActionPublishHandler(AuthorizationHandler):
             ids = {'ids':['0bbf89e2f73411e69a3c00163e023e51']}
             _json = json_encode(ids)
             headers = {"Authorization":"Bearer "+access_token}
-            url = "http://api.7x24hs.com/api/articles/" + _article_id + "/categories"
+            url = API_DOMAIN + "/api/articles/" + _article_id + "/categories"
             http_client = HTTPClient()
             response = http_client.fetch(url, method="POST", headers=headers, body=_json)
             logging.info("got response %r", response.body)

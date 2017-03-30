@@ -80,12 +80,13 @@ class WxPersonalCenter0Handler(BaseHandler):
 
         if access_token:
             try:
-                url = "http://api.7x24hs.com/api/myinfo-as-wx-user"
+                url = API_DOMAIN + "/api/myinfo-as-wx-user"
                 http_client = HTTPClient()
                 headers = {"Authorization":"Bearer "+access_token}
                 response = http_client.fetch(url, method="GET", headers=headers)
                 logging.info("got response.body %r", response.body)
-                user = json_decode(response.body)
+                data = json_decode(response.body)
+                user = data['rs']
                 account_id=user['_id']
                 avatar=user['avatar']
                 nickname=user['nickname']
@@ -183,14 +184,15 @@ class WxPersonalCenter1Handler(tornado.web.RequestHandler):
             logging.error("got nickname=[%r]", nickname)
             nickname = "anonymous"
 
-        url = "http://api.7x24hs.com/api/auth/wx/register"
+        url = API_DOMAIN + "/api/auth/wx/register"
         http_client = HTTPClient()
         random = str(uuid.uuid1()).replace('-', '')
         headers = {"Authorization":"Bearer "+random}
         _json = json_encode({'wx_openid':wx_openid,'nickname':nickname,'avatar':avatar})
         response = http_client.fetch(url, method="POST", headers=headers, body=_json)
         logging.info("got response.body %r", response.body)
-        session_ticket = json_decode(response.body)
+        data = json_decode(response.body)
+        session_ticket = data['rs']
 
         account_id = session_ticket['account_id']
 

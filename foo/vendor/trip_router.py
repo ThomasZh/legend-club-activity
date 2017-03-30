@@ -128,7 +128,7 @@ class VendorTriprouterCreateHandler(AuthorizationHandler):
         article = {'title':_title, 'subtitle':_location, 'img':_bk_img_url,'paragraphs':''}
         _json = json_encode(article)
         headers = {"Authorization":"Bearer "+access_token}
-        url = "http://api.7x24hs.com/api/articles"
+        url = API_DOMAIN + "/api/articles"
         http_client = HTTPClient()
         response = http_client.fetch(url, method="POST", headers=headers, body=_json)
         logging.info("got response %r", response.body)
@@ -233,7 +233,7 @@ class VendorTriprouterEditStep2Handler(AuthorizationHandler):
         _paragraphs = None
         if triprouter.has_key('article_id'):
             _article_id = triprouter['article_id']
-            url = "http://api.7x24hs.com/api/articles/" + _article_id
+            url = API_DOMAIN + "/api/articles/" + _article_id
             http_client = HTTPClient()
             response = http_client.fetch(url, method="GET")
             logging.info("got response %r", response.body)
@@ -243,7 +243,7 @@ class VendorTriprouterEditStep2Handler(AuthorizationHandler):
             article = {'title':triprouter['title'], 'subtitle':triprouter['location'], 'img':triprouter['bk_img_url'],'paragraphs':''}
             _json = json_encode(article)
             headers = {"Authorization":"Bearer "+access_token}
-            url = "http://api.7x24hs.com/api/articles"
+            url = API_DOMAIN + "/api/articles"
             http_client = HTTPClient()
             response = http_client.fetch(url, method="POST", headers=headers, body=_json)
             logging.info("got response %r", response.body)
@@ -281,7 +281,7 @@ class VendorTriprouterEditStep2Handler(AuthorizationHandler):
         article = {'title':triprouter['title'], 'subtitle':triprouter['location'], 'img':triprouter['bk_img_url'],'paragraphs':content}
         _json = json_encode(article)
         headers = {"Authorization":"Bearer "+access_token}
-        url = "http://api.7x24hs.com/api/articles/"+_article_id
+        url = API_DOMAIN + "/api/articles/"+_article_id
         http_client = HTTPClient()
         response = http_client.fetch(url, method="PUT", headers=headers, body=_json)
         logging.info("got response %r", response.body)
@@ -442,7 +442,7 @@ class VendorTriprouterOpenSetHandler(AuthorizationHandler):
         if triprouter.has_key('article_id'):
             _article_id = triprouter['article_id']
         headers = {"Authorization":"Bearer "+access_token}
-        url = "http://api.7x24hs.com/api/articles/" + _article_id + "/publish"
+        url = API_DOMAIN + "/api/articles/" + _article_id + "/publish"
         http_client = HTTPClient()
         _json = json_encode(headers)
         response = http_client.fetch(url, method="POST", headers=headers, body=_json)
@@ -451,7 +451,7 @@ class VendorTriprouterOpenSetHandler(AuthorizationHandler):
         ids = {'ids':['b0569f58144f11e78d3400163e023e51']}
         _json = json_encode(ids)
         headers = {"Authorization":"Bearer "+access_token}
-        url = "http://api.7x24hs.com/api/articles/" + _article_id + "/categories"
+        url = API_DOMAIN + "/api/articles/" + _article_id + "/categories"
         http_client = HTTPClient()
         response = http_client.fetch(url, method="POST", headers=headers, body=_json)
         logging.info("got response %r", response.body)
@@ -473,7 +473,7 @@ class VendorTriprouterOpenCancelHandler(AuthorizationHandler):
         if triprouter.has_key('article_id'):
             _article_id = triprouter['article_id']
         headers = {"Authorization":"Bearer "+access_token}
-        url = "http://api.7x24hs.com/api/articles/" + _article_id + "/unpublish"
+        url = API_DOMAIN + "/api/articles/" + _article_id + "/unpublish"
         http_client = HTTPClient()
         _json = json_encode(headers)
         response = http_client.fetch(url, method="POST", headers=headers, body=_json)
