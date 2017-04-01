@@ -59,7 +59,7 @@ class vendor_wx_dao(singleton):
     def query(self, _id):
         data = self.query_not_safe(_id)
         if not data:
-            data = {"_id":_id, "wx_app_id":"", "wx_app_secret":"", "wx_mch_id":"", "wx_mch_key":"", "wx_qrcode":""}
+            data = {"_id":_id, "wx_app_id":"", "wx_app_secret":"", "wx_mch_id":"", "wx_mch_key":"", "wx_notify_domain":"", "wx_qrcode":""}
         else:
             try:
                 data['wx_app_id']
@@ -77,6 +77,10 @@ class vendor_wx_dao(singleton):
                 data['wx_mch_key']
             except:
                 data['wx_mch_key'] = ''
+            try:
+                data['wx_notify_domain']
+            except:
+                data['wx_notify_domain'] = ''
             try:
                 data['wx_qrcode']
             except:

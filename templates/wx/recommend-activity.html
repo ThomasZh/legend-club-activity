@@ -17,7 +17,7 @@
     {% set phases = {'0':'招募中','1':'已成行','2':'已满员','3':'已结束'} %}
     {% set themes = {'0':'green','1':'orange','2':'red','3':'gray'} %}
     {% for activity in activitys %}
-    <a href="/bf/wx/vendors/{{activity['club']}}/activitys/{{activity['_id']}}_{{club}}">
+    <a href="/bf/wx/vendors/{{activity['vendor_id']}}/activitys/{{activity['_id']}}_{{activity['vendor_id']}}">
       <div class="bot_con"><!--start of card-->
         <div class="imger">
           <img src="{{activity['bk_img_url']}}">

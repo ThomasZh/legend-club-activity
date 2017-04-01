@@ -49,6 +49,7 @@ from dao import vendor_member_dao
 from dao import trip_router_dao
 from dao import evaluation_dao
 from dao import activity_share_dao
+from dao import vendor_wx_dao
 
 from global_const import *
 
@@ -584,8 +585,10 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
 
         activity_dao.activity_dao().update({'_id':_activity_id, 'article_id':article_id})
 
+        wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
+        wx_notify_domain = wx_app_info['wx_notify_domain']
         # create wechat qrcode
-        activity_url = WX_NOTIFY_DOMAIN + "/bf/wx/vendors/" + vendor_id + "/activitys/" + _activity_id
+        activity_url = wx_notify_domain + "/bf/wx/vendors/" + vendor_id + "/activitys/" + _activity_id
         logging.info("got activity_url %r", activity_url)
         data = {"url": activity_url}
         _json = json_encode(data)
@@ -811,11 +814,14 @@ class VendorActivityDetailStep2Handler(AuthorizationHandler):
             json = {"_id":activity_id,"wx_qrcode_url":qrcode['qrcode_url']}
             group_qrcode_dao.group_qrcode_dao().update(json)
 
+        wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
+        wx_notify_domain = wx_app_info['wx_notify_domain']
+
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/activity-edit-step2.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                wx_notify_domain=WX_NOTIFY_DOMAIN,
+                wx_notify_domain=wx_notify_domain,
                 activity_id=activity_id,
                 budge_num=budge_num,
                 activity=activity, categorys=categorys,

@@ -71,8 +71,9 @@ class WxPersonalCenter0Handler(BaseHandler):
         wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
         wx_app_id = wx_app_info['wx_app_id']
         logging.info("got wx_app_id %r in uri", wx_app_id)
+        wx_notify_domain = wx_app_info['wx_notify_domain']
 
-        redirect_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + wx_app_id + "&redirect_uri=" + WX_NOTIFY_DOMAIN + "/bf/wx/vendors/" + vendor_id + "/pc1&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
+        redirect_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + wx_app_id + "&redirect_uri=" + wx_notify_domain + "/bf/wx/vendors/" + vendor_id + "/pc1&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
         # FIXME 这里应改为从缓存取自己的access_token然后查myinfo是否存在wx_openid
         # 存在就直接用，不存在再走微信授权并更新用户信息 /api/myinfo-as-wx-user
         access_token=self.get_secure_cookie("access_token")
@@ -152,9 +153,10 @@ class WxPersonalCenter1Handler(tornado.web.RequestHandler):
         wx_app_id = wx_app_info['wx_app_id']
         logging.info("got wx_app_id %r in uri", wx_app_id)
         wx_app_secret = wx_app_info['wx_app_secret']
+        wx_notify_domain = wx_app_info['wx_notify_domain']
 
         if not wx_code:
-            redirect_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + wx_app_id + "&redirect_uri=" + WX_NOTIFY_DOMAIN + "/bf/wx/vendors/" + vendor_id + "/pc1&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
+            redirect_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + wx_app_id + "&redirect_uri=" + wx_notify_domain + "/bf/wx/vendors/" + vendor_id + "/pc1&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect"
             self.redirect(redirect_url)
             return
 

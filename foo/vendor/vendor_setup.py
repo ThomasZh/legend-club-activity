@@ -199,14 +199,16 @@ class VendorSetupWxHandler(AuthorizationHandler):
         wx_app_secret = self.get_argument("wx_app_secret", "")
         wx_mch_id = self.get_argument("wx_mch_id", "")
         wx_mch_key = self.get_argument("wx_mch_key", "")
+        wx_notify_domain = self.get_argument("wx_notify_domain", "")
         wx_qrcode = self.get_argument("wx_qrcode", "")
 
-        vendor_wx = vendor_wx_dao.vendor_wx_dao().query_not_safe(vendor_id)
+        vendor_wx = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
         _json = {"_id":vendor_id,
                 "wx_app_id":wx_app_id,
                 "wx_app_secret":wx_app_secret,
                 "wx_mch_id":wx_mch_id,
                 "wx_mch_key":wx_mch_key,
+                "wx_notify_domain":wx_notify_domain,
                 "wx_qrcode":wx_qrcode}
         if not vendor_wx:
             vendor_wx_dao.vendor_wx_dao().create(_json)

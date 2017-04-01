@@ -44,6 +44,7 @@ from dao import vendor_member_dao
 from dao import voucher_dao
 from dao import voucher_order_dao
 from dao import voucher_pay_dao
+from dao import vendor_wx_dao
 from global_const import *
 
 
@@ -172,7 +173,10 @@ class VendorVoucherPayCreateHandler(AuthorizationHandler):
 
         voucher_id = str(uuid.uuid1()).replace('-', '')
 
-        voucher_url = WX_NOTIFY_DOMAIN + "/bf/wx/vendors/" + vendor_id + "/vouchers/" + voucher_id
+        wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
+        wx_notify_domain = wx_app_info['wx_notify_domain']
+
+        voucher_url = wx_notify_domain + "/bf/wx/vendors/" + vendor_id + "/vouchers/" + voucher_id
         data = {"url": voucher_url}
         _json = json_encode(data)
         logging.info("got ——json %r", _json)
