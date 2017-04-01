@@ -655,7 +655,8 @@ class WxActivityApplyStep2Handler(BaseHandler):
         if len(_old_orders) > 0:
             for _old_order in _old_orders:
                 if (_timestamp - _old_order['create_time']) < 60:
-                    return
+                    self.redirect('/bf/wx/orders/wait')
+                    # return
 
         # 订单总金额
         _total_amount = self.get_argument("total_amount", 0)
@@ -1137,6 +1138,12 @@ class WxOrderNotifyHandler(tornado.web.RequestHandler):
                 'last_update_time': _timestamp, "status": ORDER_STATUS_WECHAT_PAY_FAILED}
             order_dao.order_dao().update(json)
 
+
+class WxOrderWaitHandler(tornado.web.RequestHandler):
+    def get(self):
+        logging.info("wait for a moments")
+
+        self.render('wx/orders-wait.html')
 
 # 添加当前订单的成员
 class WxHhaHandler(tornado.web.RequestHandler):

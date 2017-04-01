@@ -242,6 +242,7 @@ def map():
         # 通知url必须为直接可访问的url，不能携带参数。示例：notify_url：“https://pay.weixin.qq.com/wxpay/pay.action”
         (r"/bf/wx/orders/notify", getattr(wx_activity, 'WxOrderNotifyHandler')),
         (r"/bf/wx/voucher-orders/notify", getattr(wx_activity, 'WxVoucherOrderNotifyHandler')),
+        (r"/bf/wx/orders/wait", getattr(wx_activity, 'WxOrderWaitHandler')),
 
         # bike-forever wexin personal-center
         (r"/bf/wx/vendors/([a-z0-9]*)/pc0", getattr(wx_personal_center, 'WxPersonalCenter0Handler')),
