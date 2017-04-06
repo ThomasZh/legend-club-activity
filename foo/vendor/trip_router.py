@@ -304,6 +304,7 @@ class VendorTriprouterCloneHandler(AuthorizationHandler):
                 "scenery":triprouter['scenery'],
                 "road_info":triprouter['road_info'],
                 "kickoff":triprouter['kickoff'],
+                "open":triprouter['open'],
                 "score":10}
 
         trip_router_dao.trip_router_dao().create(_json)

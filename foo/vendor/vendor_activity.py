@@ -314,6 +314,7 @@ class VendorActivityLeagueRecruitHandler(AuthorizationHandler):
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
 
+
         activitys_me = activity_dao.activity_dao().query_by_vendor(vendor_id)
         activitys_share = activity_share_dao.activity_share_dao().query_by_vendor(vendor_id)
 
