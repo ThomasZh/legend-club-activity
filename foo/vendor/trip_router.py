@@ -140,21 +140,6 @@ class VendorTriprouterCreateHandler(AuthorizationHandler):
 
         trip_router_dao.trip_router_dao().update({'_id':_id, 'article_id':article_id})
 
-        # create blog article
-        # _ticket = self.get_secure_cookie("session_ticket")
-        # params = {"X-Session-Id": _ticket}
-        # url = url_concat("http://" + STP + "/blogs/articles", params)
-        # data = {"title": _title, "content": "", "imgUrl": _bk_img_url}
-        # _json = json_encode(data)
-        # http_client = HTTPClient()
-        # response = http_client.fetch(url, method="POST", body=_json)
-        # logging.info("got response %r", response.body)
-        # _article_id = json_decode(response.body)
-        # logging.info("got _article_id %r", _article_id)
-        #
-        # json = {"_id":_id, "article_id":_article_id}
-        # trip_router_dao.trip_router_dao().update(json)
-
 
         self.redirect('/vendors/' + vendor_id + '/trip_router')
 
@@ -303,85 +288,49 @@ class VendorTriprouterCloneHandler(AuthorizationHandler):
         ops = self.get_ops_info()
 
         triprouter = trip_router_dao.trip_router_dao().query(trip_router_id)
-        article_id = triprouter['article_id']
-        logging.info("got article_id %r", article_id)
 
-        # create activity
-        _activity_id = str(uuid.uuid1()).replace('-', '')
+        # create new triprouter
+        _triprouterty_id = str(uuid.uuid1()).replace('-', '')
         _timestamp = time.time()
-        _json = {"_id":_activity_id, "vendor_id":vendor_id,
-                "status":ACTIVITY_STATUS_DRAFT, "popular":False,
-                "create_time":_timestamp, "last_update_time":_timestamp,
+        _json = {"_id":_triprouterty_id, "vendor_id":vendor_id,
                 "title":triprouter['title'],
                 "bk_img_url":triprouter['bk_img_url'],
                 "category":triprouter['category'],
-                "triprouter":triprouter['_id'],
                 "location":triprouter['location'],
-                "hidden":False,"cash_only":False,
-                "begin_time":_timestamp, "end_time":_timestamp, "apply_end_time":_timestamp,
                 "distance":triprouter['distance'],
                 "strength":triprouter['strength'],
                 "scenery":triprouter['scenery'],
                 "road_info":triprouter['road_info'],
                 "kickoff":triprouter['kickoff'],
-                "base_fee_template":[],
-                "ext_fee_template":[],
-                "member_min":0,
-                "member_max":0,
-                "notes":''}
-        activity_dao.activity_dao().create(_json)
+                "score":10}
 
-        wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
-        wx_notify_domain = wx_app_info['wx_notify_domain']
+        trip_router_dao.trip_router_dao().create(_json)
 
-        # create wechat qrcode
-        activity_url = wx_notify_domain + "/bf/wx/vendors/" + vendor_id + "/activitys/" + _activity_id
-        logging.info("got activity_url %r", activity_url)
-        data = {"url": activity_url}
-        _json = json_encode(data)
-        logging.info("got ——json %r", _json)
-        http_client = HTTPClient()
-        response = http_client.fetch(QRCODE_CREATE_URL, method="POST", body=_json)
-        logging.info("got response %r", response.body)
-        qrcode_url = response.body
-        logging.info("got qrcode_url %r", qrcode_url)
+        if triprouter.has_key('article_id'):
+            # 先取出旧的article_id和内容
+            _article_id = triprouter['article_id']
+            url = API_DOMAIN + "/api/articles/" + _article_id
+            http_client = HTTPClient()
+            response = http_client.fetch(url, method="GET")
+            logging.info("got response %r", response.body)
+            data = json_decode(response.body)
+            article = data['rs']
+            _paragraphs = article['paragraphs']
+            # 再创建一个新的article
+            article = {'title':triprouter['title'], 'subtitle':triprouter['location'], 'img':triprouter['bk_img_url'],'paragraphs':_paragraphs}
+            _json = json_encode(article)
+            headers = {"Authorization":"Bearer "+access_token}
+            url = API_DOMAIN + "/api/articles"
+            http_client = HTTPClient()
+            response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+            logging.info("got response %r", response.body)
+            data = json_decode(response.body)
+            article = data['rs']
+            new_article_id = article['_id']
 
-        wx_qrcode_url = "http://bike-forever.b0.upaiyun.com/vendor/wx/2016/7/21/66a75009-e60e-44b1-80f7-bf4a9d95525a.jpg"
-        json = {"_id":_activity_id,
-                "create_time":_timestamp, "last_update_time":_timestamp,
-                "qrcode_url":qrcode_url, "wx_qrcode_url":wx_qrcode_url}
-        group_qrcode_dao.group_qrcode_dao().create(json)
+            trip_router_dao.trip_router_dao().update({'_id':_triprouterty_id, 'article_id':new_article_id})
 
-        # create blog article
-        _ticket = self.get_secure_cookie("session_ticket")
-        params = {"X-Session-Id": _ticket}
-        _json = json_encode(params)
-        url = "http://"+STP+"/blogs/articles/" + article_id + "/clone"
-        http_client = HTTPClient()
-        response = http_client.fetch(url, method="POST", body=_json)
-        logging.info("got response %r", response.body)
-        new_article_id = json_decode(response.body)
-        logging.info("got new_article_id %r", new_article_id)
-
-        _json = {"_id":_activity_id, "article_id":new_article_id}
-        activity_dao.activity_dao().update(_json)
-
-        # create cretificate
-        _cert_template_id = str(uuid.uuid1()).replace('-', '')
-        _timestamp = time.time()
-        json = {"_id":_activity_id,
-                "create_time":_timestamp, "last_update_time":_timestamp,
-                "distance":0, "hours":0, "height":0, "slope_length":0, "speed":0,
-                "road_map_url":"", "contour_map_url":""}
-        cret_template_dao.cret_template_dao().create(json);
-
-        # create bonus
-        json = {"_id":_activity_id,
-                "create_time":_timestamp, "last_update_time":_timestamp,
-                "activity_shared":0, "cret_shared":0}
-        bonus_template_dao.bonus_template_dao().create(json);
-
-        self.redirect('/vendors/' + vendor_id + '/activitys/draft')
+        self.redirect('/vendors/' + ops['club_id'] + '/trip_router')
 
 
  #/vendors/<string:vendor_id>/trip_router/<string:trip_router_id>/activitylist

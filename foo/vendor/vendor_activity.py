@@ -1402,6 +1402,9 @@ class VendorActivityActionResetHandler(AuthorizationHandler):
         ops = self.get_ops_info()
 
         activity_dao.activity_dao().update_status(activity_id, ACTIVITY_STATUS_DRAFT)
+        # 取消后的活动不能在分享列表里
+        activity_share_dao.activity_share_dao().delete_by_activity(activity_id)
+
         self.redirect('/vendors/' + vendor_id + '/activitys/draft')
 
 
@@ -1536,8 +1539,30 @@ class VendorActivityActionCloneHandler(AuthorizationHandler):
         new_article_id = json_decode(response.body)
         logging.info("got new_article_id %r", new_article_id)
 
-        _json = {"_id":new_activity_id, "article_id":new_article_id}
-        activity_dao.activity_dao().update(_json)
+
+        if activity.has_key('article_id'):
+            # 先取出旧的article_id和内容
+            _article_id = activity['article_id']
+            url = API_DOMAIN + "/api/articles/" + _article_id
+            http_client = HTTPClient()
+            response = http_client.fetch(url, method="GET")
+            logging.info("got response %r", response.body)
+            data = json_decode(response.body)
+            article = data['rs']
+            _paragraphs = article['paragraphs']
+            # 再创建一个新的article
+            article = {'title':activity['title'], 'subtitle':activity['location'], 'img':activity['bk_img_url'],'paragraphs':_paragraphs}
+            _json = json_encode(article)
+            headers = {"Authorization":"Bearer "+access_token}
+            url = API_DOMAIN + "/api/articles"
+            http_client = HTTPClient()
+            response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+            logging.info("got response %r", response.body)
+            data = json_decode(response.body)
+            article = data['rs']
+            new_article_id = article['_id']
+
+            activity_dao.activity_dao().update({'_id':new_activity_id, 'article_id':new_article_id})
 
         # create cretificate
         cret_template = cret_template_dao.cret_template_dao().query(activity_id)

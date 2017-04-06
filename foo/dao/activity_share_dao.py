@@ -53,6 +53,11 @@ class activity_share_dao(singleton):
         self._activity_share_collection.remove({"_id":_id});
         logging.info("delete activity_share success......");
 
+    def delete_by_activity(self, activity_id):
+        self._activity_share_collection.remove({"activity":activity_id});
+        logging.info("delete activity_share success......");
+
+
 
     def query(self, _id):
         cursor = self._activity_share_collection.find({"_id":_id})
