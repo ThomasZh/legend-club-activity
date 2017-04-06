@@ -1491,6 +1491,7 @@ class VendorActivityActionCloneHandler(AuthorizationHandler):
         logging.info("got activity_id %r in uri", activity_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         activity = activity_dao.activity_dao().query(activity_id)
         article_id = activity['article_id']
@@ -1529,17 +1530,6 @@ class VendorActivityActionCloneHandler(AuthorizationHandler):
         group_qrcode_dao.group_qrcode_dao().create(_json)
 
         # create blog article
-        _ticket = self.get_secure_cookie("session_ticket")
-        params = {"X-Session-Id": _ticket}
-        _json = json_encode(params)
-        url = "http://"+STP+"/blogs/articles/" + article_id + "/clone"
-        http_client = HTTPClient()
-        response = http_client.fetch(url, method="POST", body=_json)
-        logging.info("got response %r", response.body)
-        new_article_id = json_decode(response.body)
-        logging.info("got new_article_id %r", new_article_id)
-
-
         if activity.has_key('article_id'):
             # 先取出旧的article_id和内容
             _article_id = activity['article_id']

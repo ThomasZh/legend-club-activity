@@ -73,6 +73,7 @@ class VendorTriprouterListHandler(AuthorizationHandler):
                 if category['_id'] == triprouter['category']:
                     triprouter['category'] = category['title']
                     break
+        logging.info("got triprouter %r in uri", triprouters)
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/trip-router-list.html',
@@ -286,6 +287,7 @@ class VendorTriprouterCloneHandler(AuthorizationHandler):
         logging.info("got trip_router_id %r in uri", trip_router_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         triprouter = trip_router_dao.trip_router_dao().query(trip_router_id)
 

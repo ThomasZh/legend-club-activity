@@ -52,7 +52,7 @@ class vendor_member_dao(singleton):
 
     def update(self, json):
         vendor_id = json["vendor_id"];
-        account_id = json["account_id"];
+        account_id = json["_id"];
         self.__vendor_member_collection.update({
                 "vendor_id":vendor_id,
                 "account_id":account_id},{"$set":json});
