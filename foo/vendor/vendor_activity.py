@@ -221,6 +221,9 @@ class VendorActivityOpenCancelHandler(AuthorizationHandler):
         json = {"_id":activity_id, "open":False}
         activity_dao.activity_dao().updateOpenStatus(json)
 
+        # 取消开放的活动不能在分享列表里
+        activity_share_dao.activity_share_dao().delete_by_activity(activity_id)
+
         self.redirect('/vendors/' + vendor_id + '/activitys/recruit-nothidden')
 
 
@@ -233,7 +236,8 @@ class VendorActivityLeagueShareHandler(AuthorizationHandler):
         ops = self.get_ops_info()
         access_token = self.get_access_token()
 
-        activitys = activity_dao.activity_dao().query_by_open()
+        # activitys = activity_dao.activity_dao().query_by_open()
+        activitys = activity_dao.activity_dao().query_by_open_status(ACTIVITY_STATUS_RECRUIT)
         activitys_share = activity_share_dao.activity_share_dao().query_by_vendor(vendor_id)
 
         # 在所有开放的活动中剔除掉自己开放的
@@ -314,8 +318,8 @@ class VendorActivityLeagueRecruitHandler(AuthorizationHandler):
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
 
-
-        activitys_me = activity_dao.activity_dao().query_by_vendor(vendor_id)
+        # 查询自己在招募中的活动
+        activitys_me = activity_dao.activity_dao().query_by_vendor_status(vendor_id,ACTIVITY_STATUS_RECRUIT)
         activitys_share = activity_share_dao.activity_share_dao().query_by_vendor(vendor_id)
 
         # 处理一下自己活动
@@ -328,14 +332,18 @@ class VendorActivityLeagueRecruitHandler(AuthorizationHandler):
         for share in activitys_share:
             _id = share['activity']
             act = activity_dao.activity_dao().query(_id)
-            share['begin_time'] = timestamp_date(float(act['begin_time'])) # timestamp -> %m/%d/%Y
-            # 取俱乐部名称
-            club_id = share['club']
-            club = get_club_info(access_token,club_id)
-            if club:
-                share['club'] = club['name']
+            # 分享了别人俱乐部招募中的活动
+            if act['status'] != ACTIVITY_STATUS_RECRUIT:
+                activitys_share.remove(share)
             else:
-                share['club'] = ""
+                share['begin_time'] = timestamp_date(float(act['begin_time'])) # timestamp -> %m/%d/%Y
+                # 取俱乐部名称
+                club_id = share['club']
+                club = get_club_info(access_token,club_id)
+                if club:
+                    share['club'] = club['name']
+                else:
+                    share['club'] = ""
 
         activitys = activitys_me + activitys_share
 
@@ -1477,7 +1485,7 @@ class VendorActivityActionCompleteHandler(AuthorizationHandler):
                     _customer_profile['crets'] = 0
                 crets_num = int(_customer_profile['crets']) + 1
                 vendor_member_dao.vendor_member_dao().update({
-                        "_id":order['account_id'],
+                        "account_id":order['account_id'],
                         "vendor_id":vendor_id,
                         "crets":crets_num,
                         "last_update_time":_timestamp})

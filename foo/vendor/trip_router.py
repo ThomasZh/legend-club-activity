@@ -215,10 +215,7 @@ class VendorTriprouterEditStep2Handler(AuthorizationHandler):
         ops = self.get_ops_info()
 
         triprouter = trip_router_dao.trip_router_dao().query(trip_router_id)
-        # _article_id = triprouter['article_id']
 
-        _article_id = None
-        _paragraphs = None
         if triprouter.has_key('article_id'):
             _article_id = triprouter['article_id']
             url = API_DOMAIN + "/api/articles/" + _article_id
@@ -304,7 +301,7 @@ class VendorTriprouterCloneHandler(AuthorizationHandler):
                 "scenery":triprouter['scenery'],
                 "road_info":triprouter['road_info'],
                 "kickoff":triprouter['kickoff'],
-                "open":triprouter['open'],
+                "open":False,
                 "score":10}
 
         trip_router_dao.trip_router_dao().create(_json)

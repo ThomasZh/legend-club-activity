@@ -136,6 +136,14 @@ class activity_dao(singleton):
             array.append(i)
         return array
 
+
+    def query_by_vendor_status(self, vendor_id , status):
+        cursor = self.__activity_collection.find({"vendor_id":vendor_id,"status":status})
+        array = []
+        for i in cursor:
+            array.append(i)
+        return array
+
     def query_by_triprouter(self, trip_router_id):
         cursor = self.__activity_collection.find({"triprouter":trip_router_id})
         array = []
@@ -149,6 +157,14 @@ class activity_dao(singleton):
         for i in cursor:
             array.append(i)
         return array
+
+    def query_by_open_status(self,status):
+        cursor = self.__activity_collection.find({"open":True,"status":status})
+        array = []
+        for i in cursor:
+            array.append(i)
+        return array
+
 
     def updateOpenStatus(self, json):
         _id = json["_id"];
