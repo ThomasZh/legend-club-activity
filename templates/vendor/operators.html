@@ -198,9 +198,8 @@
   <!-- form validation -->
   <script src="{{ static_url('admin/js/validator/validator.js') }}"></script>
 
-  <!-- Datatables -->
-  <script src="{{ static_url('admin/js/datatables/js/jquery.dataTables.js') }}"></script>
-  <script src="{{ static_url('admin/js/datatables/tools/js/dataTables.tableTools.js') }}"></script>
+  <script src="{{ static_url('js/custom.js') }}" type="text/javascript"></script>
+  <script src="{{ static_url('js/vue-2.1.4.js') }}" type="text/javascript"></script>
 
   <script>
     function getCookie(name) {
@@ -257,7 +256,10 @@
           <td class="a-center "><input type="checkbox" class="flat" name="table_records"></td>\
           <td class=" "><img :src="user.avatar" class="avatar" alt="avatar"></td>\
           <td class=" ">{{! user.nickname }}</td>\
-          <td class="last"><a v-on:click="promoteToAdmin" type="button" class="btn btn-round btn-sm btn-success">添加</a></td>\
+          <td class="last">\
+          <a v-if="user.ops_club_id" type="button" class="btn btn-round btn-sm btn-info">已经是加盟商管理员</a>\
+          <a v-else v-on:click="promoteToAdmin" type="button" class="btn btn-round btn-sm btn-success">添加</a>\
+          </td>\
         </tr>',
       props: ['user', 'idx'],
       methods: {
@@ -313,8 +315,8 @@
             contentType: 'application/json',
             success: function(data, status, xhr) {
               console.log(data);
-              _self.admins = data;
-              _self.admins_num += data.length;
+              _self.admins = data.rs;
+              _self.admins_num += data.rs.length;
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
               console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
@@ -335,7 +337,7 @@
             contentType: 'application/json',
             success: function(data, status, xhr) {
               console.log(data);
-              _self.users.push(data);
+              _self.users.push(data.rs);
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
               console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
