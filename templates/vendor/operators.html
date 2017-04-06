@@ -228,7 +228,7 @@
 
           $.ajax({
             type: "POST",
-            url: "/api/clubs/{{ vendor_id }}/operators/" + _self.admin.account_id + "/demote",
+            url: "{{api_domain}}/api/clubs/{{ vendor_id }}/operators/" + _self.admin.account_id + "/demote",
             dataType: "json",
             contentType: 'application/json',
             success: function(data, status, xhr) {
@@ -271,7 +271,7 @@
 
           $.ajax({
             type: "POST",
-            url: "/api/clubs/{{ vendor_id }}/operators/" + _self.user.account_id + "/promote",
+            url: "{{api_domain}}/api/clubs/{{ vendor_id }}/operators/" + _self.user.account_id + "/promote",
             dataType: "json",
             contentType: 'application/json',
             success: function(data, status, xhr) {
@@ -310,7 +310,7 @@
 
           $.ajax({
             type: "GET",
-            url: "/api/clubs/{{ vendor_id }}/operators?idx=" + idx + "&limit=" + limit,
+            url: "{{api_domain}}/api/clubs/{{ vendor_id }}/operators?idx=" + idx + "&limit=" + limit,
             dataType: "json",
             contentType: 'application/json',
             success: function(data, status, xhr) {
@@ -329,10 +329,9 @@
         searchUser: function() {
           var _self = this;
           console.log('login: ' + _self.phone);
-
           $.ajax({
             type: "GET",
-            url: "/api/profiles/" + _self.phone + "?filter=basic&by=login",
+            url: "{{api_domain}}/api/profiles/" + _self.phone + "?filter=basic&by=login",
             dataType: "json",
             contentType: 'application/json',
             success: function(data, status, xhr) {

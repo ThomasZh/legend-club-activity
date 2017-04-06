@@ -70,6 +70,7 @@ class VendorSetupOperatorsHandler(AuthorizationHandler):
         self.render('vendor/operators.html',
                 vendor_id=vendor_id,
                 ops=ops,
+                api_domain=API_DOMAIN,
                 budge_num=budge_num)
 
 
