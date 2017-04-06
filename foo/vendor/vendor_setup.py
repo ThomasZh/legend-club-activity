@@ -65,11 +65,13 @@ class VendorSetupOperatorsHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/operators.html',
                 vendor_id=vendor_id,
                 ops=ops,
+                access_token=access_token,
                 api_domain=API_DOMAIN,
                 budge_num=budge_num)
 

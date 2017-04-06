@@ -231,6 +231,7 @@
             url: "{{api_domain}}/api/clubs/{{ vendor_id }}/operators/" + _self.admin.account_id + "/demote",
             dataType: "json",
             contentType: 'application/json',
+            headers: {"Authorization":"Bearer {{access_token}}"},
             success: function(data, status, xhr) {
               _self.$root.admins.splice(_self.idx, 1);
               _self.$root.admins_num -= 1;
@@ -274,6 +275,7 @@
             url: "{{api_domain}}/api/clubs/{{ vendor_id }}/operators/" + _self.user.account_id + "/promote",
             dataType: "json",
             contentType: 'application/json',
+            headers: {"Authorization":"Bearer {{access_token}}"},
             success: function(data, status, xhr) {
               _self.$root.users.splice(_self.idx, 1);
               _self.$root.queryAdmins(_self.$root.admins_num, 1);
@@ -313,6 +315,7 @@
             url: "{{api_domain}}/api/clubs/{{ vendor_id }}/operators?idx=" + idx + "&limit=" + limit,
             dataType: "json",
             contentType: 'application/json',
+            headers: {"Authorization":"Bearer {{access_token}}"},
             success: function(data, status, xhr) {
               console.log(data);
               _self.admins = data.rs;
@@ -334,6 +337,7 @@
             url: "{{api_domain}}/api/profiles/" + _self.phone + "?filter=basic&by=login",
             dataType: "json",
             contentType: 'application/json',
+            headers: {"Authorization":"Bearer {{access_token}}"},
             success: function(data, status, xhr) {
               console.log(data);
               _self.users.push(data.rs);
