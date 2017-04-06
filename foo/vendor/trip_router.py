@@ -133,7 +133,8 @@ class VendorTriprouterCreateHandler(AuthorizationHandler):
         http_client = HTTPClient()
         response = http_client.fetch(url, method="POST", headers=headers, body=_json)
         logging.info("got response %r", response.body)
-        article = json_decode(response.body)
+        data = json_decode(response.body)
+        article = data['rs']
         article_id = article['_id']
         _paragraphs = ''
 
@@ -238,7 +239,8 @@ class VendorTriprouterEditStep2Handler(AuthorizationHandler):
             http_client = HTTPClient()
             response = http_client.fetch(url, method="GET")
             logging.info("got response %r", response.body)
-            article = json_decode(response.body)
+            data = json_decode(response.body)
+            article = data['rs']
             _paragraphs = article['paragraphs']
         else:
             article = {'title':triprouter['title'], 'subtitle':triprouter['location'], 'img':triprouter['bk_img_url'],'paragraphs':''}
@@ -248,7 +250,8 @@ class VendorTriprouterEditStep2Handler(AuthorizationHandler):
             http_client = HTTPClient()
             response = http_client.fetch(url, method="POST", headers=headers, body=_json)
             logging.info("got response %r", response.body)
-            article = json_decode(response.body)
+            data = json_decode(response.body)
+            article = data['rs']
             article_id = article['_id']
             _paragraphs = ''
 
