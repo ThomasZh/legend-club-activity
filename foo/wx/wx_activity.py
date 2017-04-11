@@ -417,6 +417,8 @@ class WxActivityQrcodeHandler(tornado.web.RequestHandler):
 class WxActivityApplyStep0Handler(tornado.web.RequestHandler):
     def get(self, vendor_id, activity_id, guest_club_id):
 
+        logging.info("guest_club_id+++++++++++%r",guest_club_id)
+
         wx_app_id=''
         activity = activity_dao.activity_dao().query(activity_id)
         activity_club = activity['vendor_id']
@@ -424,7 +426,7 @@ class WxActivityApplyStep0Handler(tornado.web.RequestHandler):
         if vendor_id != activity_club:
             wx_app_info = vendor_wx_dao.vendor_wx_dao().query(guest_club_id)
             wx_notify_domain = wx_app_info['wx_notify_domain']
-            redirect_url = "http://domibake.com/bf/wx/vendors/"+guest_club_id+"/activitys/"+ activity_id+"_"+ vendor_id +"/apply/step0"
+            redirect_url = wx_notify_domain+"/bf/wx/vendors/"+guest_club_id+"/activitys/"+ activity_id+"_"+ vendor_id +"/apply/step0"
         else:
             wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
             wx_app_id = wx_app_info['wx_app_id']
