@@ -165,6 +165,13 @@ class activity_dao(singleton):
             array.append(i)
         return array
 
+    def query_by_open_status_notme(self,status,vendor_id):
+        cursor = self.__activity_collection.find({"open":True,"status":status,"vendor_id":{"$ne":vendor_id}})
+        array = []
+        for i in cursor:
+            array.append(i)
+        return array
+
 
     def updateOpenStatus(self, json):
         _id = json["_id"];

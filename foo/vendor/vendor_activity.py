@@ -237,14 +237,8 @@ class VendorActivityLeagueShareHandler(AuthorizationHandler):
         access_token = self.get_access_token()
 
         # activitys = activity_dao.activity_dao().query_by_open()
-        activitys = activity_dao.activity_dao().query_by_open_status(ACTIVITY_STATUS_RECRUIT)
+        activitys = activity_dao.activity_dao().query_by_open_status_notme(ACTIVITY_STATUS_RECRUIT,vendor_id)
         activitys_share = activity_share_dao.activity_share_dao().query_by_vendor(vendor_id)
-
-        # 在所有开放的活动中剔除掉自己开放的
-        for activity in activitys:
-            if(activity['vendor_id'] == vendor_id):
-                activitys.remove(activity)
-                break
 
         # 加share属性，区别一个自己是否已经分享了别人开放的这个活动
         for activity in activitys:
@@ -307,7 +301,7 @@ class VendorActivityShareCancelHandler(AuthorizationHandler):
 
         self.redirect('/vendors/' + vendor_id + '/activitys/league/share')
 
-
+# 我会员所见所有活动
 class VendorActivityLeagueRecruitHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
@@ -329,23 +323,31 @@ class VendorActivityLeagueRecruitHandler(AuthorizationHandler):
             activity['begin_time'] = timestamp_date(float(activity['begin_time'])) # timestamp -> %m/%d/%Y
             activity['club'] = ops['club_name']
 
+        # 分享的活动中如果不是在招募中了就删除掉
         for share in activitys_share:
             _id = share['activity']
             act = activity_dao.activity_dao().query(_id)
             # 分享了别人俱乐部招募中的活动
             if act['status'] != ACTIVITY_STATUS_RECRUIT:
-                activitys_share.remove(share)
-            else:
-                share['begin_time'] = timestamp_date(float(act['begin_time'])) # timestamp -> %m/%d/%Y
-                # 取俱乐部名称
-                club_id = share['club']
-                club = get_club_info(access_token,club_id)
-                if club:
-                    share['club'] = club['name']
-                else:
-                    share['club'] = ""
+                logging.info("===========%r",act['status'])
+                # activitys_share.remove(share)
+                activity_share_dao.activity_share_dao().delete(share['_id'])
 
-        activitys = activitys_me + activitys_share
+        # 重新查询分享了的活动
+        activitys_share_new = activity_share_dao.activity_share_dao().query_by_vendor(vendor_id)
+        for share in activitys_share_new:
+            _id = share['activity']
+            act = activity_dao.activity_dao().query(_id)
+            share['begin_time'] = timestamp_date(float(act['begin_time'])) # timestamp -> %m/%d/%Y
+            # 取俱乐部名称
+            club_id = share['club']
+            club = get_club_info(access_token,club_id)
+            if club:
+                share['club'] = club['name']
+            else:
+                share['club'] = ""
+
+        activitys = activitys_me + activitys_share_new
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/activity-recruit-all.html',
