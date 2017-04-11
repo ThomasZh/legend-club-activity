@@ -22,7 +22,7 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../"))
 from comm import singleton
-from global_const import MONGO_HOST, MONGO_PORT, MONGO_USR, MONGO_PWD, MONGO_DB
+from global_const import MONGO_HOST, MONGO_PORT, MONGO_USR, MONGO_PWD, MONGO_DB, GUEST_CLUB_ID
 
 
 #order options
@@ -111,6 +111,7 @@ class order_dao(singleton):
         cursor = self.__order_collection.find({
                 "vendor_id":vendor_id,
                 "guest_club_id":{"$ne":vendor_id},
+                "guest_club_id":{"$ne":GUEST_CLUB_ID},
                 "create_time":{"$lt":before}}).sort("create_time",-1).limit(limit);
         array = []
         for i in cursor:

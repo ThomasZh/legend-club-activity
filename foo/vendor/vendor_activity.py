@@ -277,7 +277,7 @@ class VendorActivityShareSetHandler(AuthorizationHandler):
         # 设置别人开放的活动为自己所用
         activity = activity_dao.activity_dao().query(activity_id)
 
-        # vendor_id是我 club是活动的创建者
+        # vendor_id是我,club是活动的创建者
         _id = str(uuid.uuid1()).replace('-', '')
         json = {"_id":_id, "activity":activity_id,
                 "share":True,"vendor_id":vendor_id, "bk_img_url":activity['bk_img_url'],
