@@ -28,11 +28,21 @@ from api import api_blog
 from api import api_setup
 from api import api_customer_profile
 from api import api_order
+from foo.portal import eshop
 
 
 def map():
 
     config = [
+
+        (r'/webapp', getattr(eshop, 'EshopHomeHandler')),
+        (r'/webapp/eshop', getattr(eshop, 'EshopHomeHandler')),
+        (r'/webapp/eshop/clubs/([a-z0-9]*)', getattr(eshop, 'EshopIndexHandler')),
+        (r'/webapp/eshop/clubs/([a-z0-9]*)/articles/([a-z0-9]*)', getattr(eshop, 'EshopArticleHandler')),
+        (r'/webapp/eshop/clubs/([a-z0-9]*)/articles/([a-z0-9]*)/add-comment', getattr(eshop, 'EshopArticleAddCommentHandler')),
+        (r'/webapp/eshop/clubs/([a-z0-9]*)/products/([a-z0-9]*)', getattr(eshop, 'EshopProductHandler')),
+        (r'/webapp/eshop/clubs/([a-z0-9]*)/products/([a-z0-9]*)/place-order', getattr(eshop, 'EshopProductPlaceOrderHandler')),
+        (r'/webapp/eshop/clubs/([a-z0-9]*)/products/([a-z0-9]*)/place-order-success', getattr(eshop, 'EshopProductPlaceOrderSuccessHandler')),
 
         # authenticated
         (r'/ops/auth/email/login', getattr(auth_email, 'AuthEmailLoginHandler')),
@@ -117,6 +127,19 @@ def map():
         (r"/vendors/([a-z0-9]*)/blog/paragraph/up", getattr(blog, 'UpParagraphHandler')),
         (r"/vendors/([a-z0-9]*)/blog/paragraph/down", getattr(blog, 'DownParagraphHandler')),
         (r"/vendors/([a-z0-9]*)/blog/paragraph/del", getattr(blog, 'DelParagraphHandler')),
+
+        # 我自己的全部订单，含分销
+        (r"/vendors/([a-z0-9]*)/orders-me-all", getattr(vendor_order, 'VendorOrdersMeAllHandler')),
+        # 我自己的订单，不含分销
+        (r"/vendors/([a-z0-9]*)/orders-me-none", getattr(vendor_order, 'VendorOrdersMeNoneHandler')),
+        # 某人分销我的订单
+        (r"/vendors/([a-z0-9]*)/orders-me-other", getattr(vendor_order, 'VendorOrdersMeOtherHandler')),
+        # 他人分销我的全部订单
+        (r"/vendors/([a-z0-9]*)/orders-me-others", getattr(vendor_order, 'VendorOrdersMeOthersHandler')),
+        # 我分销他人的全部订单
+        (r"/vendors/([a-z0-9]*)/orders-others-me", getattr(vendor_order, 'VendorOrdersOthersMeHandler')),
+        # 我分销某人的订单
+        (r"/vendors/([a-z0-9]*)/orders-other-me", getattr(vendor_order, 'VendorOrdersOtherMeHandler')),
 
         # 联盟里别人活动我的订单
         (r"/vendors/([a-z0-9]*)/league/orders-me", getattr(vendor_order, 'VendorLeagueMyOrderListHandler')),

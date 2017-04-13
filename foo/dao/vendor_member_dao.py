@@ -87,7 +87,7 @@ class vendor_member_dao(singleton):
         data = self.query_not_safe(vendor_id, account_id)
         if not data:
             logging.debug("data is None");
-            data = {'_id':'00000000000000000000000000000000',
+            data = {'_id':'0000000000000000000000000000000',
                     'vendor_id':vendor_id,
                     'account_id':account_id,
                     'account_nickname':'',

@@ -30,6 +30,7 @@ from tornado.escape import json_encode, json_decode
 from tornado.httpclient import HTTPClient
 from tornado.httputil import url_concat
 
+from global_const import *
 from comm import AuthorizationHandler
 from comm import timestamp_datetime
 from comm import datetime_timestamp
@@ -50,8 +51,104 @@ from dao import vendor_member_dao
 from dao import voucher_order_dao
 
 
-from global_const import STP
-from global_const import PAGE_SIZE_LIMIT
+class VendorOrdersMeAllHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        access_token = self.get_access_token()
+        ops = self.get_ops_info()
+
+        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        self.render('vendor/orders-me-all.html',
+                vendor_id=vendor_id,
+                ops=ops,
+                access_token=access_token,
+                budge_num=budge_num)
+
+
+class VendorOrdersMeNoneHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        access_token = self.get_access_token()
+        ops = self.get_ops_info()
+
+        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        self.render('vendor/orders-me-none.html',
+                vendor_id=vendor_id,
+                ops=ops,
+                access_token=access_token,
+                budge_num=budge_num)
+
+
+class VendorOrdersMeOtherHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+        club_id = self.get_argument("club_id", "")
+
+        access_token = self.get_access_token()
+        ops = self.get_ops_info()
+
+        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        self.render('vendor/orders-me-other.html',
+                vendor_id=vendor_id,
+                club_id=club_id,
+                ops=ops,
+                access_token=access_token,
+                budge_num=budge_num)
+
+
+class VendorOrdersMeOthersHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        access_token = self.get_access_token()
+        ops = self.get_ops_info()
+
+        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        self.render('vendor/orders-me-others.html',
+                vendor_id=vendor_id,
+                ops=ops,
+                access_token=access_token,
+                budge_num=budge_num)
+
+
+class VendorOrdersOtherMeHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+        club_id = self.get_argument("club_id", "")
+
+        access_token = self.get_access_token()
+        ops = self.get_ops_info()
+
+        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        self.render('vendor/orders-other-me.html',
+                vendor_id=vendor_id,
+                club_id=club_id,
+                ops=ops,
+                access_token=access_token,
+                budge_num=budge_num)
+
+
+class VendorOrdersOthersMeHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        access_token = self.get_access_token()
+        ops = self.get_ops_info()
+
+        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        self.render('vendor/orders-others-me.html',
+                vendor_id=vendor_id,
+                ops=ops,
+                access_token=access_token,
+                budge_num=budge_num)
 
 
 class VendorOrderListHandler(AuthorizationHandler):
@@ -121,7 +218,8 @@ class VendorOrderListHandler(AuthorizationHandler):
                 budge_num=budge_num,
                 orders=_array)
 
-# 联盟里别人活动我的订单
+
+# 联盟其他俱乐部活动，我俱乐部会员的订单
 class VendorLeagueMyOrderListHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
@@ -190,7 +288,8 @@ class VendorLeagueMyOrderListHandler(AuthorizationHandler):
                 budge_num=budge_num,
                 orders=_array)
 
-# 联盟里我的活动别人订单
+
+# 联盟我俱乐部活动，其他俱乐部会员的订单
 class VendorLeagueOtherOrderListHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
@@ -336,9 +435,20 @@ class VendorOrderInfoHandler(AuthorizationHandler):
 
         order['create_time'] = timestamp_datetime(order['create_time'])
 
-        customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, order['account_id'])
-        order['account_nickname'] = customer_profile['account_nickname']
-        order['account_avatar'] = customer_profile['account_avatar']
+        if order['account_id'] == DEFAULT_USER_ID:
+            order['account_nickname'] = DEFAULT_USER_NICKNAME
+            order['account_avatar'] = DEFAULT_USER_AVATAR
+        else:
+            params = {"filter":"basic", "by":"account_id"}
+            url = url_concat(API_DOMAIN + "/api/profiles/" + order['account_id'], params)
+            http_client = HTTPClient()
+            response = http_client.fetch(url, method="GET")
+            logging.info("got profile basic response.body %r", response.body)
+            data = json_decode(response.body)
+            profile = data['rs']
+
+            order['account_nickname'] = profile['nickname']
+            order['account_avatar'] = profile['avatar']
         try:
             order['prepay_id']
         except:
@@ -361,13 +471,16 @@ class VendorOrderInfoHandler(AuthorizationHandler):
             _apply['activity_title'] = _activity['title']
             logging.info("got activity_title %r", _apply['activity_title'])
             _apply['create_time'] = timestamp_datetime(_apply['create_time'])
-            if _apply['gender'] == 'male':
-                _apply['gender'] = u'男'
+            if _apply.has_key('gender'):
+                if _apply['gender'] == 'male':
+                    _apply['gender'] = u'男'
+                else:
+                    _apply['gender'] = u'女'
             else:
-                _apply['gender'] = u'女'
+                _apply['gender'] = u'未知'
 
-            _apply['account_nickname'] = customer_profile['account_nickname']
-            _apply['account_avatar'] = customer_profile['account_avatar']
+            _apply['account_nickname'] = order['account_nickname']
+            _apply['account_avatar'] = order['account_avatar']
             try:
                 _apply['note']
             except:

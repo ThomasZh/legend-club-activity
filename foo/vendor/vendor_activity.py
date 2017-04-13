@@ -301,6 +301,7 @@ class VendorActivityShareCancelHandler(AuthorizationHandler):
 
         self.redirect('/vendors/' + vendor_id + '/activitys/league/share')
 
+
 # 我会员所见所有活动
 class VendorActivityLeagueRecruitHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
@@ -355,6 +356,7 @@ class VendorActivityLeagueRecruitHandler(AuthorizationHandler):
                 ops=ops,
                 budge_num=budge_num,
                 activitys=activitys)
+
 
 #查看别人分享活动的招募帖 VendorActivityLeagueDemoHandler
 class VendorActivityLeagueDemoHandler(AuthorizationHandler):
@@ -455,6 +457,7 @@ class VendorActivityLeagueDemoHandler(AuthorizationHandler):
                     bonus_template=_bonus_template,
                     paragraphs=_paragraphs,
                     activity=_activity)
+
 
 # /vendors/<string:vendor_id>/activitys/canceled
 class VendorActivityCanceledHandler(AuthorizationHandler):

@@ -52,128 +52,41 @@ from dao import club_dao
 
 from global_const import *
 
+
 class ApiOrderListXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
+        product_type = self.get_argument("product_type", "all")
+        logging.debug("get product_type=[%r] from argument", product_type)
+        distributor_id = self.get_argument("distributor_id", "none")
+        logging.debug("get distributor_id=[%r] from argument", distributor_id)
+        page = self.get_argument("page", 1)
+        logging.debug("get page=[%r] from argument", page)
+        limit = self.get_argument("limit", 20)
+        logging.debug("get limit=[%r] from argument", limit)
+
         access_token = self.get_access_token()
 
-        iBefore = 0
-        sBefore = self.get_argument("before", "") #格式 2016-06-01 22:36
-        if sBefore != "":
-            iBefore = float(datetime_timestamp(sBefore))
-        else:
-            iBefore = time.time()
+        params = {"club_id":vendor_id, "distributor_id":distributor_id, "page":page, "limit":limit, "product_type": product_type}
+        url = url_concat(API_DOMAIN + "/api/orders", params)
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        rs = data['rs']
+        orders = rs['data']
 
-        _array = order_dao.order_dao().query_pagination_by_vendor(vendor_id, iBefore, PAGE_SIZE_LIMIT);
-
-        for order in _array:
-            if order.has_key('guest_club_id'):
-                if order['guest_club_id']:
-                    guest_club_id = order["guest_club_id"]
-                    club = get_club_info(access_token,guest_club_id)
-                    if club:
-                        order['guest_club_name'] = club['name']
-                    else:
-                        order['guest_club_name'] = ""
-                else:
-                    order['guest_club_name'] = ""
-            else:
-                order['guest_club_name'] = ""
-
-            _activity = activity_dao.activity_dao().query(order['activity_id'])
-            order['activity_title'] = _activity['title']
-            # order['activity_amount'] = _activity['amount']
-            try:
-                order['base_fees']
-            except:
-                order['base_fees'] = _activity['base_fee_template']
-                # 数据库apply无base_fees时，取order的赋值给它，并更新其数据库字段
-                _json = {"_id":order['_id'],"base_fees":order['base_fees']}
-                logging.info("got base_fees json %r in uri", _json)
-                order_dao.order_dao().update(_json)
-
-            order['activity_amount'] = 0
-            if order['base_fees'] :
-                for base_fee in order['base_fees']:
-                    # 价格转换成元
-                    order['activity_amount'] = float(base_fee['fee']) / 100
-
-            logging.info("got activity_title %r", order['activity_title'])
-            order['create_time'] = timestamp_datetime(order['create_time'])
-
-            customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, order['account_id'])
-
-            if(customer_profile):
-                try:
-                    customer_profile['account_nickname']
-                except:
-                    customer_profile['account_nickname'] = ''
-                try:
-                    customer_profile['account_avatar']
-                except:
-                    customer_profile['account_avatar'] = ''
-
-                order['account_nickname'] = customer_profile['account_nickname']
-                order['account_avatar'] = customer_profile['account_avatar']
-            else:
-                order['account_nickname'] = ''
-                order['account_avatar'] = ''
-
-            try:
-                order['bonus']
-            except:
-                order['bonus'] = 0
-            # 价格转换成元
-            order['bonus'] = float(order['bonus']) / 100
-            try:
-                order['prepay_id']
-            except:
-                order['prepay_id'] = ''
-            try:
-                order['transaction_id']
-            except:
-                order['transaction_id'] = ''
-            try:
-                order['payed_total_fee']
-            except:
-                order['payed_total_fee'] = 0
-
-            for ext_fee in order['ext_fees']:
-                # 价格转换成元
-                ext_fee['fee'] = float(ext_fee['fee']) / 100
-
-            for insurance in order['insurances']:
-                # 价格转换成元
-                insurance['fee'] = float(insurance['fee']) / 100
-
-            for _voucher in order['vouchers']:
-                # 价格转换成元
-                _voucher['fee'] = float(_voucher['fee']) / 100
-
-            _cret = cret_dao.cret_dao().query_by_account(order['activity_id'], order['account_id'])
-            if _cret:
-                logging.info("got _cret_id %r", _cret['_id'])
-                order['cret_id'] = _cret['_id']
-            else:
-                order['cret_id'] = None
-
-            # order['activity_amount'] = float(_activity['amount']) / 100
-            if not order['base_fees']:
-                order['activity_amount'] = 0
-            else:
-                for base_fee in order['base_fees']:
-                    # 价格转换成元
-                    order['activity_amount'] = float(base_fee['fee']) / 100
-
+        for order in orders:
+            # 下单时间，timestamp -> %m月%d 星期%w
+            order['create_time'] = timestamp_datetime(float(order['create_time']))
+            # 合计金额
             order['total_amount'] = float(order['total_amount']) / 100
-            order['payed_total_fee'] = float(order['payed_total_fee']) / 100
 
-        _json = json_encode(_array)
-        logging.info("got _json %r", _json)
-
-        self.write(JSON.dumps(_json, default=json_util.default))
+        self.write(JSON.dumps(orders, default=json_util.default))
         self.finish()
+
 
 # 我的活动 别人的订单
 class ApiLeagueOtherOrderListXHR(AuthorizationHandler):
@@ -261,6 +174,7 @@ class ApiLeagueOtherOrderListXHR(AuthorizationHandler):
 
         self.write(JSON.dumps(_json, default=json_util.default))
         self.finish()
+
 
 #别人活动我的订单
 class ApiLeagueMyOrderListXHR(AuthorizationHandler):
@@ -548,6 +462,7 @@ class ApiActivityExportXHR(AuthorizationHandler):
         _file.save('static/report/'+activity_id+'.xls')     # Save file
         self.finish(JSON.dumps("http://riding.time2box.com/static/report/"+activity_id+".xls"))
 
+
 class ApiVoucherOrderReviewXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, voucher_order_id):
@@ -562,6 +477,7 @@ class ApiVoucherOrderReviewXHR(AuthorizationHandler):
         budge_num_dao.budge_num_dao().update({"_id":vendor_id, "voucher_order":num})
 
         self.finish("ok")
+
 
 class ApiVoucherOrderListXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
@@ -588,6 +504,7 @@ class ApiVoucherOrderListXHR(AuthorizationHandler):
         logging.info("got _json %r", _json)
         self.write(JSON.dumps(_json, default=json_util.default))
         self.finish()
+
 
 class ApiApplySearchXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
@@ -647,6 +564,7 @@ class ApiApplySearchXHR(AuthorizationHandler):
         logging.info("got _json %r", _json)
         self.write(JSON.dumps(_json, default=json_util.default))
         self.finish()
+
 
 class ApiOrderSearchXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page

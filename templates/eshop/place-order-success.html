@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>预订成功</title>
+  <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" name="viewport" />
+  <meta content="yes" name="apple-mobile-web-app-capable" />
+  <meta content="black" name="apple-mobile-web-app-status-bar-style" />
+  <meta content="telephone=no" name="format-detection" />
+
+  <!-- 引入fontawesome字体 -->
+  <link rel="stylesheet" href="{{ static_url('css/font-awesome.min.css') }}">
+  <!-- 引入YDUI样式 -->
+  <link rel="stylesheet" href="{{ static_url('ydui/css/ydui.css') }}">
+  <link rel="stylesheet" href="{{ static_url('jquery-weui/lib/weui.min.css') }}">
+  <!-- <link rel="stylesheet" href="{{ static_url('css/legend.css') }}" /> -->
+
+  <style>
+    .primary-color {
+      background-color: #01acc6 !important;
+    }
+  </style>
+
+  <!-- 引入YDUI自适应解决方案类库 -->
+  <script src="{{ static_url('ydui/js/ydui.flexible.js') }}"></script>
+
+</head>
+
+<body>
+
+  <section class="g-flexview">
+    <section id="mainForm" class="g-scrollview">
+
+      <div class="weui-msg">
+        <div class="weui-msg__icon-area"><i class="weui-icon-success weui-icon_msg"></i></div>
+        <div class="weui-msg__text-area">
+          <h2 class="weui-msg__title">操作成功</h2>
+          <p class="weui-msg__desc">预订成功，<a href="tel:{{ club['phone'] }}">店小二</a>&nbsp;会尽快联系您!</p>
+        </div>
+        <div class="weui-msg__opr-area">
+          <p class="weui-btn-area">
+            <a href="/webapp/eshop/clubs/{{ club['_id'] }}" class="weui-btn weui-btn_primary primary-color">返回首页</a>
+            <a href="javascript:;" class="weui-btn weui-btn_default">关闭</a>
+          </p>
+        </div>
+        <div class="weui-msg__extra-area">
+          <div class="weui-footer">
+            <p class="weui-footer__links">
+              <a href="javascript:void(0);" class="weui-footer__link">{{ club['name'] }}</a>
+            </p>
+            <p class="weui-footer__text">Copyright © 2015-2017 7x24hs.com</p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </section>
+
+  <!-- 引入jQuery 2.0+ -->
+  <script src="{{ static_url('js/jquery-2.2.4.min.js') }}"></script>
+  <!-- 引入YDUI脚本 -->
+  <script src="{{ static_url('ydui/js/ydui.js') }}"></script>
+
+</body>
+
+</html>

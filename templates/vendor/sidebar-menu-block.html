@@ -30,61 +30,58 @@
         </ul>
       </li>
       {% if budge_num['total'] > 0 %}
-        <li><a><i class="fa fa-rmb"></i> 订单 <span class="badge bg-green">{{budge_num['total']}}</span>
+      <li><a><i class="fa fa-rmb"></i> 订单 <span class="badge bg-green">{{budge_num['total']}}</span>
       {% else %}
         <li><a><i class="fa fa-rmb"></i> 订单
       {% end %}
         <span class="fa fa-chevron-down"></span></a>
         <ul class="nav child_menu" style="display: none">
           {% if budge_num['order'] > 0 %}
-            <li><a href="/vendors/{{ vendor_id }}/orders"> 活动订单 <span class="badge bg-green">{{budge_num['order']}}</span></a>
-            </li>
+          <li><a href="/vendors/{{ vendor_id }}/orders-me-all"> 我的全部订单(含分销)  <span class="badge bg-green">{{budge_num['order']}}</span></a></li>
           {% else %}
-            <li><a href="/vendors/{{ vendor_id }}/orders"> 活动订单 </a>
-            </li>
+          <li><a href="/vendors/{{ vendor_id }}/orders-me-all"> 我的全部订单(含分销)  </a></li>
           {% end %}
-          <li><a href="/vendors/{{ vendor_id }}/league/orders-me"> 联盟活动 我会员订单 </a>
-          <li><a href="/vendors/{{ vendor_id }}/league/orders-other">我的活动 其他会员订单 </a>
-
+          <li><a href="/vendors/{{ vendor_id }}/orders-me-none"> 我自己的订单(不含分销) </a></li>
+          <li><a href="/vendors/{{ vendor_id }}/orders-me-others"> 他人分销我的订单 </a>
+          <li><a href="/vendors/{{ vendor_id }}/orders-others-me"> 我分销他人的订单 </a>
           {% if budge_num['application'] > 0 %}
           <li><a href="/vendors/{{ vendor_id }}/applys">报名 <span class="badge bg-green">{{budge_num['application']}}</span></a>
           </li>
           {% else %}
-            <li><a href="/vendors/{{ vendor_id }}/applys">报名</a>
-            </li>
+          <li><a href="/vendors/{{ vendor_id }}/applys">报名</a>
+          </li>
           {% end %}
-
           {% if budge_num['voucher_order'] > 0 %}
-            <li><a href="/vendors/{{ vendor_id }}/order/vouchers"> 代金券订单 <span class="badge bg-green">{{budge_num['voucher_order']}}</span></a>
-            </li>
+          <li><a href="/vendors/{{ vendor_id }}/order/vouchers"> 代金券订单 <span class="badge bg-green">{{budge_num['voucher_order']}}</span></a>
+          </li>
           {% else %}
-            <li><a href="/vendors/{{ vendor_id }}/order/vouchers"> 代金券订单 </a>
-            </li>
+          <li><a href="/vendors/{{ vendor_id }}/order/vouchers"> 代金券订单 </a>
+          </li>
           {% end %}
         </ul>
-      </li>
-      <li><a><i class="fa fa-male"></i> 会员 <span class="fa fa-chevron-down"></span></a>
-        <ul class="nav child_menu" style="display: none">
-          <li><a href="/vendors/{{ vendor_id }}/customers">会员</a></li>
-        </ul>
-      </li>
-      <li><a><i class="fa fa-rmb"></i> 代金券 <span class="fa fa-chevron-down"></span></a>
-        <ul class="nav child_menu" style="display: none">
-          <li><a href="/vendors/{{ vendor_id }}/vouchers?status=0">未分配</a></li>
-          <li><a href="/vendors/{{ vendor_id }}/vouchers?status=1">已分配, 未使用</a></li>
-          <li><a href="/vendors/{{ vendor_id }}/vouchers?status=2">已分配, 已使用</a></li>
-        </ul>
-      </li>
-      <li><a><i class="fa fa-gear"></i> 配置 <span class="fa fa-chevron-down"></span></a>
-        <ul class="nav child_menu" style="display: none">
-          <li><a href="/vendors/{{ vendor_id }}/setup/task">任务</a></li>
-          <li><a href="/vendors/{{ vendor_id }}/setup/operators">管理员</a></li>
-          <li><a href="/vendors/{{ vendor_id }}/setup/hha">免责声明</a></li>
-          <li><a href="/vendors/{{ vendor_id }}/setup/insurances">保险</a></li>
-          <li><a href="/vendors/{{ vendor_id }}/setup/wx">微信</a></li>
-          <li><a href="/vendors/{{ vendor_id }}/setup/club">俱乐部信息</a></li>
-        </ul>
-      </li>
+        </li>
+        <li><a><i class="fa fa-male"></i> 会员 <span class="fa fa-chevron-down"></span></a>
+          <ul class="nav child_menu" style="display: none">
+            <li><a href="/vendors/{{ vendor_id }}/customers">会员</a></li>
+          </ul>
+        </li>
+        <li><a><i class="fa fa-rmb"></i> 代金券 <span class="fa fa-chevron-down"></span></a>
+          <ul class="nav child_menu" style="display: none">
+            <li><a href="/vendors/{{ vendor_id }}/vouchers?status=0">未分配</a></li>
+            <li><a href="/vendors/{{ vendor_id }}/vouchers?status=1">已分配, 未使用</a></li>
+            <li><a href="/vendors/{{ vendor_id }}/vouchers?status=2">已分配, 已使用</a></li>
+          </ul>
+        </li>
+        <li><a><i class="fa fa-gear"></i> 配置 <span class="fa fa-chevron-down"></span></a>
+          <ul class="nav child_menu" style="display: none">
+            <li><a href="/vendors/{{ vendor_id }}/setup/task">任务</a></li>
+            <li><a href="/vendors/{{ vendor_id }}/setup/operators">管理员</a></li>
+            <li><a href="/vendors/{{ vendor_id }}/setup/hha">免责声明</a></li>
+            <li><a href="/vendors/{{ vendor_id }}/setup/insurances">保险</a></li>
+            <li><a href="/vendors/{{ vendor_id }}/setup/wx">微信</a></li>
+            <li><a href="/vendors/{{ vendor_id }}/setup/club">俱乐部信息</a></li>
+          </ul>
+        </li>
     </ul>
   </div>
 

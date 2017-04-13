@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>{{ club['name'] }}</title>
+  <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" name="viewport" />
+  <meta content="yes" name="apple-mobile-web-app-capable" />
+  <meta content="black" name="apple-mobile-web-app-status-bar-style" />
+  <meta content="telephone=no" name="format-detection" />
+
+  <!-- 引入fontawesome字体 -->
+  <link rel="stylesheet" href="{{ static_url('css/font-awesome.min.css') }}">
+  <!-- 引入YDUI样式 -->
+  <link rel="stylesheet" href="{{ static_url('ydui/css/ydui.css') }}">
+  <!-- <link rel="stylesheet" href="{{ static_url('jquery-weui/lib/weui.min.css') }}"> -->
+  <link rel="stylesheet" href="{{ static_url('shuttle/css/swipebox.min.css') }}">
+  <link rel="stylesheet" href="{{ static_url('shuttle/css/swiper.min.css') }}">
+  <link rel="stylesheet" href="{{ static_url('css/legend.css') }}" />
+
+  <!-- 引入YDUI自适应解决方案类库 -->
+  <script src="{{ static_url('ydui/js/ydui.flexible.js') }}"></script>
+
+</head>
+
+<body>
+  <div class="g-flexview">
+    <!-- Page Contents -->
+    <div id="mainForm" class="g-scrollview">
+
+      <!-- Hero Header -->
+      <div class="hero-header hero-big bg-3 animated fadeindown" style="background: url({{ club['img'] }}!700x467) no-repeat center / cover !important;">
+        <div class="hero-author">
+          <div class="media-top-object">
+            <div class="media-body left-align">
+              <p class="white-text">{{ club['name'] }}</p>
+              <span class="white-text small"><a href="tel:{{ club['phone'] }}"><em>{{ club['phone'] }}</em></a></span>
+              <div class="card-feedback">
+                <div class="card-users white-text">
+                  <i class="fa fa-eye" style="font-size:16px"></i> <span>346</span>
+                  <i class="fa fa-thumbs-o-up accent-text" style="font-size:16px"></i> <span class="accent-text">467</span>
+                  <i class="fa fa-comments-o" style="font-size:16px"></i> <span>205</span>
+                </div>
+                <div class="card-share white-text">
+                  <i class="fa fa-share-alt" style="font-size:16px"></i> <span>211</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="opacity-overlay-gradient"></div>
+      </div>
+
+      <div class="m-tab demo-small-pitch" data-ydui-tab>
+        <ul class="tab-nav ">
+          <li class="tab-nav-item tab-active">
+            <a href="javascript:;"></a>热销</li>
+          <li class="tab-nav-item"><a href="javascript:;">博客</a></li>
+          <li class="tab-nav-item"><a href="javascript:;">精彩瞬间</a></li>
+        </ul>
+
+        <div class="tab-panel">
+          <div class="tab-panel-item tab-active">
+            <article class="m-list list-theme2">
+              {% for activity in activitys %}
+              <a href="/webapp/eshop/clubs/{{ club['_id'] }}/products/{{ activity['_id'] }}" class="list-item">
+                <div class="list-img">
+                  <img src="{{ activity['bk_img_url'] }}!370x320" data-url="{{ activity['bk_img_url'] }}!370x320">
+                </div>
+                <div class="list-mes">
+                  <h3 class="list-title">{{ activity['title'] }}</h3>
+                  <div class="list-mes-item">
+                    <div>
+                      <span class="list-price"><em>¥</em>{{ activity['amount'] }}</span>
+                      <span class="list-del-price">¥45.65</span>
+                    </div>
+                    <div>15人购买</div>
+                  </div>
+                </div>
+              </a>
+              {% end %}
+              <!-- <a is="oneProduct" v-for="(product, idx) in products" v-bind:product="product" v-bind:idx="idx"></a> -->
+            </article>
+          </div>
+          <div class="tab-panel-item">
+            <div class="card fullscreen" is="oneArticle" v-for="(article, idx) in articles" v-bind:article="article" v-bind:idx="idx"></div>
+          </div>
+          <div class="tab-panel-item">
+            <ul class="m-grids-2">
+              <li class="grids-item b-0" is="oneMultimedia" v-for="(multimedia, idx) in multimedias" v-bind:multimedia="multimedia" v-bind:idx="idx"></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      {% module Template("eshop/block-footer.html", club=club) %}
+
+    </div>
+  </div>
+
+  <!-- 引入jQuery 2.0+ -->
+  <script src="{{ static_url('js/jquery-2.2.4.min.js') }}"></script>
+  <!-- 引入YDUI脚本 -->
+  <script src="{{ static_url('ydui/js/ydui.js') }}"></script>
+  <!-- <script src="{{ static_url('shuttle/js/vendor/jquery.mixitup.min.js') }}"></script> -->
+  <script src="{{ static_url('shuttle/js/vendor/jquery.swipebox.min.js') }}"></script>
+  <!-- <script src="{{ static_url('shuttle/js/vendor/masonry.min.js') }}"></script> -->
+  <script src="{{ static_url('shuttle/js/vendor/swiper.min.js') }}"></script>
+  <script src="{{ static_url('shuttle/js/vendor/materialize.min.js') }}"></script>
+  <!-- <script src="{{ static_url('shuttle/js/main.js') }}"></script> -->
+  <!-- 引入vue脚本 -->
+  <script src="{{ static_url('js/vue-2.1.4.js') }}" type="text/javascript"></script>
+
+  <script>
+    // Swipebox
+    $('.swipebox').swipebox();
+  </script>
+
+  <script>
+    Vue.component('oneProduct', {
+      template: '\
+        <a v-bind:href="product.url" class="list-item">\
+          <div class="list-img">\
+            <img v-bind:src="product.img" v-bind:data-url="product.img">\
+          </div>\
+          <div class="list-mes">\
+            <h3 class="list-title">{{! product.title }}</h3>\
+            <div class="list-mes-item">\
+              <div>\
+                <span class="list-price"><em>¥</em>34.7</span>\
+                <span class="list-del-price">¥45.65</span>\
+              </div>\
+              <div>15人购买</div>\
+            </div>\
+          </div>\
+        </a>\
+      ',
+      props: ['idx', 'product'],
+      methods: {}
+    })
+
+    Vue.component('oneArticle', {
+      template: '\
+        <div class="card fullscreen">\
+          <div class="card-image">\
+            <a v-bind:href="article.url"><img v-bind:src="article.img" alt=""></a>\
+          </div>\
+          <div class="card-feedback">\
+            <div class="card-users">\
+              <i class="fa fa-eye" style="font-size:16px"></i> <span>{{! article.read_num }}</span>\
+              <i class="fa fa-thumbs-o-up accent-text" style="font-size:16px"></i> <span>{{! article.like_num }}</span>\
+              <i class="fa fa-comments-o" style="font-size:16px"></i> <span>{{! article.comment_num }}</span>\
+            </div>\
+            <div class="card-share">\
+              <i class="ion-android-calendar white-text"></i> <span>{{! article.publish_time }}</span>\
+            </div>\
+          </div>\
+          <div class="card-content m-20">\
+            <h5><strong>{{! article.title }}</strong></h5>\
+          </div>\
+          <div class="card-author">\
+            <div class="media-top-object middle">\
+              <img v-bind:src="article.avatar" alt="" class="media-left avatar small">\
+              <div class="media-body">\
+                <span class="small">{{! article.nickname }}</span>\
+              </div>\
+            </div>\
+          </div>\
+        </div>\
+      ',
+      props: ['idx', 'article'],
+      methods: {}
+    })
+
+    Vue.component('oneMultimedia', {
+      template: '\
+        <li class="grids-item b-0">\
+          <a v-bind:href="multimedia.url_original" class="swipebox no-smoothState" title="This is dummy caption.">\
+            <img class="b-0" v-bind:src="multimedia.url" alt="image">\
+          </a>\
+        </li>\
+      ',
+      props: ['idx', 'multimedia'],
+      methods: {}
+    })
+
+    new Vue({
+      el: '#mainForm',
+      data: {
+        products: [],
+        products_num: 0,
+        articles: [],
+        articles_num: 0,
+        multimedias: [],
+        multimedias_num: 0,
+        limit: 8,
+      },
+      created: function() {
+        this.queryMoreProducts();
+        this.queryMoreArticles();
+        this.queryMoreMultimedias();
+      },
+      methods: {
+        queryMoreProducts: function() {
+          $('#loadingToast').show();
+
+          _self = this;
+          idx = this.products_num;
+          limit = this.limit;
+
+          $.ajax({
+            type: "GET",
+            url: "{{ API_DOMAIN }}/api/articles?idx=" + idx + "&limit=" + limit + "&filter=club&club_id={{ club['_id'] }}&category=0bbf89e2f73411e69a3c00163e023e51",
+            async: true,
+            dataType: "json",
+            contentType: 'application/json',
+            success: function(datas, status, xhr) {
+              console.log(datas);
+              for (var i = 0, l = datas.rs.length; i < l; i++) {
+                product = datas.rs[i];
+                product.url = "/webapp/eshop/clubs/" + product.club_id + "/products/" + product._id;
+                product.img += "!370x320";
+                _self.products.push(product);
+                _self.products_num += 1;
+              }
+
+              if (datas.rs.length < limit) {
+                $("#queryMoreProductsBtn").css('display', 'none');
+              }
+
+              $('#loadingToast').hide();
+            },
+          });
+        },
+        queryMoreArticles: function() {
+          _self = this;
+          idx = this.articles_num;
+          limit = this.limit;
+
+          $.ajax({
+            type: "GET",
+            url: "{{ API_DOMAIN }}/api/articles?idx=" + idx + "&limit=" + limit + "&filter=club&club_id={{ club['_id'] }}",
+            async: true,
+            dataType: "json",
+            contentType: 'application/json',
+            success: function(datas, status, xhr) {
+              console.log(datas);
+              for (var i = 0, l = datas.rs.length; i < l; i++) {
+                article = datas.rs[i];
+                article.url = "/webapp/eshop/clubs/" + article.club_id + "/articles/" + article._id;
+                article.img += "!800x370";
+                article.publish_time = _self.getFriendlyTime(article.publish_time);
+                _self.articles.push(article);
+                _self.articles_num += 1;
+              }
+
+              if (datas.rs.length < limit) {
+                $("#queryMoreArticlesBtn").css('display', 'none');
+              }
+            },
+          });
+        },
+        queryMoreMultimedias: function() {
+          _self = this;
+          idx = this.multimedias_num;
+          limit = this.limit;
+
+          $.ajax({
+            type: "GET",
+            url: "{{ API_DOMAIN }}/api/multimedias?idx=" + idx + "&limit=" + limit + "&filter=club&club_id={{ club['_id'] }}",
+            async: true,
+            dataType: "json",
+            contentType: 'application/json',
+            success: function(datas, status, xhr) {
+              console.log(datas);
+              for (var i = 0, l = datas.rs.length; i < l; i++) {
+                multimedia = datas.rs[i];
+                multimedia.url_original = multimedia.url;
+                multimedia.url += "!700x467";
+                _self.multimedias.push(multimedia);
+                _self.multimedias_num += 1;
+              }
+
+              if (datas.rs.length < limit) {
+                $("#queryMoreMultimediasBtn").css('display', 'none');
+              }
+            },
+          });
+        },
+        getFriendlyTime(nS) { //时间戳转换
+          return new Date(parseInt(nS) * 1000).toLocaleString().replace(/:\d{1,2}$/, ' ');
+        },
+      }
+    })
+  </script>
+
+</body>
+
+</html>

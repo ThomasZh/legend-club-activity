@@ -134,9 +134,8 @@
                         <th>订单号</th>
                         <th>活动名称</th>
                         <th>会员</th>
-                        <th>购买数量</th>
-                        <th>购买详情</th>
-                        <th>支付总额</th>
+                        <th>下单金额</th>
+                        <th>支付金额</th>
                         <th>日期</th>
                         <th>状态</th>
                         <th class=" no-link last">
@@ -210,14 +209,16 @@
       console.log(lastTimestamp);
       $.ajax({
         type: "GET",
-        url: "/bf/api/vendors/{{ vendor_id }}/league/orders-me?before="+lastTimestamp,
+        url: "/bf/api/vendors/all/orders?distributor_id={{ vendor_id }}",
         headers: {
           "Authorization": "Bearer {{ access_token }}"
         },
         dataType: "json",
         contentType: 'application/json',
         success: function(data, status, xhr) {
-          var ajaxobj = eval("("+data+")");
+          // var ajaxobj = eval("("+data+")");
+          var ajaxobj = data;
+          console.log(ajaxobj);
           for (var i in ajaxobj) {
             var inner_html = '<tr class="even pointer">';
               inner_html += '<td class="a-center">';
@@ -238,43 +239,25 @@
               inner_html += '</td>';
 
               inner_html += '<td class=" ">';
-                inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/' + ajaxobj[i].activity_id + '/detail/step1">'+ajaxobj[i].activity_title+'</a>';
+                inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/' + ajaxobj[i].product_id + '/detail/step1">'+ajaxobj[i].activity_title+'</a>';
               inner_html += '</td>';
 
               inner_html += '<td class=" ">';
                 inner_html += '<ul class="list-inline">';
                   inner_html += '<li>';
-                    inner_html += '<img src="'+ajaxobj[i].account_avatar+'" class="avatar" alt="Avatar">';
+                    inner_html += '<img src="'+ajaxobj[i].avatar+'" class="avatar" alt="Avatar">';
                   inner_html += '</li>';
                 inner_html += '</ul>';
-                inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ajaxobj[i].account_id+'">'+ajaxobj[i].account_nickname+'</a>';
+                inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ajaxobj[i].account_id+'">'+ajaxobj[i].nickname+'</a>';
                 inner_html += '<br />';
               inner_html += '</td>';
 
               inner_html += '<td class=" ">';
-                inner_html += ajaxobj[i].applicant_num;
+                inner_html += ajaxobj[i].total_amount+'元<br />';
               inner_html += '</td>';
 
               inner_html += '<td class=" ">';
-                inner_html += '活动费用: '+ajaxobj[i].activity_amount+'元<br />';
-                for (var j in ajaxobj[i].ext_fees) {
-                  inner_html += ajaxobj[i].ext_fees[j].name + ': ' + ajaxobj[i].ext_fees[j].fee + '元<br />';
-                }
-                for (var k in ajaxobj[i].insurances) {
-                  inner_html += ajaxobj[i].insurances[k].name + ': ' + ajaxobj[i].insurances[k].fee + '元<br />';
-                }
-                for (var k in ajaxobj[i].vouchers) {
-                  inner_html += '使用代金券抵: ' + ajaxobj[i].vouchers[k].fee + '元<br />';
-                }
-                if (ajaxobj[i].bonus < 0) {
-                  inner_html += '使用积分抵: ' + ajaxobj[i].bonus + '元';
-                }
-              inner_html += '</td>';
-
-              inner_html += '<td class=" ">';
-                inner_html += '订单总额: ' + ajaxobj[i].total_amount + '元';
-                if (ajaxobj[i].status > 20)
-                  inner_html += '<br />实际支付: ' + ajaxobj[i].payed_total_fee + '元';
+                inner_html += ajaxobj[i].payed_total_fee + '元';
               inner_html += '</td>';
 
               inner_html += '<td class=" ">';
@@ -283,32 +266,24 @@
 
               inner_html += '<td class=" ">';
 
-                if (ajaxobj[i].status == 20)
+                if (ajaxobj[i].pay_status <= 20)
                   inner_html += '<a href="#" class="btn btn-warning btn-xs"> 待付款 </a>';
-                else if(ajaxobj[i].status == 21)
+                else if(ajaxobj[i].pay_status == 21)
                   inner_html += '<a href="#" class="btn btn-warning btn-xs"> 下单失败 </a>';
-                else if (ajaxobj[i].status == 31)
+                else if (ajaxobj[i].pay_status == 31)
                   inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a>';
-                else if (ajaxobj[i].status == 30)
-                  inner_html += '<a href="#" class="btn btn-warning btn-xs"> 待报名 </a>';
-                else if (ajaxobj[i].status == 10)
-                  inner_html += '<a href="#" class="btn btn-danger btn-xs"> 初始化成功 </a>';
-                else if (ajaxobj[i].status == 50)
-                  inner_html += '<a href="#" class="btn btn-info btn-xs"> 待骑行 </a>';
-                else if (ajaxobj[i].status == 60)
-                  inner_html += '<a href="#" class="btn btn-info btn-xs"> 待评价 </a>';
-                else if (ajaxobj[i].status == 70)
-                  inner_html += '<a href="#" class="btn btn-success btn-xs"> 活动完成 </a>';
-                else
-                  inner_html += '<a href="#" class="btn btn-success btn-xs">'+ ajaxobj[i].status +'</a>';
+                else if (ajaxobj[i].pay_status == 30)
+                  inner_html += '<a href="#" class="btn btn-warning btn-xs"> 支付成功 </a>';
+                else if (ajaxobj[i].pay_status > 31)
+                  inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付成功 </a>';
 
               inner_html += '</td>';
 
               inner_html += '<td class=" ">';
-                inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+ajaxobj[i]._id+'" class="btn btn-info btn-xs"><i class="fa fa-eye"></i> 报名 </a>';
+                inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+ajaxobj[i]._id+'" class="btn btn-info btn-xs"><i class="fa fa-eye"></i> 查看详情 </a>';
               inner_html += '</td>';
               inner_html += '<td class=" ">';
-              inner_html += ajaxobj[i].club_name;
+              inner_html += ajaxobj[i].distributor_name;
               inner_html += '</td>';
 
 

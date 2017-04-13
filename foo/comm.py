@@ -196,6 +196,26 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class AuthorizationHandler(BaseHandler):
 
+    def get_user_basic_info(self, account_id):
+        params = {"filter":"basic", "by":"account_id"}
+        url = url_concat(API_DOMAIN + "/api/profiles/" + account_id, params)
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="GET")
+        data = json_decode(response.body)
+        account = data['rs']
+        return account
+
+
+    def get_club_basic_info(self, club_id):
+        params = {"filter":"basic"}
+        url = url_concat(API_DOMAIN + "/api/clubs/" + club_id, params)
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="GET")
+        data = json_decode(response.body)
+        club = data['rs']
+        return club
+
+
     def get_access_token(self):
         access_token = self.get_secure_cookie("access_token")
         if access_token:
@@ -212,6 +232,7 @@ class AuthorizationHandler(BaseHandler):
                 return
             logging.info("got access_token=[%r] from headers", access_token)
         return access_token
+
 
     def get_ops_info(self):
         access_token = self.get_secure_cookie("access_token")

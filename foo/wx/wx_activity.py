@@ -119,6 +119,7 @@ class WxActivityListHandler(tornado.web.RequestHandler):
                 vendor_id=vendor_id,
                 activitys=_array)
 
+
 #推荐活动列表
 class WxRecommendActivityHandler(tornado.web.RequestHandler):
     def get(self, vendor_id):
@@ -172,6 +173,7 @@ class WxRecommendActivityHandler(tornado.web.RequestHandler):
         self.render('wx/recommend-activity.html',
                 vendor_id=vendor_id,
                 activitys=_array)
+
 
 # 推荐活动详情
 class WxRecommendActivityInfoHandler(BaseHandler):
@@ -744,6 +746,27 @@ class WxActivityApplyStep2Handler(BaseHandler):
         _status = ORDER_STATUS_BF_INIT
         if _total_amount == 0:
             _status = ORDER_STATUS_WECHAT_PAY_SUCCESS
+
+        access_token = self.get_secure_cookie("access_token")
+        order_index = {
+            "_id": _order_id,
+            "club_id": vendor_id,
+            "product_type": "activity",
+            "product_id": activity_id,
+            "product_name": _title,
+            "distributor_type": "club",
+            "distributor_id": guest_club_id,
+            "create_time": _timestamp,
+            "pay_type": "wxpay",
+            "pay_status": _status,
+            "total_amount": _total_amount, #已经转换为分，注意转为数值
+        }
+        url = API_DOMAIN + "/api/orders"
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        _json = json_encode(order_index)
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("got response.body %r", response.body)
 
         # status: 10=order but not pay it, 20=order and pay it.
         # pay_type: wxpay, alipay, paypal, applepay, huaweipay, ...
