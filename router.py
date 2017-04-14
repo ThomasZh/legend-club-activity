@@ -216,6 +216,7 @@ def map():
         (r"/bf/api/vendors/([a-z0-9]*)/league/orders-other", getattr(api_order, 'ApiLeagueOtherOrderListXHR')),
 
         (r"/bf/api/vendors/([a-z0-9]*)/orders", getattr(api_order, 'ApiOrderListXHR')),
+        (r"/bf/api/vendors/([a-z0-9]*)/orders/activitys/([a-z0-9]*)", getattr(api_order, 'ApiActivityOrderListXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/orders/([a-z0-9]*)", getattr(api_order, 'ApiOrderInfoXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/orders/([a-z0-9]*)/review", getattr(api_order, 'ApiOrderReviewXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/orders/([a-z0-9]*)/delete", getattr(api_order, 'ApiOrderDeleteXHR')),
