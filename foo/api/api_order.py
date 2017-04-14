@@ -94,6 +94,7 @@ class ApiActivityOrderListXHR(AuthorizationHandler):
     def get(self, vendor_id, activity_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
+        product_type = self.get_argument("product_type", "all")
         page = self.get_argument("page", 1)
         logging.debug("get page=[%r] from argument", page)
         limit = self.get_argument("limit", 20)

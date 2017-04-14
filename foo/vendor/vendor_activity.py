@@ -1006,6 +1006,7 @@ class VendorActivityDetailStep5Handler(AuthorizationHandler):
         self.render('vendor/activity-edit-step5.html',
                 vendor_id=vendor_id,
                 ops=ops,
+                access_token=access_token,
                 activity_id=activity_id,
                 budge_num=budge_num,
                 activity=activity, categorys=categorys,

@@ -24,15 +24,6 @@
 
   <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
 
-  <!-- fileinput -->
-  <link rel="stylesheet" href="{{ static_url("css/fileinput.min.css")}}">
-
-  <!-- fileinput -->
-  <script src="{{ static_url("js/fileinput.min.js")}}"></script>
-	<script src="{{ static_url("js/spark-md5.min.js")}}"></script>
-	<script src="{{ static_url("js/async.js")}}"></script>
-	<script src="{{ static_url("js/upyun-mu.js")}}"></script>
-
 </head>
 
 
@@ -212,7 +203,7 @@
                         <th>俱乐部</th>
                       </tr>
                     </thead>
-                    <tbody id="tbody{{ vendor_id }}"></tbody>
+                    <tbody id="tbody"></tbody>
                   </table>
                   <div class="clearfix"></div>
                   <div class="col-md-5 col-sm-12 col-xs-12 center-margin">
@@ -241,13 +232,6 @@
 
   </div>
 
-  <div id="custom_notifications" class="custom-notifications dsp_none">
-    <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
-    </ul>
-    <div class="clearfix"></div>
-    <div id="notif-group" class="tabbed_notifications"></div>
-  </div>
-
   <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
 
   <!-- bootstrap progress js -->
@@ -274,21 +258,21 @@
           function query(pageNum) {
             $.ajax({
               type: "GET",
-              url: "/bf/api/vendors/{{ vendor_id }}/orders?distributor_id=all&page=1&limit="+limit+"",
+              url: "/bf/api/vendors/{{ vendor_id }}/orders/activitys/{{ activity_id }}?page=1&limit="+limit,
               headers: {
                 "Authorization": "Bearer {{ access_token }}"
               },
               dataType: "json",
               contentType: 'application/json',
               success: function(data, status, xhr) {
-                  // console.log(data);
+                  console.log(data);
                   currentPage = 1;
               var pageData = data.data;
                   total_page = data.total_pgae;//总页
               // num = ajaxobj.length;
               for (var i in pageData) {
 
-                  var inner_html = '<tr id="tr{{ order['_id'] }}">';
+                  var inner_html = '<tr id="tr'+pageData[i]._id +'">';
                       inner_html += '<td class="a-center ">';
                         if (pageData[i].check_status)
                           inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
@@ -308,46 +292,33 @@
                       inner_html += '<td>';
                       inner_html += '<ul class="list-inline">';
                       inner_html += '<li>';
-                      inner_html += '<img src="'+ pageData[i].account_avatar + '" class="avatar" alt="Avatar">';
+                      inner_html += '<img src="'+ pageData[i].avatar + '" class="avatar" alt="Avatar">';
                       inner_html += '</li>';
                       inner_html += '</ul>';
-                      inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'pageData[i].account_id + '">'+ pageData[i].account_nickname +'</a>';
+                      inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ pageData[i].account_id + '">'+ pageData[i].nickname +'</a>';
                       inner_html += '<br />';
                       inner_html += '</td>';
-                      inner_html += '<td>'+ pageData[i].activity_amount +'元<br />';
-                        if (pageData[i].bonus< 0)
-                          inner_html += '使用积分抵: '+ pageData[i].bonus +' 元';
-                          inner_html += '</td>';
-                          inner_html += '<td>'+ pageData[i].total_amount +'元';
-                        if (pageData[i].status > 20){
-                          inner_html +=  '<br />实际支付:'+ pageData[i].payed_total_fee +'元'
-                          inner_html +=  '</td><td>' + pageData[i].create_time +'</td>';
-                        }
-                        if (pageData[i].status == 20){
-                          inner_html +=   '<td><a href="#" class="btn btn-warning btn-xs"> 待付款 </a></td>';}
-                        else if (pageData[i].status == 31){
-                          inner_html +=   '<td><a href="#" class="btn btn-danger btn-xs"> 支付失败 </a></td>';}
-                        else if (pageData[i].status == 30){
-                          inner_html +=   '<td><a href="#" class="btn btn-info btn-xs"> 待报名 </a></td>';}
-                        else if (pageData[i].status == 50){
-                          inner_html +=   '<td><a href="#" class="btn btn-info btn-xs"> 待骑行 </a></td>';}
-                        else if (pageData[i].status == 60){
-                          inner_html +=   '<td><a href="#" class="btn btn-info btn-xs"> 待评价 </a></td>';}
-                        else if (pageData[i].status == 70){
-                          inner_html +=   '<td><a href="#" class="btn btn-success btn-xs"> 活动完成 </a></td>';}
-                        else if (pageData[i].status == 10){
-                          inner_html +=  '<td><a href="#" class="btn btn-danger btn-xs"> 下单失败 </a></td>';
-                        }
-                      inner_html +=  '<td><a href="#" class="btn btn-primary btn-xs">'+ pageData[i].status +' </a></td>';
-                      inner_html +=   '<td><a href="/vendors/{{ vendor_id }}/orders/' + pageData[i]._id +'" class="btn btn-info btn-xs">';
-                      inner_html +=   '<i class="fa fa-eye"></i> 报名 </a>';
-                        if (pageData[i].status == 30){
-                          inner_html +=   '<button onclick="OnDeleteOrder(this);" value="'+ pageData[i]._id +'" class="btn btn-danger btn-xs">';
-                          inner_html +=    '<i class="fa fa-trash"></i> 删除 </button>';
-                        }
-                      inner_html +=   '</td><td>';
-                      inner_html +=   pageData[i].guest_club_name;
-                      inner_html +=   '</td></tr>';
+                      inner_html += '<td>'+ pageData[i].total_amount +'元<br />';
+                      inner_html += '<td>'+ pageData[i].payed_total_fee +'元</td>'
+                      inner_html +=  '<td>' + pageData[i].create_time +'</td>';
+                      inner_html += '<td>';
+                          if (pageData[i].pay_status <= 20)
+                            inner_html += '<a href="#" class="btn btn-warning btn-xs"> 待付款 </a>';
+                          else if(pageData[i].pay_status == 21)
+                            inner_html += '<a href="#" class="btn btn-danger btn-xs"> 下单失败 </a>';
+                          else if (pageData[i].pay_status == 31)
+                            inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a>';
+                          else if (pageData[i].pay_status == 30)
+                            inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
+                          else if (pageData[i].pay_status > 31)
+                            inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
+                      inner_html +=  '</td>';
+                      // inner_html +=  '<td><a href="#" class="btn btn-primary btn-xs">'+ pageData[i].settlement_status +' </a></td>';
+                      inner_html += '<td class=" ">';
+                        inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+pageData[i]._id+'" class="btn btn-info btn-xs"><i class="fa fa-eye"></i> 查看详情 </a>';
+                      inner_html += '</td>';
+                      inner_html +=   '<td>'+ pageData[i].club_name +'</td>';
+                      inner_html +=   '</tr>';
 
                 $('#tbody').append(inner_html);
                 // member_num += 1;
@@ -371,7 +342,7 @@
           function gotoPage(pageNum) {
             $.ajax({
               type: "GET",
-              url: "/bf/api/vendors/{{ vendor_id }}/orders?distributor_id=all&page="+pageNum+"&limit="+limit+"",
+              url: "/bf/api/vendors/{{ vendor_id }}/orders/activitys/{{ activity_id }}?page="+pageNum+"&limit="+limit,
               headers: {
                 "Authorization": "Bearer {{ access_token }}"
               },
@@ -385,74 +356,53 @@
               $('#tbody').html("");
 
               for (var i in pageData) {
-                var inner_html = '<tr class="even pointer">';
-                  inner_html += '<td class="a-center">';
-                    if (pageData[i].check_status == true)
-                      inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
-                    else
-                      inner_html += '<input type="checkbox" class="tableflat" disabled="true">';
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += pageData[i]._id;
-                    if (pageData[i].pay_status == 20)
-                      inner_html += '<br />' + pageData[i].prepay_id;
-                    else if (pageData[i].pay_status > 20) {
-                      inner_html += '<br />' + pageData[i].prepay_id;
-                      inner_html += '<br />' + pageData[i].transaction_id;
-                    }
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/' + pageData[i].item_id + '/detail/step1">'+pageData[i].item_name+'</a>';
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
+                var inner_html = '<tr id="tr'+pageData[i]._id +'">';
+                    inner_html += '<td class="a-center ">';
+                      if (pageData[i].check_status)
+                        inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
+                      else{
+                        inner_html += '<input type="checkbox" class="tableflat" value="'+ pageData[i]._id +'" onclick="OnReviewOrder(this);">';
+                      }
+                    inner_html += '</td>';
+                    inner_html += '<td class=" ">';
+                    inner_html +=  pageData[i]._id;
+                      if (pageData[i].status == 20)
+                        inner_html +=  '<br />'+pageData[i].prepay_id;
+                      else if (pageData[i].status > 20){
+                        inner_html += '<br />'+ pageData[i].prepay_id;
+                      }
+                    inner_html += '<br />'+ pageData[i].transaction_id;
+                    inner_html += '</td>';
+                    inner_html += '<td>';
                     inner_html += '<ul class="list-inline">';
-                      inner_html += '<li>';
-                        inner_html += '<img src="'+pageData[i].avatar+'" class="avatar" alt="Avatar">';
-                      inner_html += '</li>';
+                    inner_html += '<li>';
+                    inner_html += '<img src="'+ pageData[i].avatar + '" class="avatar" alt="Avatar">';
+                    inner_html += '</li>';
                     inner_html += '</ul>';
-                    inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+pageData[i].account_id+'">'+pageData[i].nickname+'</a>';
+                    inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ pageData[i].account_id + '">'+ pageData[i].nickname +'</a>';
                     inner_html += '<br />';
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += pageData[i].total_amount+'元<br />';
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += pageData[i].payed_total_fee + '元';
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += pageData[i].create_time;
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-
-                  if (pageData[i].pay_status <= 20)
-                    inner_html += '<a href="#" class="btn btn-warning btn-xs"> 待付款 </a>';
-                  else if(pageData[i].pay_status == 21)
-                    inner_html += '<a href="#" class="btn btn-danger btn-xs"> 下单失败 </a>';
-                  else if (pageData[i].pay_status == 31)
-                    inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a>';
-                  else if (pageData[i].pay_status == 30)
-                    inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
-                  else if (pageData[i].pay_status > 31)
-                    inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
-
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+pageData[i]._id+'" class="btn btn-info btn-xs"><i class="fa fa-eye"></i> 查看详情 </a>';
-                  inner_html += '</td>';
-                  inner_html += '<td class=" ">';
-                    inner_html += '<a href="/vendors/{{ vendor_id }}/orders-me-other?club_id=' + pageData[i].distributor_id + '">'+pageData[i].distributor_name+'</a>';
-                  inner_html += '</td>';
-
-
-                  inner_html += '</tr>';
+                    inner_html += '</td>';
+                    inner_html += '<td>'+ pageData[i].total_amount +'元<br />';
+                    inner_html += '<td>'+ pageData[i].payed_total_fee +'元</td>'
+                    inner_html +=  '<td>' + pageData[i].create_time +'</td>';
+                    inner_html += '<td>';
+                        if (pageData[i].pay_status <= 20)
+                          inner_html += '<a href="#" class="btn btn-warning btn-xs"> 待付款 </a>';
+                        else if(pageData[i].pay_status == 21)
+                          inner_html += '<a href="#" class="btn btn-danger btn-xs"> 下单失败 </a>';
+                        else if (pageData[i].pay_status == 31)
+                          inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a>';
+                        else if (pageData[i].pay_status == 30)
+                          inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
+                        else if (pageData[i].pay_status > 31)
+                          inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
+                    inner_html +=  '</td>';
+                    // inner_html +=  '<td><a href="#" class="btn btn-primary btn-xs">'+ pageData[i].settlement_status +' </a></td>';
+                    inner_html += '<td class=" ">';
+                      inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+pageData[i]._id+'" class="btn btn-info btn-xs"><i class="fa fa-eye"></i> 查看详情 </a>';
+                    inner_html += '</td>';
+                    inner_html +=   '<td>'+ pageData[i].club_name +'</td>';
+                    inner_html +=   '</tr>';
 
                 $('#tbody').append(inner_html);
                 // member_num += 1;
@@ -517,10 +467,16 @@
     }
     function OnReviewOrder(e){
     	orderId = e.value;
-    	$.get("/bf/api/vendors/{{ vendor_id }}/orders/"+orderId+"/review",function(data,status){
-			  ajaxobj = eval("("+data+")");
-        e.disabled="true";
-		  });
+      $.ajax({
+        type: "POST",
+        url: "http://7x24hs.com/api/orders/"+orderId+"/check",
+        headers: {
+          "Authorization": "Bearer {{ access_token }}"
+        },
+        success: function(data){
+          console.log(data);
+        }
+      });
     }
     function OnDeleteOrder(e) {
       orderId = e.value;
