@@ -18,7 +18,7 @@
   <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
 
   <!-- Custom styling plus plugins -->
-  <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
+  <link href="{{ static_url('css/custom.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
 
 
@@ -32,16 +32,6 @@
 	<script src="{{ static_url("js/spark-md5.min.js")}}"></script>
 	<script src="{{ static_url("js/async.js")}}"></script>
 	<script src="{{ static_url("js/upyun-mu.js")}}"></script>
-
-  <!--[if lt IE 9]>
-        <script src="../assets/js/ie8-responsive-file-warning.js"></script>
-        <![endif]-->
-
-  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-  <!--[if lt IE 9]>
-          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-        <![endif]-->
 
 </head>
 
@@ -214,8 +204,7 @@
                         <th style="width: 1%">#</th>
                         <th>订单号</th>
                         <th>会员</th>
-                        <th>购买数量</th>
-                        <th>购买详情</th>
+                        <th>下单金额</th>
                         <th>支付总额</th>
                         <th>日期</th>
                         <th>状态</th>
@@ -223,103 +212,16 @@
                         <th>俱乐部</th>
                       </tr>
                     </thead>
-                    <tbody id="tbody{{ vendor_id }}">
-                    {% for order in orders %}
-                      <tr id="tr{{ order['_id'] }}">
-                        <td class="a-center ">
-                          {% if order['review'] %}
-                            <input type="checkbox" class="tableflat" checked="checked" disabled="true">
-                          {% else %}
-                            <input type="checkbox" class="tableflat" value="{{order['_id']}}" onclick="OnReviewOrder(this);">
-                          {% end %}
-                        </td>
-                        <td class=" ">
-                          {{order['_id']}}
-                          {% if order['status'] == 20 %}
-                            <br />{{order['prepay_id']}}
-                          {% elif order['status'] > 20 %}
-                            <br />{{order['prepay_id']}}
-                            <br />{{order['transaction_id']}}
-                          {% end %}
-                        </td>
-                        <td>
-                          <ul class="list-inline">
-                            <li>
-                              <img src="{{order['account_avatar']}}" class="avatar" alt="Avatar">
-                            </li>
-                          </ul>
-                          <a href="/vendors/{{ vendor_id }}/customers/{{order['account_id']}}">{{order['account_nickname']}}</a>
-                          <br />
-                        </td>
-                        <td>{{order['applicant_num']}}</td>
-                        <td>活动费用: {{order['activity_amount']}}元<br />
-                        {% for fee in order['ext_fees'] %}
-                          {{fee['name']}}: {{fee['fee']}}元<br />
-                        {% end %}
-                        {% for insurance in order['insurances'] %}
-                          {{insurance['name']}}: {{insurance['fee']}}元<br />
-                        {% end %}
-                        {% for voucher in order['vouchers'] %}
-                          使用代金券抵: {{voucher['fee']}}元<br />
-                        {% end %}
-                        {% if order['bonus'] < 0 %}
-                          使用积分抵: {{order['bonus']}}元
-                        {% end %}
-                        </td>
-                        <td>{{order['total_amount']}}元
-                          {% if order['status'] > 20 %}
-                            <br />实际支付: {{order['payed_total_fee']}}元
-                          {% end %}
-                        </td>
-                        <td>{{order['create_time']}}</td>
-                        {% if order['status'] == 20 %}
-                        <td>
-                          <a href="#" class="btn btn-warning btn-xs"> 待付款 </a>
-                        </td>
-                        {% elif order['status'] == 31 %}
-                        <td>
-                          <a href="#" class="btn btn-danger btn-xs"> 支付失败 </a>
-                        </td>
-                        {% elif order['status'] == 30 %}
-                        <td>
-                          <a href="#" class="btn btn-info btn-xs"> 待报名 </a>
-                        </td>
-                        {% elif order['status'] == 50 %}
-                        <td>
-                          <a href="#" class="btn btn-info btn-xs"> 待骑行 </a>
-                        </td>
-                        {% elif order['status'] == 60 %}
-                        <td>
-                          <a href="#" class="btn btn-info btn-xs"> 待评价 </a>
-                        </td>
-                        {% elif order['status'] == 70 %}
-                        <td>
-                          <a href="#" class="btn btn-success btn-xs"> 活动完成 </a>
-                        </td>
-                        {% elif order['status'] == 10 %}
-                        <td>
-                          <a href="#" class="btn btn-danger btn-xs"> 下单失败 </a>
-                        </td>
-                        {% else %}
-                        <td>
-                          <a href="#" class="btn btn-primary btn-xs"> {{ order['status'] }} </a>
-                        </td>
-                        {% end %}
-                        <td>
-                          <a href="/vendors/{{ vendor_id }}/orders/{{order['_id']}}" class="btn btn-info btn-xs">
-                            <i class="fa fa-eye"></i> 报名 </a>
-                          {% if order['status'] < 30 %}
-                            <button onclick="OnDeleteOrder(this);" value="{{order['_id']}}" class="btn btn-danger btn-xs">
-                              <i class="fa fa-trash"></i> 删除 </button>
-                          {% end %}
-                        </td>
-                        <td>
-                          {{ order['guest_club_name'] }}
-                        </td>
-                      </tr>
-                    {% end %}
-                    </tbody>
+                    <tbody id="tbody{{ vendor_id }}"></tbody>
                   </table>
+                  <div class="clearfix"></div>
+                  <div class="col-md-5 col-sm-12 col-xs-12 center-margin">
+                    <button class="btn btn-success" type="button" id="prev">上一页</button>
+                    <span class="pageBox"></span>
+
+                    <button class="btn btn-success" type="button" id="next">下一页</button>
+
+                  </div>
                   <!-- end project list -->
 
                 </div>
@@ -360,9 +262,250 @@
   <!-- daterangepicker -->
   <script type="text/javascript" src="{{ static_url('admin/js/moment/moment.min.js') }}"></script>
   <script type="text/javascript" src="{{ static_url('admin/js/datepicker/daterangepicker.js') }}"></script>
-
   <!-- form validation -->
   <script src="{{ static_url('admin/js/validator/validator.js') }}"></script>
+
+  <script>
+
+          var preAllow = true;   // when ajax not completed, cannot do the next request
+          var limit = 8;//每页显示数
+          var currentPage = 0;//当前页
+          var total_page = 0;//总页数
+          function query(pageNum) {
+            $.ajax({
+              type: "GET",
+              url: "/bf/api/vendors/{{ vendor_id }}/orders?distributor_id=all&page=1&limit="+limit+"",
+              headers: {
+                "Authorization": "Bearer {{ access_token }}"
+              },
+              dataType: "json",
+              contentType: 'application/json',
+              success: function(data, status, xhr) {
+                  // console.log(data);
+                  currentPage = 1;
+              var pageData = data.data;
+                  total_page = data.total_pgae;//总页
+              // num = ajaxobj.length;
+              for (var i in pageData) {
+
+                  var inner_html = '<tr id="tr{{ order['_id'] }}">';
+                      inner_html += '<td class="a-center ">';
+                        if (pageData[i].check_status)
+                          inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
+                        else{
+                          inner_html += '<input type="checkbox" class="tableflat" value="'+ pageData[i]._id +'" onclick="OnReviewOrder(this);">';
+                        }
+                      inner_html += '</td>';
+                      inner_html += '<td class=" ">';
+                      inner_html +=  pageData[i]._id;
+                        if (pageData[i].status == 20)
+                          inner_html +=  '<br />'+pageData[i].prepay_id;
+                        else if (pageData[i].status > 20){
+                          inner_html += '<br />'+ pageData[i].prepay_id;
+                        }
+                      inner_html += '<br />'+ pageData[i].transaction_id;
+                      inner_html += '</td>';
+                      inner_html += '<td>';
+                      inner_html += '<ul class="list-inline">';
+                      inner_html += '<li>';
+                      inner_html += '<img src="'+ pageData[i].account_avatar + '" class="avatar" alt="Avatar">';
+                      inner_html += '</li>';
+                      inner_html += '</ul>';
+                      inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'pageData[i].account_id + '">'+ pageData[i].account_nickname +'</a>';
+                      inner_html += '<br />';
+                      inner_html += '</td>';
+                      inner_html += '<td>'+ pageData[i].activity_amount +'元<br />';
+                        if (pageData[i].bonus< 0)
+                          inner_html += '使用积分抵: '+ pageData[i].bonus +' 元';
+                          inner_html += '</td>';
+                          inner_html += '<td>'+ pageData[i].total_amount +'元';
+                        if (pageData[i].status > 20){
+                          inner_html +=  '<br />实际支付:'+ pageData[i].payed_total_fee +'元'
+                          inner_html +=  '</td><td>' + pageData[i].create_time +'</td>';
+                        }
+                        if (pageData[i].status == 20){
+                          inner_html +=   '<td><a href="#" class="btn btn-warning btn-xs"> 待付款 </a></td>';}
+                        else if (pageData[i].status == 31){
+                          inner_html +=   '<td><a href="#" class="btn btn-danger btn-xs"> 支付失败 </a></td>';}
+                        else if (pageData[i].status == 30){
+                          inner_html +=   '<td><a href="#" class="btn btn-info btn-xs"> 待报名 </a></td>';}
+                        else if (pageData[i].status == 50){
+                          inner_html +=   '<td><a href="#" class="btn btn-info btn-xs"> 待骑行 </a></td>';}
+                        else if (pageData[i].status == 60){
+                          inner_html +=   '<td><a href="#" class="btn btn-info btn-xs"> 待评价 </a></td>';}
+                        else if (pageData[i].status == 70){
+                          inner_html +=   '<td><a href="#" class="btn btn-success btn-xs"> 活动完成 </a></td>';}
+                        else if (pageData[i].status == 10){
+                          inner_html +=  '<td><a href="#" class="btn btn-danger btn-xs"> 下单失败 </a></td>';
+                        }
+                      inner_html +=  '<td><a href="#" class="btn btn-primary btn-xs">'+ pageData[i].status +' </a></td>';
+                      inner_html +=   '<td><a href="/vendors/{{ vendor_id }}/orders/' + pageData[i]._id +'" class="btn btn-info btn-xs">';
+                      inner_html +=   '<i class="fa fa-eye"></i> 报名 </a>';
+                        if (pageData[i].status == 30){
+                          inner_html +=   '<button onclick="OnDeleteOrder(this);" value="'+ pageData[i]._id +'" class="btn btn-danger btn-xs">';
+                          inner_html +=    '<i class="fa fa-trash"></i> 删除 </button>';
+                        }
+                      inner_html +=   '</td><td>';
+                      inner_html +=   pageData[i].guest_club_name;
+                      inner_html +=   '</td></tr>';
+
+                $('#tbody').append(inner_html);
+                // member_num += 1;
+              };
+            if(total_page>5){
+                for (var k=1;k<=5;k++){
+                  var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
+                  $(".pageBox").append(inner_html);
+                };
+              }else if(total_page<=5){
+                for (var k=1;k<=total_page;k++){
+                  var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
+                  $(".pageBox").append(inner_html);
+                };
+              }
+              $("#num1").addClass("on");
+            }
+            });
+          };
+
+          function gotoPage(pageNum) {
+            $.ajax({
+              type: "GET",
+              url: "/bf/api/vendors/{{ vendor_id }}/orders?distributor_id=all&page="+pageNum+"&limit="+limit+"",
+              headers: {
+                "Authorization": "Bearer {{ access_token }}"
+              },
+              dataType: "json",
+              contentType: 'application/json',
+              success: function(data, status, xhr) {
+                  // console.log(data);
+                  currentPage = pageNum;
+              var pageData = data.data;
+                  total_page = data.total_pgae;//总页
+              $('#tbody').html("");
+
+              for (var i in pageData) {
+                var inner_html = '<tr class="even pointer">';
+                  inner_html += '<td class="a-center">';
+                    if (pageData[i].check_status == true)
+                      inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
+                    else
+                      inner_html += '<input type="checkbox" class="tableflat" disabled="true">';
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += pageData[i]._id;
+                    if (pageData[i].pay_status == 20)
+                      inner_html += '<br />' + pageData[i].prepay_id;
+                    else if (pageData[i].pay_status > 20) {
+                      inner_html += '<br />' + pageData[i].prepay_id;
+                      inner_html += '<br />' + pageData[i].transaction_id;
+                    }
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/' + pageData[i].item_id + '/detail/step1">'+pageData[i].item_name+'</a>';
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += '<ul class="list-inline">';
+                      inner_html += '<li>';
+                        inner_html += '<img src="'+pageData[i].avatar+'" class="avatar" alt="Avatar">';
+                      inner_html += '</li>';
+                    inner_html += '</ul>';
+                    inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+pageData[i].account_id+'">'+pageData[i].nickname+'</a>';
+                    inner_html += '<br />';
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += pageData[i].total_amount+'元<br />';
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += pageData[i].payed_total_fee + '元';
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += pageData[i].create_time;
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+
+                  if (pageData[i].pay_status <= 20)
+                    inner_html += '<a href="#" class="btn btn-warning btn-xs"> 待付款 </a>';
+                  else if(pageData[i].pay_status == 21)
+                    inner_html += '<a href="#" class="btn btn-danger btn-xs"> 下单失败 </a>';
+                  else if (pageData[i].pay_status == 31)
+                    inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a>';
+                  else if (pageData[i].pay_status == 30)
+                    inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
+                  else if (pageData[i].pay_status > 31)
+                    inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
+
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+pageData[i]._id+'" class="btn btn-info btn-xs"><i class="fa fa-eye"></i> 查看详情 </a>';
+                  inner_html += '</td>';
+                  inner_html += '<td class=" ">';
+                    inner_html += '<a href="/vendors/{{ vendor_id }}/orders-me-other?club_id=' + pageData[i].distributor_id + '">'+pageData[i].distributor_name+'</a>';
+                  inner_html += '</td>';
+
+
+                  inner_html += '</tr>';
+
+                $('#tbody').append(inner_html);
+                // member_num += 1;
+              };
+
+              pageNext = parseInt((currentPage-1)/5) + 1;
+
+                start = (pageNext-1)*5+1;
+                end = pageNext*5;
+                if(end > total_page){
+                  end = total_page;
+                }
+
+                $(".pageBox").html("");
+                for (var k=start;k<=end;k++){
+                  var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
+
+                  $(".pageBox").append(inner_html);
+                };
+                 $("#num"+currentPage).addClass("on").siblings().removeClass("on");
+
+              }
+            });
+
+          };
+
+          $(function(){
+            query();
+            $(document).on('click','.pageBox > button',function(){
+              var num = $(this).text();
+              gotoPage(num);
+              //  $(this).addClass("current").siblings().removeClass("current");
+            })
+
+            $("#prev").on("click",function(){
+                if(currentPage<=1){
+
+                }else{
+                    gotoPage(--currentPage);
+                    // $("#num"+currentPage).addClass("current").siblings().removeClass("current");
+                }
+            });
+
+            $("#next").on("click",function(){
+                if(currentPage>=total_page){
+
+                }else{
+                    gotoPage(++currentPage);
+                    // $("#num"+currentPage).addClass("current").siblings().removeClass("current");
+                }
+            })
+          });
+  </script>
 
   <script>
     function OnReview(e){

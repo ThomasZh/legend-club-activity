@@ -19,7 +19,7 @@
   <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
 
   <!-- Custom styling plus plugins -->
-  <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
+  <link href="{{ static_url('css/custom.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
 
 
@@ -28,17 +28,6 @@
   <!-- Custom styling plus plugins -->
   <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/datatables/tools/css/dataTables.tableTools.css') }}" rel="stylesheet">
-
-  <!--[if lt IE 9]>
-        <script src="../assets/js/ie8-responsive-file-warning.js"></script>
-        <![endif]-->
-
-  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-  <!--[if lt IE 9]>
-          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-        <![endif]-->
-
 </head>
 
 
@@ -148,17 +137,16 @@
 
                     <tbody id="tbody"></tbody>
                   </table>
-                </div>
+                  <div class="clearfix"></div>
+                  <div class="col-md-5 col-sm-12 col-xs-12 center-margin">
+                    <button class="btn btn-success" type="button" id="prev">上一页</button>
+                    <span class="pageBox"></span>
 
-                <!-- <div class="ln_solid"></div> -->
-                <div class="form-group">
-                  <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                    <!-- Pager -->
-                    <ul class="pager">
-                      <li class="next"><a id="OnGetMore">加载更多 &rarr;</a></li>
-                    </ul>
+                    <button class="btn btn-success" type="button" id="next">下一页</button>
+
                   </div>
                 </div>
+
 
               </div>
             </div>
@@ -200,128 +188,262 @@
   <script type="text/javascript" src="{{ static_url('admin/js/moment/moment.min.js') }}"></script>
   <script type="text/javascript" src="{{ static_url('admin/js/datepicker/daterangepicker.js') }}"></script>
 
+  <script>
 
-  <script type="text/javascript">
-    var preAllow = true; // when ajax not completed, cannot do the next request
-    var lastTimestamp = '';
+          var preAllow = true;   // when ajax not completed, cannot do the next request
+          var limit = 8;//每页显示数
+          var currentPage = 0;//当前页
+          var total_page = 0;//总页数
+          function query(pageNum) {
+            $.ajax({
+              type: "GET",
+              url: "/bf/api/vendors/all/orders?distributor_id={{ vendor_id }}&page=1&limit="+limit+"",
+              headers: {
+                "Authorization": "Bearer {{ access_token }}"
+              },
+              dataType: "json",
+              contentType: 'application/json',
+              success: function(data, status, xhr) {
+                  console.log(data);
+                  currentPage = 1;
+              var ajaxobj = data.data;
+                  total_page = data.total_pgae;//总页
+              // num = ajaxobj.length;
+              for (var i in ajaxobj) {
 
-    function query() {
-      $('#loadingToast').show();
-      console.log(lastTimestamp);
-      $.ajax({
-        type: "GET",
-        url: "/bf/api/vendors/all/orders?distributor_id={{ vendor_id }}",
-        headers: {
-          "Authorization": "Bearer {{ access_token }}"
-        },
-        dataType: "json",
-        contentType: 'application/json',
-        success: function(data, status, xhr) {
-          // var ajaxobj = eval("("+data+")");
-          var ajaxobj = data;
-          console.log(ajaxobj);
-          for (var i in ajaxobj) {
-            var inner_html = '<tr class="even pointer">';
-              inner_html += '<td class="a-center">';
-                if (ajaxobj[i].review == true)
-                  inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
-                else
-                  inner_html += '<input type="checkbox" class="tableflat" disabled="true">';
-              inner_html += '</td>';
+                var inner_html = '<tr class="even pointer">';
+                  inner_html += '<td class="a-center">';
+                    if (ajaxobj[i].review == true)
+                      inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
+                    else
+                      inner_html += '<input type="checkbox" class="tableflat" disabled="true">';
+                  inner_html += '</td>';
 
-              inner_html += '<td class=" ">';
-                inner_html += ajaxobj[i]._id;
-                if (ajaxobj[i].status == 20)
-                  inner_html += '<br />' + ajaxobj[i].prepay_id;
-                else if (ajaxobj[i].status > 20) {
-                  inner_html += '<br />' + ajaxobj[i].prepay_id;
-                  inner_html += '<br />' + ajaxobj[i].transaction_id;
+                  inner_html += '<td class=" ">';
+                    inner_html += ajaxobj[i]._id;
+                    if (ajaxobj[i].status == 20)
+                      inner_html += '<br />' + ajaxobj[i].prepay_id;
+                    else if (ajaxobj[i].status > 20) {
+                      inner_html += '<br />' + ajaxobj[i].prepay_id;
+                      inner_html += '<br />' + ajaxobj[i].transaction_id;
+                    }
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += '<a href="/vendors/{{ vendor_id }}/orders-other-me?club_id='+ajaxobj[i].club_id+'">'+ajaxobj[i].club_name+'</a>';
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/' + ajaxobj[i].item_id + '/detail/step1">'+ajaxobj[i].item_name+'</a>';
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += '<ul class="list-inline">';
+                      inner_html += '<li>';
+                        inner_html += '<img src="'+ajaxobj[i].avatar+'" class="avatar" alt="Avatar">';
+                      inner_html += '</li>';
+                    inner_html += '</ul>';
+                    inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ajaxobj[i].account_id+'">'+ajaxobj[i].nickname+'</a>';
+                    inner_html += '<br />';
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += ajaxobj[i].total_amount+'元<br />';
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += ajaxobj[i].payed_total_fee + '元';
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += ajaxobj[i].create_time;
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+
+                  if (ajaxobj[i].pay_status <= 20)
+                    inner_html += '<a href="#" class="btn btn-warning btn-xs"> 待付款 </a>';
+                  else if(ajaxobj[i].pay_status == 21)
+                    inner_html += '<a href="#" class="btn btn-danger btn-xs"> 下单失败 </a>';
+                  else if (ajaxobj[i].pay_status == 31)
+                    inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a>';
+                  else if (ajaxobj[i].pay_status == 30)
+                    inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
+                  else if (ajaxobj[i].pay_status > 31)
+                    inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
+
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+ajaxobj[i]._id+'" class="btn btn-info btn-xs"><i class="fa fa-eye"></i> 查看详情 </a>';
+                  inner_html += '</td>';
+                  inner_html += '<td class=" ">';
+                  inner_html += ajaxobj[i].distributor_name;
+                  inner_html += '</td>';
+
+
+                  inner_html += '</tr>';
+
+                $('#tbody').append(inner_html);
+                // member_num += 1;
+              };
+            if(total_page>5){
+                for (var k=1;k<=5;k++){
+                  var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
+                  $(".pageBox").append(inner_html);
+                };
+              }else if(total_page<=5){
+                for (var k=1;k<=total_page;k++){
+                  var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
+                  $(".pageBox").append(inner_html);
+                };
+              }
+              $("#num1").addClass("on");
+            }
+            });
+          };
+
+          function gotoPage(pageNum) {
+            $.ajax({
+              type: "GET",
+              url: "/bf/api/vendors/all/orders?distributor_id={{ vendor_id }}&page="+pageNum+"&limit="+limit+"",
+              headers: {
+                "Authorization": "Bearer {{ access_token }}"
+              },
+              dataType: "json",
+              contentType: 'application/json',
+              success: function(data, status, xhr) {
+                  // console.log(data);
+                  currentPage = pageNum;
+              var ajaxobj = data.data;
+                  total_page = data.total_pgae;//总页
+              $('#tbody').html("");
+
+              for (var i in ajaxobj) {
+                var inner_html = '<tr class="even pointer">';
+                  inner_html += '<td class="a-center">';
+                    if (ajaxobj[i].review == true)
+                      inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
+                    else
+                      inner_html += '<input type="checkbox" class="tableflat" disabled="true">';
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += ajaxobj[i]._id;
+                    if (ajaxobj[i].status == 20)
+                      inner_html += '<br />' + ajaxobj[i].prepay_id;
+                    else if (ajaxobj[i].status > 20) {
+                      inner_html += '<br />' + ajaxobj[i].prepay_id;
+                      inner_html += '<br />' + ajaxobj[i].transaction_id;
+                    }
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += '<a href="/vendors/{{ vendor_id }}/orders-other-me?club_id='+ajaxobj[i].club_id+'">'+ajaxobj[i].club_name+'</a>';
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/' + ajaxobj[i].item_id + '/detail/step1">'+ajaxobj[i].item_name+'</a>';
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += '<ul class="list-inline">';
+                      inner_html += '<li>';
+                        inner_html += '<img src="'+ajaxobj[i].avatar+'" class="avatar" alt="Avatar">';
+                      inner_html += '</li>';
+                    inner_html += '</ul>';
+                    inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ajaxobj[i].account_id+'">'+ajaxobj[i].nickname+'</a>';
+                    inner_html += '<br />';
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += ajaxobj[i].total_amount+'元<br />';
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += ajaxobj[i].payed_total_fee + '元';
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += ajaxobj[i].create_time;
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+
+                  if (ajaxobj[i].pay_status <= 20)
+                    inner_html += '<a href="#" class="btn btn-warning btn-xs"> 待付款 </a>';
+                  else if(ajaxobj[i].pay_status == 21)
+                    inner_html += '<a href="#" class="btn btn-danger btn-xs"> 下单失败 </a>';
+                  else if (ajaxobj[i].pay_status == 31)
+                    inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a>';
+                  else if (ajaxobj[i].pay_status == 30)
+                    inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
+                  else if (ajaxobj[i].pay_status > 31)
+                    inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
+
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+ajaxobj[i]._id+'" class="btn btn-info btn-xs"><i class="fa fa-eye"></i> 查看详情 </a>';
+                  inner_html += '</td>';
+                  inner_html += '<td class=" ">';
+                  inner_html += ajaxobj[i].distributor_name;
+                  inner_html += '</td>';
+
+
+                  inner_html += '</tr>';
+
+                $('#tbody').append(inner_html);
+                // member_num += 1;
+              };
+
+              pageNext = parseInt((currentPage-1)/5) + 1;
+
+                start = (pageNext-1)*5+1;
+                end = pageNext*5;
+                if(end > total_page){
+                  end = total_page;
                 }
-              inner_html += '</td>';
 
-              inner_html += '<td class=" ">';
-                inner_html += '<a href="/vendors/{{ vendor_id }}/orders-other-me?club_id='+ajaxobj[i].club_id+'">'+ajaxobj[i].club_name+'</a>';
-              inner_html += '</td>';
+                $(".pageBox").html("");
+                for (var k=start;k<=end;k++){
+                  var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
 
-              inner_html += '<td class=" ">';
-                inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/' + ajaxobj[i].item_id + '/detail/step1">'+ajaxobj[i].item_name+'</a>';
-              inner_html += '</td>';
+                  $(".pageBox").append(inner_html);
+                };
+                 $("#num"+currentPage).addClass("on").siblings().removeClass("on");
 
-              inner_html += '<td class=" ">';
-                inner_html += '<ul class="list-inline">';
-                  inner_html += '<li>';
-                    inner_html += '<img src="'+ajaxobj[i].avatar+'" class="avatar" alt="Avatar">';
-                  inner_html += '</li>';
-                inner_html += '</ul>';
-                inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ajaxobj[i].account_id+'">'+ajaxobj[i].nickname+'</a>';
-                inner_html += '<br />';
-              inner_html += '</td>';
+              }
+            });
 
-              inner_html += '<td class=" ">';
-                inner_html += ajaxobj[i].total_amount+'元<br />';
-              inner_html += '</td>';
+          };
 
-              inner_html += '<td class=" ">';
-                inner_html += ajaxobj[i].payed_total_fee + '元';
-              inner_html += '</td>';
+          $(function(){
+            query();
+            $(document).on('click','.pageBox > button',function(){
+              var num = $(this).text();
+              gotoPage(num);
+              //  $(this).addClass("current").siblings().removeClass("current");
+            })
 
-              inner_html += '<td class=" ">';
-                inner_html += ajaxobj[i].create_time;
-              inner_html += '</td>';
+            $("#prev").on("click",function(){
+                if(currentPage<=1){
 
-              inner_html += '<td class=" ">';
+                }else{
+                    gotoPage(--currentPage);
+                    // $("#num"+currentPage).addClass("current").siblings().removeClass("current");
+                }
+            });
 
-              if (ajaxobj[i].pay_status <= 20)
-                inner_html += '<a href="#" class="btn btn-warning btn-xs"> 待付款 </a>';
-              else if(ajaxobj[i].pay_status == 21)
-                inner_html += '<a href="#" class="btn btn-danger btn-xs"> 下单失败 </a>';
-              else if (ajaxobj[i].pay_status == 31)
-                inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a>';
-              else if (ajaxobj[i].pay_status == 30)
-                inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
-              else if (ajaxobj[i].pay_status > 31)
-                inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
+            $("#next").on("click",function(){
+                if(currentPage>=total_page){
 
-              inner_html += '</td>';
-
-              inner_html += '<td class=" ">';
-                inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+ajaxobj[i]._id+'" class="btn btn-info btn-xs"><i class="fa fa-eye"></i> 查看详情 </a>';
-              inner_html += '</td>';
-              inner_html += '<td class=" ">';
-              inner_html += ajaxobj[i].distributor_name;
-              inner_html += '</td>';
-
-
-              inner_html += '</tr>';
-            $('#tbody').append(inner_html);
-            lastTimestamp = ajaxobj[i].create_time;
-          }
-
-          $('#loadingToast').hide();
-          preAllow = true;
-        },
-        error: function(XMLHttpRequest, textStatus, errorThrown) {
-          console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
-        },
-        complete: function(XMLHttpRequest, textStatus) {
-          this; // 调用本次AJAX请求时传递的options参数
-        }
-      });
-		}
-
-    $("#OnGetMore").click(function() { // This event fires when a button is clicked
-      if (preAllow) {
-        preAllow = false;
-        query();
-      }
-    });
-
-    $(document).ready(function() { // init after open this page
-      if (preAllow) {
-        preAllow = false;
-        query();
-      }
-    });
+                }else{
+                    gotoPage(++currentPage);
+                    // $("#num"+currentPage).addClass("current").siblings().removeClass("current");
+                }
+            })
+          });
   </script>
 
   <script type="text/javascript">
