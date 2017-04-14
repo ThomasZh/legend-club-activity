@@ -99,6 +99,7 @@ class VendorTriprouterCreateHandler(AuthorizationHandler):
                 budge_num=budge_num,
                 categorys=categorys)
 
+
     @tornado.web.authenticated  # if no session, redirect to login page
     def post(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
@@ -127,22 +128,11 @@ class VendorTriprouterCreateHandler(AuthorizationHandler):
 
         trip_router_dao.trip_router_dao().create(triprouters);
 
-        article = {'title':_title, 'subtitle':_location, 'img':_bk_img_url,'paragraphs':''}
-        _json = json_encode(article)
-        headers = {"Authorization":"Bearer "+access_token}
-        url = API_DOMAIN + "/api/articles"
-        http_client = HTTPClient()
-        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
-        logging.info("got response %r", response.body)
-        data = json_decode(response.body)
-        article = data['rs']
-        article_id = article['_id']
-        _paragraphs = ''
-
-        trip_router_dao.trip_router_dao().update({'_id':_id, 'article_id':article_id})
-
+        article = {'_id':_id ,'title':_title, 'subtitle':_location, 'img':_bk_img_url,'paragraphs':''}
+        self.create_article(article)
 
         self.redirect('/vendors/' + vendor_id + '/trip_router')
+
 
  #/vendors/<string:vendor_id>/trip_router/<string:trip_router_id>/delete
 class VendorTriprouterDeleteHandler(AuthorizationHandler):
@@ -156,6 +146,7 @@ class VendorTriprouterDeleteHandler(AuthorizationHandler):
         trip_router_dao.trip_router_dao().delete(trip_router_id)
 
         self.redirect('/vendors/' + vendor_id + '/trip_router')
+
 
  #/vendors/<string:vendor_id>/trip_router/<string:trip_router_id>/edit/step1
 class VendorTriprouterEditStep1Handler(AuthorizationHandler):
@@ -176,6 +167,7 @@ class VendorTriprouterEditStep1Handler(AuthorizationHandler):
                 ops=ops,
                 budge_num=budge_num,
                 triprouter=triprouter, categorys=categorys)
+
 
     @tornado.web.authenticated  # if no session, redirect to login page
     def post(self, vendor_id, trip_router_id):
@@ -204,6 +196,7 @@ class VendorTriprouterEditStep1Handler(AuthorizationHandler):
 
         self.redirect('/vendors/' + vendor_id + '/trip_router/' + trip_router_id + '/edit/step1')
 
+
  #/vendors/<string:vendor_id>/trip_router/<string:trip_router_id>/edit/step2
 class VendorTriprouterEditStep2Handler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
@@ -216,29 +209,10 @@ class VendorTriprouterEditStep2Handler(AuthorizationHandler):
 
         triprouter = trip_router_dao.trip_router_dao().query(trip_router_id)
 
-        if triprouter.has_key('article_id'):
-            _article_id = triprouter['article_id']
-            url = API_DOMAIN + "/api/articles/" + _article_id
-            http_client = HTTPClient()
-            response = http_client.fetch(url, method="GET")
-            logging.info("got response %r", response.body)
-            data = json_decode(response.body)
-            article = data['rs']
-            _paragraphs = article['paragraphs']
-        else:
-            article = {'title':triprouter['title'], 'subtitle':triprouter['location'], 'img':triprouter['bk_img_url'],'paragraphs':''}
-            _json = json_encode(article)
-            headers = {"Authorization":"Bearer "+access_token}
-            url = API_DOMAIN + "/api/articles"
-            http_client = HTTPClient()
-            response = http_client.fetch(url, method="POST", headers=headers, body=_json)
-            logging.info("got response %r", response.body)
-            data = json_decode(response.body)
-            article = data['rs']
-            article_id = article['_id']
-            _paragraphs = ''
-
-            trip_router_dao.trip_router_dao().update({'_id':trip_router_id, 'article_id':article_id})
+        article = self.get_article(trip_router_id)
+        if not article:
+            article = {'_id':trip_router_id ,'title':triprouter['title'], 'subtitle':triprouter['location'], 'img':triprouter['bk_img_url'],'paragraphs':''}
+            self.create_article(article)
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/trip-router-edit-step2.html',
@@ -247,8 +221,8 @@ class VendorTriprouterEditStep2Handler(AuthorizationHandler):
                 budge_num=budge_num,
                 triprouter=triprouter,
                 travel_id=trip_router_id,
-                article_id=_article_id,
-                paragraphs=_paragraphs)
+                article=article)
+
 
     def post(self,vendor_id, trip_router_id):
         logging.info("got vendor_id %r in uri", vendor_id)
@@ -262,16 +236,8 @@ class VendorTriprouterEditStep2Handler(AuthorizationHandler):
         content = self.get_argument("content","")
         logging.info("got content %r", content)
 
-        _article_id = None
-        if triprouter.has_key('article_id'):
-            _article_id = triprouter['article_id']
-        article = {'title':triprouter['title'], 'subtitle':triprouter['location'], 'img':triprouter['bk_img_url'],'paragraphs':content}
-        _json = json_encode(article)
-        headers = {"Authorization":"Bearer "+access_token}
-        url = API_DOMAIN + "/api/articles/"+_article_id
-        http_client = HTTPClient()
-        response = http_client.fetch(url, method="PUT", headers=headers, body=_json)
-        logging.info("got response %r", response.body)
+        article = {'_id':trip_router_id ,'title':triprouter['title'], 'subtitle':triprouter['location'], 'img':triprouter['bk_img_url'],'paragraphs':content}
+        self.update_article(article)
 
         self.redirect('/vendors/' + vendor_id + '/trip_router/' + trip_router_id + '/edit/step2')
 
@@ -305,30 +271,11 @@ class VendorTriprouterCloneHandler(AuthorizationHandler):
                 "score":10}
 
         trip_router_dao.trip_router_dao().create(_json)
-
-        if triprouter.has_key('article_id'):
-            # 先取出旧的article_id和内容
-            _article_id = triprouter['article_id']
-            url = API_DOMAIN + "/api/articles/" + _article_id
-            http_client = HTTPClient()
-            response = http_client.fetch(url, method="GET")
-            logging.info("got response %r", response.body)
-            data = json_decode(response.body)
-            article = data['rs']
-            _paragraphs = article['paragraphs']
+        article = self.get_article(trip_router_id)
+        if article:
             # 再创建一个新的article
-            article = {'title':triprouter['title'], 'subtitle':triprouter['location'], 'img':triprouter['bk_img_url'],'paragraphs':_paragraphs}
-            _json = json_encode(article)
-            headers = {"Authorization":"Bearer "+access_token}
-            url = API_DOMAIN + "/api/articles"
-            http_client = HTTPClient()
-            response = http_client.fetch(url, method="POST", headers=headers, body=_json)
-            logging.info("got response %r", response.body)
-            data = json_decode(response.body)
-            article = data['rs']
-            new_article_id = article['_id']
-
-            trip_router_dao.trip_router_dao().update({'_id':_triprouterty_id, 'article_id':new_article_id})
+            article = {'_id':_triprouterty_id, 'title':triprouter['title'], 'subtitle':triprouter['location'], 'img':triprouter['bk_img_url'],'paragraphs':_paragraphs}
+            self.create_article(article)
 
         self.redirect('/vendors/' + ops['club_id'] + '/trip_router')
 
@@ -394,25 +341,12 @@ class VendorTriprouterOpenSetHandler(AuthorizationHandler):
         json = {"_id":trip_router_id, "open":True}
         trip_router_dao.trip_router_dao().updateOpenStatus(json)
 
-        _article_id = None
-        if triprouter.has_key('article_id'):
-            _article_id = triprouter['article_id']
-        headers = {"Authorization":"Bearer "+access_token}
-        url = API_DOMAIN + "/api/articles/" + _article_id + "/publish"
-        http_client = HTTPClient()
-        _json = json_encode(headers)
-        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
-        logging.info("got response %r", response.body)
-
         ids = {'ids':['b0569f58144f11e78d3400163e023e51']}
-        _json = json_encode(ids)
-        headers = {"Authorization":"Bearer "+access_token}
-        url = API_DOMAIN + "/api/articles/" + _article_id + "/categories"
-        http_client = HTTPClient()
-        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
-        logging.info("got response %r", response.body)
+        self.update_article_categories(trip_router_id, ids)
+        self.publish_article(trip_router_id)
 
         self.redirect('/vendors/' + vendor_id + '/trip_router')
+
 
 class VendorTriprouterOpenCancelHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
@@ -425,15 +359,7 @@ class VendorTriprouterOpenCancelHandler(AuthorizationHandler):
         access_token = self.get_secure_cookie("access_token")
         ops = self.get_ops_info()
 
-        _article_id = None
-        if triprouter.has_key('article_id'):
-            _article_id = triprouter['article_id']
-        headers = {"Authorization":"Bearer "+access_token}
-        url = API_DOMAIN + "/api/articles/" + _article_id + "/unpublish"
-        http_client = HTTPClient()
-        _json = json_encode(headers)
-        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
-        logging.info("got response %r", response.body)
+        self.unpublish_article(trip_router_id)
 
         json = {"_id":trip_router_id, "open":False}
         trip_router_dao.trip_router_dao().updateOpenStatus(json)

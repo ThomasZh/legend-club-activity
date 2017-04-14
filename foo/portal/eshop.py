@@ -251,6 +251,26 @@ class EshopProductPlaceOrderHandler(tornado.web.RequestHandler):
         if total_amount == 0:
             _status = ORDER_STATUS_WECHAT_PAY_SUCCESS
 
+        # 创建订单索引
+        order_index = {
+            "_id": order_id,
+            "club_id": vendor_id,
+            "item_type": "cake",
+            "item_id": activity_id,
+            "item_name": title,
+            "distributor_type": "personal",
+            "distributor_id": DEFAULT_USER_ID,
+            "create_time": timestamp,
+            "pay_type": "wxpay",
+            "pay_status": _status,
+            "total_amount": total_amount, #已经转换为分，注意转为数值
+        }
+        url = API_DOMAIN + "/api/orders"
+        http_client = HTTPClient()
+        _json = json_encode(order_index)
+        response = http_client.fetch(url, method="POST", body=_json)
+        logging.info("got response.body %r", response.body)
+
         # status: 10=order but not pay it, 20=order and pay it.
         # pay_type: wxpay, alipay, paypal, applepay, huaweipay, ...
         order = {

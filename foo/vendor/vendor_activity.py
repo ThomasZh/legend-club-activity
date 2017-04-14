@@ -405,49 +405,10 @@ class VendorActivityLeagueDemoHandler(AuthorizationHandler):
 
         _bonus_template = bonus_template_dao.bonus_template_dao().query(_activity['_id'])
 
-        _article_id = None
-        _paragraphs = None
-        if _activity.has_key('article_id'):
-            _article_id = _activity['article_id']
-            url = API_DOMAIN + "/api/articles/" + _article_id
-            http_client = HTTPClient()
-            response = http_client.fetch(url, method="GET")
-            logging.info("got response %r", response.body)
-            data = json_decode(response.body)
-            article = data['rs']
-            _paragraphs = article['paragraphs']
-
-            # 为图片延迟加载准备数据
-            # < img alt="" src="http://bighorn.b0.upaiyun.com/blog/2016/11/2/758f7478-d406-4f2e-9566-306a963fb979" />
-            # < img data-original="真实图片" src="占位符图片">
-            ptn="(<img src=\"http[s]*://[\w\.\/\-]+\" />)"
-            img_ptn = re.compile(ptn)
-            imgs = img_ptn.findall(_paragraphs)
-            for img in imgs:
-                logging.info("got img %r", img)
-                ptn="<img src=\"(http[s]*://[\w\.\/\-]+)\" />"
-                url_ptn = re.compile(ptn)
-                urls = url_ptn.findall(_paragraphs)
-                url = urls[0]
-                logging.info("got url %r", url)
-                #html = html.replace(img, "< img class=\"lazy\" data-original=\""+url+"\" src=\"/static/images/weui.png\" width=\"100%\" height=\"480\" />")
-                _paragraphs = _paragraphs.replace(img, "<img width='100%' src='"+url+"' />")
-
-        else:
-            article = {'title':_activity['title'], 'subtitle':_activity['location'], 'img':_activity['bk_img_url'],'paragraphs':''}
-            _json = json_encode(article)
-            headers = {"Authorization":"Bearer "+access_token}
-            url = API_DOMAIN + "/api/articles"
-            http_client = HTTPClient()
-            response = http_client.fetch(url, method="POST", headers=headers, body=_json)
-            logging.info("got response %r", response.body)
-            data = json_decode(response.body)
-            article = data['rs']
-            article_id = article['_id']
-            _paragraphs = ''
-
-            activity_dao.activity_dao().update({'_id':activity_id, 'article_id':article_id})
-        logging.info("//////////%r",_paragraphs)
+        article = self.get_article(_activity['_id'])
+        if not article:
+            article = {'_id':_activity['_id'], 'title':_activity['title'], 'subtitle':_activity['location'], 'img':_activity['bk_img_url'],'paragraphs':''}
+            self.create_article(article)
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/activity-demo.html',
@@ -455,7 +416,7 @@ class VendorActivityLeagueDemoHandler(AuthorizationHandler):
                     ops=ops,
                     budge_num=budge_num,
                     bonus_template=_bonus_template,
-                    paragraphs=_paragraphs,
+                    article=article,
                     activity=_activity)
 
 
@@ -585,19 +546,8 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
                 "member_min":_member_min, "member_max":_member_max, "notes":'' }
         activity_dao.activity_dao().create(json)
 
-        article = {'title':_title, 'subtitle':location, 'img':_bk_img_url,'paragraphs':''}
-        _json = json_encode(article)
-        headers = {"Authorization":"Bearer "+access_token}
-        url = API_DOMAIN + "/api/articles"
-        http_client = HTTPClient()
-        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
-        logging.info("got response %r", response.body)
-        data = json_decode(response.body)
-        article = data['rs']
-        article_id = article['_id']
-        _paragraphs = ''
-
-        activity_dao.activity_dao().update({'_id':_activity_id, 'article_id':article_id})
+        article = {'_id':_activity_id, 'title':_title, 'subtitle':location, 'img':_bk_img_url,'paragraphs':''}
+        self.create_article(article)
 
         wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
         wx_notify_domain = wx_app_info['wx_notify_domain']
@@ -1025,9 +975,9 @@ class VendorActivityDetailStep5Handler(AuthorizationHandler):
             order['total_amount'] = float(order['total_amount']) / 100
             order['create_time'] = timestamp_datetime(order['create_time'])
 
-            customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, order['account_id'])
-            order['account_nickname'] = customer_profile['account_nickname']
-            order['account_avatar'] = customer_profile['account_avatar']
+            user = self.get_user_basic_info(order['account_id'])
+            order['account_nickname'] = user['nickname']
+            order['account_avatar'] = user['avatar']
             try:
                 order['bonus']
             except:
@@ -1083,9 +1033,9 @@ class VendorActivityDetailStep6Handler(AuthorizationHandler):
         for _apply in applys:
             _apply['create_time'] = timestamp_datetime(_apply['create_time'])
 
-            customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, _apply['account_id'])
-            _apply['account_nickname'] = customer_profile['account_nickname']
-            _apply['account_avatar'] = customer_profile['account_avatar']
+            user = self.get_user_basic_info(_apply['account_id'])
+            _apply['account_nickname'] = user['nickname']
+            _apply['account_avatar'] = user['avatar']
             try:
                 _apply['note']
             except:
@@ -1142,31 +1092,10 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
         bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
 
-        _article_id = None
-        _paragraphs = None
-        if activity.has_key('article_id'):
-            _article_id = activity['article_id']
-            url = API_DOMAIN + "/api/articles/" + _article_id
-            http_client = HTTPClient()
-            response = http_client.fetch(url, method="GET")
-            logging.info("got response %r", response.body)
-            data = json_decode(response.body)
-            article = data['rs']
-            _paragraphs = article['paragraphs']
-        else:
-            article = {'title':activity['title'], 'subtitle':activity['location'], 'img':activity['bk_img_url'],'paragraphs':''}
-            _json = json_encode(article)
-            headers = {"Authorization":"Bearer "+access_token}
-            url = API_DOMAIN + "/api/articles"
-            http_client = HTTPClient()
-            response = http_client.fetch(url, method="POST", headers=headers, body=_json)
-            logging.info("got response %r", response.body)
-            data = json_decode(response.body)
-            article = data['rs']
-            article_id = article['_id']
-            _paragraphs = ''
-
-            activity_dao.activity_dao().update({'_id':activity_id, 'article_id':article_id})
+        article = self.get_article(activity_id)
+        if not article:
+            article = {'_id':activity_id, 'title':activity['title'], 'subtitle':activity['location'], 'img':activity['bk_img_url'],'paragraphs':''}
+            self.create_article(article)
 
         budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
         self.render('vendor/activity-edit-step7.html',
@@ -1177,7 +1106,8 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
                 activity=activity, categorys=categorys,
                 orders=orders, applys=applys, bonus=bonus,
                 cret_template=cret_template,
-                article_id=_article_id, paragraphs=_paragraphs)
+                article=article)
+
 
     def post(self,vendor_id, activity_id):
         logging.info("got vendor_id %r in uri", vendor_id)
@@ -1198,16 +1128,8 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
         content = self.get_argument("content","")
         logging.info("got content %r", content)
 
-        _article_id = None
-        if activity.has_key('article_id'):
-            _article_id = activity['article_id']
-        article = {'title':activity['title'], 'subtitle':activity['location'], 'img':activity['bk_img_url'],'paragraphs':content}
-        _json = json_encode(article)
-        headers = {"Authorization":"Bearer "+access_token}
-        url = API_DOMAIN + "/api/articles/"+_article_id
-        http_client = HTTPClient()
-        response = http_client.fetch(url, method="PUT", headers=headers, body=_json)
-        logging.info("got response %r", response.body)
+        article = {'_id':activity_id ,'title':activity['title'], 'subtitle':activity['location'], 'img':activity['bk_img_url'],'paragraphs':content}
+        self.update_article(article)
 
         self.redirect('/vendors/' + vendor_id + '/activitys/' + activity_id + '/detail/step7')
 
@@ -1283,6 +1205,7 @@ class VendorActivityDetailStep8Handler(AuthorizationHandler):
 
         self.redirect('/vendors/' + vendor_id + '/activitys/' + activity_id + '/detail/step8')
 
+
 class VendorActivityDetailStep9Handler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, activity_id):
@@ -1346,23 +1269,9 @@ class VendorActivityActionPublishHandler(AuthorizationHandler):
         if activity['base_fee_template']:
             activity_dao.activity_dao().update_status(activity_id, ACTIVITY_STATUS_RECRUIT)
 
-            _article_id = None
-            if activity.has_key('article_id'):
-                _article_id = activity['article_id']
-            headers = {"Authorization":"Bearer "+access_token}
-            url = API_DOMAIN + "/api/articles/" + _article_id + "/publish"
-            http_client = HTTPClient()
-            _json = json_encode(headers)
-            response = http_client.fetch(url, method="POST", headers=headers, body=_json)
-            logging.info("got response %r", response.body)
-
             ids = {'ids':['0bbf89e2f73411e69a3c00163e023e51']}
-            _json = json_encode(ids)
-            headers = {"Authorization":"Bearer "+access_token}
-            url = API_DOMAIN + "/api/articles/" + _article_id + "/categories"
-            http_client = HTTPClient()
-            response = http_client.fetch(url, method="POST", headers=headers, body=_json)
-            logging.info("got response %r", response.body)
+            self.update_article_categories(activity_id, ids)
+            self.publish_article(activity_id)
 
             self.redirect('/vendors/' + vendor_id + '/activitys/draft')
         else:

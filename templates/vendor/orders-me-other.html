@@ -239,7 +239,7 @@
               inner_html += '</td>';
 
               inner_html += '<td class=" ">';
-                inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/' + ajaxobj[i].product_id + '/detail/step1">'+ajaxobj[i].product_name+'</a>';
+                inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/' + ajaxobj[i].item_id + '/detail/step1">'+ajaxobj[i].item_name+'</a>';
               inner_html += '</td>';
 
               inner_html += '<td class=" ">';
@@ -266,16 +266,16 @@
 
               inner_html += '<td class=" ">';
 
-                if (ajaxobj[i].pay_status <= 20)
-                  inner_html += '<a href="#" class="btn btn-warning btn-xs"> 待付款 </a>';
-                else if(ajaxobj[i].pay_status == 21)
-                  inner_html += '<a href="#" class="btn btn-warning btn-xs"> 下单失败 </a>';
-                else if (ajaxobj[i].pay_status == 31)
-                  inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a>';
-                else if (ajaxobj[i].pay_status == 30)
-                  inner_html += '<a href="#" class="btn btn-warning btn-xs"> 支付成功 </a>';
-                else if (ajaxobj[i].pay_status > 31)
-                  inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付成功 </a>';
+              if (ajaxobj[i].pay_status <= 20)
+                inner_html += '<a href="#" class="btn btn-warning btn-xs"> 待付款 </a>';
+              else if(ajaxobj[i].pay_status == 21)
+                inner_html += '<a href="#" class="btn btn-danger btn-xs"> 下单失败 </a>';
+              else if (ajaxobj[i].pay_status == 31)
+                inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a>';
+              else if (ajaxobj[i].pay_status == 30)
+                inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
+              else if (ajaxobj[i].pay_status > 31)
+                inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
 
               inner_html += '</td>';
 

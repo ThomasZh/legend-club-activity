@@ -7,7 +7,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>{{activity['title']}}</title>
+<title>{{ activity['title'] }}</title>
 <link rel="stylesheet" href="{{ static_url('frozenui-1.3.0/css/frozen.css') }}">
 <link href="{{ static_url('customer/css/common.css') }}" rel="stylesheet" type="text/css">
 <link href="{{ static_url('customer/css/actdetails.css') }}" rel="stylesheet" type="text/css">
@@ -75,7 +75,7 @@ body {
 
   <div class="ui-loading-wrap">
     <div class="m1">
-      {% raw paragraphs %}
+      {% raw article['paragraphs'] %}
     </div>
   </div>
 

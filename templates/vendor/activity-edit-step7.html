@@ -368,7 +368,7 @@
                   s = s.replace(/\\/g, "");
                   return s;
                 }
-            var html = html_decode("{{ paragraphs }}");
+            var html = html_decode("{{ article['paragraphs'] }}");
             //   alert(html);
             $("#editor").html(html);
 

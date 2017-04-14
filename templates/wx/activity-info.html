@@ -89,7 +89,7 @@
 	<div class="main routines">
     <!-- <span class="bm">活动介绍</span> -->
     <div class="m1">
-      {% raw activity['desc'] %}
+      {% raw article['paragraphs'] %}
     </div>
 	</div>
 
@@ -154,7 +154,7 @@
     wx.ready(function(){
   	  wx.onMenuShareAppMessage({
         title: '{{activity["title"]}}', // 分享标题
-        desc: '{{activity["desc"]}}', // 分享描述
+        desc: '{{activity["location"]}}', // 分享描述
   	    link: '{{ wx_notify_domain }}/bf/wx/vendors/{{ vendor_id }}/activitys/{{activity["_id"]}}', // 分享链接
   	    imgUrl: '{{activity["bk_img_url"]}}', // 分享图标
   	    type: 'link', // 分享类型,music、video或link，不填默认为link

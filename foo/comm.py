@@ -140,6 +140,56 @@ def time_span(ts):
 
 class BaseHandler(tornado.web.RequestHandler):
 
+    def get_user_basic_info(self, account_id):
+        params = {"filter":"basic", "by":"account_id"}
+        url = url_concat(API_DOMAIN + "/api/profiles/" + account_id, params)
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="GET")
+        data = json_decode(response.body)
+        account = data['rs']
+        return account
+
+
+    def get_club_basic_info(self, club_id):
+        params = {"filter":"basic"}
+        url = url_concat(API_DOMAIN + "/api/clubs/" + club_id, params)
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="GET")
+        data = json_decode(response.body)
+        club = data['rs']
+        return club
+
+
+    def get_article(self, article_id):
+        url = API_DOMAIN + "/api/articles/" + article_id
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="GET")
+        logging.info("got article response %r", response.body)
+        data = json_decode(response.body)
+        if data['err_code'] == 404:
+            return None
+
+        article = data['rs']
+        html = article['paragraphs']
+        # 为图片延迟加载准备数据
+        # < img alt="" src="http://bighorn.b0.upaiyun.com/blog/2016/11/2/758f7478-d406-4f2e-9566-306a963fb979" />
+        # < img data-original="真实图片" src="占位符图片">
+        ptn="(<img src=\"http[s]*://[\w\.\/\-]+\" />)"
+        img_ptn = re.compile(ptn)
+        imgs = img_ptn.findall(html)
+        for img in imgs:
+            logging.info("got img %r", img)
+            ptn="<img src=\"(http[s]*://[\w\.\/\-]+)\" />"
+            url_ptn = re.compile(ptn)
+            urls = url_ptn.findall(html)
+            url = urls[0]
+            logging.info("got url %r", url)
+            #html = html.replace(img, "< img class=\"lazy\" data-original=\""+url+"\" src=\"/static/images/weui.png\" width=\"100%\" height=\"480\" />")
+            html = html.replace(img, "<img width='100%' src='"+url+"' />")
+        article['paragraphs'] = html
+        return article
+
+
     def get_code(self):
         url = API_DOMAIN + "/api/auth/codes"
         http_client = HTTPClient()
@@ -196,24 +246,59 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class AuthorizationHandler(BaseHandler):
 
-    def get_user_basic_info(self, account_id):
-        params = {"filter":"basic", "by":"account_id"}
-        url = url_concat(API_DOMAIN + "/api/profiles/" + account_id, params)
+    def publish_article(self, article_id):
+        access_token = self.get_access_token()
+        headers = {"Authorization":"Bearer "+access_token}
+
+        url = API_DOMAIN + "/api/articles/" + article_id + "/publish"
         http_client = HTTPClient()
-        response = http_client.fetch(url, method="GET")
-        data = json_decode(response.body)
-        account = data['rs']
-        return account
+        _json = json_encode(headers)
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("got response %r", response.body)
 
 
-    def get_club_basic_info(self, club_id):
-        params = {"filter":"basic"}
-        url = url_concat(API_DOMAIN + "/api/clubs/" + club_id, params)
+    def unpublish_article(self, article_id):
+        access_token = self.get_access_token()
+        headers = {"Authorization":"Bearer "+access_token}
+
+        url = API_DOMAIN + "/api/articles/" + article_id + "/unpublish"
         http_client = HTTPClient()
-        response = http_client.fetch(url, method="GET")
-        data = json_decode(response.body)
-        club = data['rs']
-        return club
+        _json = json_encode(headers)
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("got response %r", response.body)
+
+
+    def update_article_categories(self, article_id, ids):
+        access_token = self.get_access_token()
+        headers = {"Authorization":"Bearer "+access_token}
+        _json = json_encode(ids)
+
+        url = API_DOMAIN + "/api/articles/" + article_id + "/categories"
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("got response %r", response.body)
+
+
+    def update_article(self, article):
+        access_token = self.get_access_token()
+        headers = {"Authorization":"Bearer "+access_token}
+        _json = json_encode(article)
+
+        url = API_DOMAIN + "/api/articles/" + article['_id']
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="PUT", headers=headers, body=_json)
+        logging.info("got response %r", response.body)
+
+
+    def create_article(self, article):
+        access_token = self.get_access_token()
+        headers = {"Authorization":"Bearer "+access_token}
+        _json = json_encode(article)
+
+        url = API_DOMAIN + "/api/articles"
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("create article response %r", response.body)
 
 
     def get_access_token(self):

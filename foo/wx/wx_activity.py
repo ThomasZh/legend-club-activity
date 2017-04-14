@@ -221,43 +221,7 @@ class WxRecommendActivityInfoHandler(BaseHandler):
                 _activity['amount'] = float(base_fee_template['fee']) / 100
                 break
 
-        # 判断是否有article_id
-        try:
-            _activity['article_id']
-        except:
-            _activity['article_id']=''
-
-        if(_activity['article_id']!=''):
-
-            _article_id = _activity['article_id']
-            url = API_DOMAIN + "/api/articles/" + _article_id
-            http_client = HTTPClient()
-            response = http_client.fetch(url, method="GET")
-            logging.info("got response %r", response.body)
-            data = json_decode(response.body)
-            article = data['rs']
-            _paragraphs = article['paragraphs']
-
-            # 为图片延迟加载准备数据
-            # < img alt="" src="http://bighorn.b0.upaiyun.com/blog/2016/11/2/758f7478-d406-4f2e-9566-306a963fb979" />
-            # < img data-original="真实图片" src="占位符图片">
-            ptn="(<img src=\"http[s]*://[\w\.\/\-]+\" />)"
-            img_ptn = re.compile(ptn)
-            imgs = img_ptn.findall(_paragraphs)
-            for img in imgs:
-                logging.info("got img %r", img)
-                ptn="<img src=\"(http[s]*://[\w\.\/\-]+)\" />"
-                url_ptn = re.compile(ptn)
-                urls = url_ptn.findall(_paragraphs)
-                url = urls[0]
-                logging.info("got url %r", url)
-                #html = html.replace(img, "< img class=\"lazy\" data-original=\""+url+"\" src=\"/static/images/weui.png\" width=\"100%\" height=\"480\" />")
-                _paragraphs = _paragraphs.replace(img, "<img width='100%' src='"+url+"' />")
-
-            _activity['desc'] = _paragraphs
-
-        else:
-            _activity['desc'] = '...'
+        article = self.get_article(activity_id)
 
         logging.info("------------------------------------uri: "+self.request.uri)
 
@@ -283,6 +247,7 @@ class WxRecommendActivityInfoHandler(BaseHandler):
                 guest_club_id = guest_club_id,
                 vendor_id=vendor_id,
                 activity=_activity,
+                article=article,
                 wx_app_id=wx_app_id,
                 wx_notify_domain=wx_notify_domain,
                 sign=_sign, account_id=_account_id,
@@ -332,43 +297,7 @@ class WxActivityInfoHandler(BaseHandler):
                 _activity['amount'] = float(base_fee_template['fee']) / 100
                 break
 
-        # 判断是否有article_id
-        try:
-            _activity['article_id']
-        except:
-            _activity['article_id']=''
-
-        if(_activity['article_id']!=''):
-
-            _article_id = _activity['article_id']
-            url = API_DOMAIN + "/api/articles/" + _article_id
-            http_client = HTTPClient()
-            response = http_client.fetch(url, method="GET")
-            logging.info("got response %r", response.body)
-            data = json_decode(response.body)
-            article = data['rs']
-            _paragraphs = article['paragraphs']
-
-            # 为图片延迟加载准备数据
-            # < img alt="" src="http://bighorn.b0.upaiyun.com/blog/2016/11/2/758f7478-d406-4f2e-9566-306a963fb979" />
-            # < img data-original="真实图片" src="占位符图片">
-            ptn="(<img src=\"http[s]*://[\w\.\/\-]+\" />)"
-            img_ptn = re.compile(ptn)
-            imgs = img_ptn.findall(_paragraphs)
-            for img in imgs:
-                logging.info("got img %r", img)
-                ptn="<img src=\"(http[s]*://[\w\.\/\-]+)\" />"
-                url_ptn = re.compile(ptn)
-                urls = url_ptn.findall(_paragraphs)
-                url = urls[0]
-                logging.info("got url %r", url)
-                #html = html.replace(img, "< img class=\"lazy\" data-original=\""+url+"\" src=\"/static/images/weui.png\" width=\"100%\" height=\"480\" />")
-                _paragraphs = _paragraphs.replace(img, "<img width='100%' src='"+url+"' />")
-
-            _activity['desc'] = _paragraphs+'...'
-
-        else:
-            _activity['desc'] = '...'
+        article = self.get_article(activity_id)
 
         wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
         wx_app_id = wx_app_info['wx_app_id']
@@ -393,6 +322,7 @@ class WxActivityInfoHandler(BaseHandler):
                 guest_club_id = GUEST_CLUB_ID,
                 vendor_id=vendor_id,
                 activity=_activity,
+                article=article,
                 wx_app_id=wx_app_id,
                 wx_notify_domain=wx_notify_domain,
                 sign=_sign, account_id=_account_id,
@@ -747,13 +677,14 @@ class WxActivityApplyStep2Handler(BaseHandler):
         if _total_amount == 0:
             _status = ORDER_STATUS_WECHAT_PAY_SUCCESS
 
+        # 创建订单索引
         access_token = self.get_secure_cookie("access_token")
         order_index = {
             "_id": _order_id,
             "club_id": vendor_id,
-            "product_type": "activity",
-            "product_id": activity_id,
-            "product_name": _title,
+            "item_type": "activity",
+            "item_id": activity_id,
+            "item_name": _title,
             "distributor_type": "club",
             "distributor_id": guest_club_id,
             "create_time": _timestamp,
@@ -871,11 +802,26 @@ class WxActivityApplyStep2Handler(BaseHandler):
             _order_return['timestamp'] = _timestamp
             _order_return['app_id'] = wx_app_id
 
+            # 微信统一下单返回成功
+            _json = ""
+            unified_json = ""
             if(_order_return['return_msg'] == 'OK'):
-                json = {'_id': _order_id, 'prepay_id': prepayId, 'status': ORDER_STATUS_WECHAT_UNIFIED_SUCCESS}
+                _json = {'_id': _order_id, 'prepay_id': prepayId, 'status': ORDER_STATUS_WECHAT_UNIFIED_SUCCESS}
+                unified_json = {'prepay_id': prepayId, 'pay_status': ORDER_STATUS_WECHAT_UNIFIED_SUCCESS}
             else:
-                json = {'_id': _order_id, 'prepay_id': prepayId, 'status': ORDER_STATUS_WECHAT_UNIFIED_FAILED}
-            order_dao.order_dao().update(json)
+                _json = {'_id': _order_id, 'prepay_id': prepayId, 'status': ORDER_STATUS_WECHAT_UNIFIED_FAILED}
+                unified_json = {'prepay_id': prepayId, 'pay_status': ORDER_STATUS_WECHAT_UNIFIED_FAILED}
+            order_dao.order_dao().update(_json)
+
+            # 微信统一下单返回成功
+            # TODO: 更新订单索引中，订单状态pay_status,prepay_id
+            access_token = self.get_secure_cookie("access_token")
+            url = API_DOMAIN + "/api/orders/" + _order_id + "/unified"
+            http_client = HTTPClient()
+            headers = {"Authorization":"Bearer " + access_token}
+            _unified_json = json_encode(unified_json)
+            response = http_client.fetch(url, method="POST", headers=headers, body=_unified_json)
+            logging.info("got response.body %r", response.body)
 
             _activity = activity_dao.activity_dao().query(activity_id)
             # FIXME, 将服务模板转为字符串，客户端要用
@@ -1119,6 +1065,17 @@ class WxOrderNotifyHandler(tornado.web.RequestHandler):
                     'transaction_id':_pay_return['transaction_id'], 'payed_total_fee':_pay_return['total_fee']}
                 order_dao.order_dao().update(json)
 
+                # 调用微信支付接口，返回成功
+                # TODO: 更新订单索引中，订单状态pay_status,transaction_id,payed_total_fee
+                url = API_DOMAIN + "/api/orders/" + _order_id + "/payed"
+                http_client = HTTPClient()
+                payed_json = {"pay_status": ORDER_STATUS_WECHAT_PAY_SUCCESS,
+                    'transaction_id':_pay_return['transaction_id'],
+                    'payed_total_fee':_pay_return['total_fee']}
+                _payed_json = json_encode(payed_json)
+                response = http_client.fetch(url, method="POST", body=_payed_json)
+                logging.info("got response.body %r", response.body)
+
                 # 如使用积分抵扣，则将积分减去
                 _bonus = _old_order['bonus']
                 if _bonus < 0:
@@ -1162,6 +1119,17 @@ class WxOrderNotifyHandler(tornado.web.RequestHandler):
             json = {'_id':_order_id,
                 'last_update_time': _timestamp, "status": ORDER_STATUS_WECHAT_PAY_FAILED}
             order_dao.order_dao().update(json)
+
+            # 调用微信支付接口，返回成功
+            # TODO: 更新订单索引中，订单状态pay_status,transaction_id,payed_total_fee
+            url = API_DOMAIN + "/api/orders/" + _order_id + "/payed"
+            http_client = HTTPClient()
+            payed_json = {"pay_status": ORDER_STATUS_WECHAT_PAY_FAILED,
+                'transaction_id':DEFAULT_USER_ID,
+                'payed_total_fee':0}
+            _payed_json = json_encode(payed_json)
+            response = http_client.fetch(url, method="POST", body=_payed_json)
+            logging.info("got response.body %r", response.body)
 
 
 class WxOrderWaitHandler(tornado.web.RequestHandler):

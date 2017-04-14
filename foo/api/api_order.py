@@ -83,6 +83,7 @@ class ApiOrderListXHR(AuthorizationHandler):
             order['create_time'] = timestamp_datetime(float(order['create_time']))
             # 合计金额
             order['total_amount'] = float(order['total_amount']) / 100
+            order['payed_total_fee'] = float(order['payed_total_fee']) / 100
 
         self.write(JSON.dumps(orders, default=json_util.default))
         self.finish()
