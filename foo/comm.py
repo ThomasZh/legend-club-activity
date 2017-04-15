@@ -284,6 +284,17 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class AuthorizationHandler(BaseHandler):
 
+    def check_order(self, order_id):
+        access_token = self.get_access_token()
+        headers = {"Authorization":"Bearer "+access_token}
+
+        url = API_DOMAIN + "/api/orders/" + order_id + "/check"
+        http_client = HTTPClient()
+        _json = json_encode(headers)
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("got response %r", response.body)
+
+
     def publish_article(self, article_id):
         access_token = self.get_access_token()
         headers = {"Authorization":"Bearer "+access_token}

@@ -201,7 +201,6 @@
     function OnReviewOrder(e) {
       orderId = e.value;
       $.get("/bf/api/vendors/{{ vendor_id }}/orders/" + orderId + "/review", function(data, status) {
-        pageData = eval("(" + data + ")");
         e.disabled = "true";
       });
     }
@@ -232,10 +231,10 @@
 
                 var inner_html = '<tr class="even pointer">';
                   inner_html += '<td class="a-center">';
-                    if (pageData[i].check_status == true)
-                      inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
+                    if (pageData[i].check_status == '0')
+                      inner_html += '<input type="checkbox" class="tableflat" value="'+pageData[i]._id+'" onclick="javascript:OnReviewOrder(this);">';
                     else
-                      inner_html += '<input type="checkbox" class="tableflat" disabled="true">';
+                      inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
                   inner_html += '</td>';
 
                   inner_html += '<td class=" ">';
@@ -337,10 +336,10 @@
               for (var i in pageData) {
                 var inner_html = '<tr class="even pointer">';
                   inner_html += '<td class="a-center">';
-                    if (pageData[i].check_status == true)
-                      inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
+                    if (pageData[i].check_status == '0')
+                      inner_html += '<input type="checkbox" class="tableflat" value="'+pageData[i]._id+'" onclick="javascript:OnReviewOrder(this);">';
                     else
-                      inner_html += '<input type="checkbox" class="tableflat" disabled="true">';
+                      inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
                   inner_html += '</td>';
 
                   inner_html += '<td class=" ">';

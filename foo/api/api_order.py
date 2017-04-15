@@ -404,8 +404,8 @@ class ApiOrderReviewXHR(AuthorizationHandler):
         json = {"_id":order_id, "last_update_time":_timestamp, "review":True}
         order_dao.order_dao().update(json);
 
-        num = order_dao.order_dao().count_not_review_by_vendor(vendor_id)
-        budge_num_dao.budge_num_dao().update({"_id":vendor_id, "order":num})
+        self.check_order(order_id)
+        self.counter_decrease(vendor_id, "activity_order")
 
         self.finish("ok")
 
