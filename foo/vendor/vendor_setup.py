@@ -67,13 +67,13 @@ class VendorSetupOperatorsHandler(AuthorizationHandler):
         ops = self.get_ops_info()
         access_token = self.get_access_token()
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/operators.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 access_token=access_token,
                 api_domain=API_DOMAIN,
-                budge_num=budge_num)
+                counter=counter)
 
 
 class VendorSetupInsuranceListHandler(AuthorizationHandler):
@@ -88,11 +88,11 @@ class VendorSetupInsuranceListHandler(AuthorizationHandler):
             # 价格转换成元
             _insurance['amount'] = float(_insurance['amount']) / 100
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/insurances.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 insurances=_array)
 
 
@@ -103,11 +103,11 @@ class VendorSetupInsuranceCreateHandler(AuthorizationHandler):
 
         ops = self.get_ops_info()
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/insurance-create.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num)
+                counter=counter)
 
     @tornado.web.authenticated  # if no session, redirect to login page
     def post(self, vendor_id):
@@ -138,10 +138,10 @@ class VendorSetupInsuranceEditHandler(AuthorizationHandler):
         # 价格转换成元
         _insurance['amount'] = float(_insurance['amount']) / 100
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/insurance-edit.html',
                 vendor_id=vendor_id,
-                budge_num=budge_num,
+                counter=counter,
                 insurance=_insurance)
 
     @tornado.web.authenticated  # if no session, redirect to login page
@@ -186,11 +186,11 @@ class VendorSetupWxHandler(AuthorizationHandler):
 
         vendor_wx = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/setup-wx.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 vendor_wx=vendor_wx)
 
     def post(self, vendor_id):
@@ -229,11 +229,11 @@ class VendorSetupClubHandler(AuthorizationHandler):
         ops = self.get_ops_info()
 
         club = club_dao.club_dao().query(vendor_id)
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/setup-club.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 club=club)
 
     @tornado.web.authenticated  # if no session, redirect to login page
@@ -272,11 +272,11 @@ class VendorSetupHhaHandler(AuthorizationHandler):
         vendor_hha = vendor_hha_dao.vendor_hha_dao().query(vendor_id)
         vendor_hha['content'] = markdown_html(vendor_hha['content'])
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/hold-harmless-agreements.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 vendor_hha=vendor_hha)
 
 
@@ -324,11 +324,11 @@ class VendorSetupTaskHandler(AuthorizationHandler):
                     task['category'] = category['title']
                     break
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/task-list.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 tasks=tasks)
 
 
@@ -365,11 +365,11 @@ class VendorSetupTaskCreateHandler(AuthorizationHandler):
                     trip_routers.remove(trip_router)
                     break
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/task-create.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 triprouters=trip_routers)
 
     def post(self,vendor_id):
@@ -436,11 +436,11 @@ class VendorSetupTaskAllocateHandler(AuthorizationHandler):
             except:
                 _customer['comment'] = ''
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/task-allocate.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 task=_task, customers=_customers)
 
     def post(self, vendor_id, task_id):

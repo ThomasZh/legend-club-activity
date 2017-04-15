@@ -140,6 +140,44 @@ def time_span(ts):
 
 class BaseHandler(tornado.web.RequestHandler):
 
+    def get_counter(self, item_id):
+        url = API_DOMAIN + "/api/counters/" + item_id
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="GET")
+        logging.info("got get_counter %r", response.body)
+        data = json_decode(response.body)
+        counter = data['rs']
+        return counter
+
+
+    def counter_increase(self, item_id, parameter):
+        url = API_DOMAIN + "/api/counters/" + item_id + "/parameters/" + parameter +"/increase"
+        http_client = HTTPClient()
+        data = {"appid":"7x24hs:activity",
+                "app_secret":"2518e11b3bc89ebec594350d5739f29e"}
+        _json = json_encode(data)
+        response = http_client.fetch(url, method="PUT", body=_json)
+        logging.info("got counter_increase %r", response.body)
+        data = json_decode(response.body)
+        counter = data['rs']
+        num = counter['num']
+        return num
+
+
+    def counter_decrease(self, item_id, parameter):
+        url = API_DOMAIN + "/api/counters/" + item_id + "/parameters/" + parameter +"/decrease"
+        http_client = HTTPClient()
+        data = {"appid":"7x24hs:activity",
+                "app_secret":"2518e11b3bc89ebec594350d5739f29e"}
+        _json = json_encode(data)
+        response = http_client.fetch(url, method="PUT", body=_json)
+        logging.info("got counter_increase %r", response.body)
+        data = json_decode(response.body)
+        counter = data['rs']
+        num = counter['num']
+        return num
+
+
     def get_user_basic_info(self, account_id):
         params = {"filter":"basic", "by":"account_id"}
         url = url_concat(API_DOMAIN + "/api/profiles/" + account_id, params)

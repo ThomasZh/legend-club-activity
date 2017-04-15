@@ -29,30 +29,30 @@
           <li><a href="/vendors/{{ vendor_id }}/trip_router/use">我会员所见线路</a></li>
         </ul>
       </li>
-      {% if budge_num['total'] > 0 %}
-      <li><a><i class="fa fa-rmb"></i> 订单 <span class="badge bg-green">{{budge_num['total']}}</span>
-      {% else %}
-        <li><a><i class="fa fa-rmb"></i> 订单
-      {% end %}
+    {% if counter and counter.has_key('activity_order') > 0 %}
+      <li><a><i class="fa fa-rmb"></i> 订单 <span class="badge bg-green">{{ counter['activity_order'] }}</span>
+    {% else %}
+      <li><a><i class="fa fa-rmb"></i> 订单
+    {% end %}
         <span class="fa fa-chevron-down"></span></a>
         <ul class="nav child_menu" style="display: none">
-          {% if budge_num['order'] > 0 %}
-          <li><a href="/vendors/{{ vendor_id }}/orders-me-all"> 我的全部订单(含分销)  <span class="badge bg-green">{{budge_num['order']}}</span></a></li>
+          {% if counter and counter.has_key('activity_order') > 0 %}
+          <li><a href="/vendors/{{ vendor_id }}/orders-me-all"> 我的全部订单(含分销)  <span class="badge bg-green">{{ counter['activity_order'] }}</span></a></li>
           {% else %}
           <li><a href="/vendors/{{ vendor_id }}/orders-me-all"> 我的全部订单(含分销)  </a></li>
           {% end %}
           <li><a href="/vendors/{{ vendor_id }}/orders-me-none"> 我自己的订单(不含分销) </a></li>
           <li><a href="/vendors/{{ vendor_id }}/orders-me-others"> 他人分销我的订单 </a>
           <li><a href="/vendors/{{ vendor_id }}/orders-others-me"> 我分销他人的订单 </a>
-          {% if budge_num['application'] > 0 %}
-          <li><a href="/vendors/{{ vendor_id }}/applys">报名 <span class="badge bg-green">{{budge_num['application']}}</span></a>
+          {% if counter and counter.has_key('activity_apply') > 0 %}
+          <li><a href="/vendors/{{ vendor_id }}/applys">报名 <span class="badge bg-green">{{ counter['activity_apply'] }}</span></a>
           </li>
           {% else %}
           <li><a href="/vendors/{{ vendor_id }}/applys">报名</a>
           </li>
           {% end %}
-          {% if budge_num['voucher_order'] > 0 %}
-          <li><a href="/vendors/{{ vendor_id }}/order/vouchers"> 代金券订单 <span class="badge bg-green">{{budge_num['voucher_order']}}</span></a>
+          {% if counter and counter.has_key('voucher_order') > 0 %}
+          <li><a href="/vendors/{{ vendor_id }}/order/vouchers"> 代金券订单 <span class="badge bg-green">{{ counter['voucher_order'] }}</span></a>
           </li>
           {% else %}
           <li><a href="/vendors/{{ vendor_id }}/order/vouchers"> 代金券订单 </a>

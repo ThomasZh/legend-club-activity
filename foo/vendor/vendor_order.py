@@ -59,12 +59,12 @@ class VendorOrdersMeAllHandler(AuthorizationHandler):
         access_token = self.get_access_token()
         ops = self.get_ops_info()
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/orders-me-all.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 access_token=access_token,
-                budge_num=budge_num)
+                counter=counter)
 
 
 class VendorOrdersMeNoneHandler(AuthorizationHandler):
@@ -75,12 +75,12 @@ class VendorOrdersMeNoneHandler(AuthorizationHandler):
         access_token = self.get_access_token()
         ops = self.get_ops_info()
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/orders-me-none.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 access_token=access_token,
-                budge_num=budge_num)
+                counter=counter)
 
 
 class VendorOrdersMeOtherHandler(AuthorizationHandler):
@@ -92,13 +92,13 @@ class VendorOrdersMeOtherHandler(AuthorizationHandler):
         access_token = self.get_access_token()
         ops = self.get_ops_info()
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/orders-me-other.html',
                 vendor_id=vendor_id,
                 club_id=club_id,
                 ops=ops,
                 access_token=access_token,
-                budge_num=budge_num)
+                counter=counter)
 
 
 class VendorOrdersMeOthersHandler(AuthorizationHandler):
@@ -109,12 +109,12 @@ class VendorOrdersMeOthersHandler(AuthorizationHandler):
         access_token = self.get_access_token()
         ops = self.get_ops_info()
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/orders-me-others.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 access_token=access_token,
-                budge_num=budge_num)
+                counter=counter)
 
 
 class VendorOrdersOtherMeHandler(AuthorizationHandler):
@@ -126,13 +126,13 @@ class VendorOrdersOtherMeHandler(AuthorizationHandler):
         access_token = self.get_access_token()
         ops = self.get_ops_info()
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/orders-other-me.html',
                 vendor_id=vendor_id,
                 club_id=club_id,
                 ops=ops,
                 access_token=access_token,
-                budge_num=budge_num)
+                counter=counter)
 
 
 class VendorOrdersOthersMeHandler(AuthorizationHandler):
@@ -143,12 +143,12 @@ class VendorOrdersOthersMeHandler(AuthorizationHandler):
         access_token = self.get_access_token()
         ops = self.get_ops_info()
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/orders-others-me.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 access_token=access_token,
-                budge_num=budge_num)
+                counter=counter)
 
 
 class VendorOrderListHandler(AuthorizationHandler):
@@ -210,12 +210,12 @@ class VendorOrderListHandler(AuthorizationHandler):
             except:
                 order['payed_total_fee'] = 0
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/orders.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 access_token=access_token,
-                budge_num=budge_num,
+                counter=counter,
                 orders=_array)
 
 
@@ -280,12 +280,12 @@ class VendorLeagueMyOrderListHandler(AuthorizationHandler):
             except:
                 order['payed_total_fee'] = 0
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/orders-league-me.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 access_token=access_token,
-                budge_num=budge_num,
+                counter=counter,
                 orders=_array)
 
 
@@ -349,12 +349,12 @@ class VendorLeagueOtherOrderListHandler(AuthorizationHandler):
             except:
                 order['payed_total_fee'] = 0
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/orders-league-others.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 access_token=access_token,
-                budge_num=budge_num,
+                counter=counter,
                 orders=_array)
 
 
@@ -380,12 +380,12 @@ class VendorApplyListHandler(AuthorizationHandler):
             except:
                 _apply['note'] = ''
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/applys.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 access_token=access_token,
-                budge_num=budge_num,
+                counter=counter,
                 applys=_array)
 
 
@@ -404,12 +404,12 @@ class VendorVoucherOrderListHandler(AuthorizationHandler):
             _voucher_order['voucher_amount'] = float(_voucher_order['voucher_amount'])/100
             _voucher_order['create_time'] = timestamp_datetime(_voucher_order['create_time'])
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/voucher-orders.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 access_token=access_token,
-                budge_num=budge_num,
+                counter=counter,
                 voucher_orders= _array)
 
 
@@ -506,10 +506,10 @@ class VendorOrderInfoHandler(AuthorizationHandler):
         order['bonus'] = float(order['bonus']) / 100
         order['payed_total_fee'] = float(order['payed_total_fee']) / 100
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/order-detail.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 access_token=access_token,
-                budge_num=budge_num,
+                counter=counter,
                 activity=_activity, order=order, applys=_applys)

@@ -73,11 +73,11 @@ class VendorActivityDraftHandler(AuthorizationHandler):
                     activity['category'] = category['title']
                     break
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-draft.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 activitys=activitys)
 
 
@@ -100,11 +100,11 @@ class VendorActivityPopHandler(AuthorizationHandler):
                     activity['category'] = category['title']
                     break
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-pop.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 activitys=activitys)
 
 
@@ -127,11 +127,11 @@ class VendorActivityDoingHandler(AuthorizationHandler):
                     activity['category'] = category['title']
                     break
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-doing.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 activitys=activitys)
 
 
@@ -154,11 +154,11 @@ class VendorActivityRecruitHandler(AuthorizationHandler):
                     activity['category'] = category['title']
                     break
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-recruit.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 activitys=activitys)
 
 
@@ -188,11 +188,11 @@ class VendorActivityRecruitNotHiddenHandler(AuthorizationHandler):
                     activity['category'] = category['title']
                     break
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-recruit-nothidden.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 activitys=activitys)
 
 
@@ -258,11 +258,11 @@ class VendorActivityLeagueShareHandler(AuthorizationHandler):
                     activity['share'] = True
                     break
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-league-share.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 activitys=activitys)
 
 
@@ -350,11 +350,11 @@ class VendorActivityLeagueRecruitHandler(AuthorizationHandler):
 
         activitys = activitys_me + activitys_share_new
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-recruit-all.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 activitys=activitys)
 
 
@@ -410,11 +410,11 @@ class VendorActivityLeagueDemoHandler(AuthorizationHandler):
             article = {'_id':_activity['_id'], 'title':_activity['title'], 'subtitle':_activity['location'], 'img':_activity['bk_img_url'],'paragraphs':''}
             self.create_article(article)
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-demo.html',
                     vendor_id=vendor_id,
                     ops=ops,
-                    budge_num=budge_num,
+                    counter=counter,
                     bonus_template=_bonus_template,
                     article=article,
                     activity=_activity)
@@ -439,11 +439,11 @@ class VendorActivityCanceledHandler(AuthorizationHandler):
                     activity['category'] = category['title']
                     break
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-canceled.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 activitys=activitys)
 
 
@@ -466,11 +466,11 @@ class VendorActivityCompletedHandler(AuthorizationHandler):
                     activity['category'] = category['title']
                     break
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-completed.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 activitys=activitys)
 
 
@@ -484,11 +484,11 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         triprouters = trip_router_dao.trip_router_dao().query_by_vendor(vendor_id)
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-create-step1.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 triprouters=triprouters,
                 categorys=categorys)
 
@@ -584,11 +584,11 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
                 "activity_shared":0, "cret_shared":0}
         bonus_template_dao.bonus_template_dao().create(json)
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-create-step2.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 activity_id=_activity_id)
 
 
@@ -600,11 +600,11 @@ class VendorActivityCreateStep2Handler(AuthorizationHandler):
 
         ops = self.get_ops_info()
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-create-step2.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 activity_id=activity_id)
 
     @tornado.web.authenticated  # if no session, redirect to login page
@@ -629,11 +629,11 @@ class VendorActivityCreateStep2Handler(AuthorizationHandler):
                 "road_map_url":road_map_url, "contour_map_url":contour_map_url}
         cret_template_dao.cret_template_dao().update(json);
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-create-step3.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 activity_id=activity_id)
 
 
@@ -645,11 +645,11 @@ class VendorActivityCreateStep3Handler(AuthorizationHandler):
 
         ops = self.get_ops_info()
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-create-step3.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 activity_id=activity_id)
 
     @tornado.web.authenticated  # if no session, redirect to login page
@@ -700,12 +700,12 @@ class VendorActivityDetailStep1Handler(AuthorizationHandler):
             bonus_template['cret_shared'] = 0
         bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-edit-step1.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 activity_id=activity_id,
-                budge_num=budge_num, triprouters=triprouters,
+                counter=counter, triprouters=triprouters,
                 activity=_activity, categorys=categorys,
                 orders=orders, applys=applys, bonus=bonus,
                 cret_template=cret_template)
@@ -781,13 +781,13 @@ class VendorActivityDetailStep2Handler(AuthorizationHandler):
         wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
         wx_notify_domain = wx_app_info['wx_notify_domain']
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-edit-step2.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 wx_notify_domain=wx_notify_domain,
                 activity_id=activity_id,
-                budge_num=budge_num,
+                counter=counter,
                 activity=activity, categorys=categorys,
                 orders=orders, applys=applys, bonus=bonus,
                 cret_template=cret_template,
@@ -829,12 +829,12 @@ class VendorActivityDetailStep3Handler(AuthorizationHandler):
         bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-edit-step3.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 activity_id=activity_id,
-                budge_num=budge_num,
+                counter=counter,
                 activity=activity, categorys=categorys,
                 orders=orders, applys=applys, bonus=bonus,
                 cret_template=cret_template)
@@ -884,12 +884,12 @@ class VendorActivityDetailStep4Handler(AuthorizationHandler):
         bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-edit-step4.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 activity_id=activity_id,
-                budge_num=budge_num,
+                counter=counter,
                 activity=activity, categorys=categorys,
                 orders=orders, applys=applys, bonus=bonus,
                 cret_template=cret_template, bonus_template=bonus_template)
@@ -1002,13 +1002,13 @@ class VendorActivityDetailStep5Handler(AuthorizationHandler):
                 # 价格转换成元
                 _voucher['fee'] = float(_voucher['fee']) / 100
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-edit-step5.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 access_token=access_token,
                 activity_id=activity_id,
-                budge_num=budge_num,
+                counter=counter,
                 activity=activity, categorys=categorys,
                 orders=orders, applys=applys, bonus=bonus,
                 cret_template=cret_template)
@@ -1064,12 +1064,12 @@ class VendorActivityDetailStep6Handler(AuthorizationHandler):
                 apply_dao.apply_dao().update(_json)
 
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-edit-step6.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 activity_id=activity_id,
-                budge_num=budge_num,
+                counter=counter,
                 activity=activity, categorys=categorys,
                 orders=orders, applys=applys, bonus=bonus,
                 cret_template=cret_template)
@@ -1098,12 +1098,12 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
             article = {'_id':activity_id, 'title':activity['title'], 'subtitle':activity['location'], 'img':activity['bk_img_url'],'paragraphs':''}
             self.create_article(article)
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-edit-step7.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 travel_id=activity_id,
-                budge_num=budge_num,
+                counter=counter,
                 activity=activity, categorys=categorys,
                 orders=orders, applys=applys, bonus=bonus,
                 cret_template=cret_template,
@@ -1156,12 +1156,12 @@ class VendorActivityDetailStep8Handler(AuthorizationHandler):
         bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
         bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
 
         self.render('vendor/activity-edit-step8.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 activity=activity, categorys=categorys,
                 orders=orders, applys=applys, bonus=bonus,
                 cret_template=cret_template)
@@ -1223,11 +1223,11 @@ class VendorActivityDetailStep9Handler(AuthorizationHandler):
         bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
         bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-edit-step9.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 activity=activity, categorys=categorys,
                 orders=orders, applys=applys, bonus=bonus,
                 cret_template=cret_template)
@@ -1514,11 +1514,11 @@ class VendorActivityActionEvalHandler(AuthorizationHandler):
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         activity = activity_dao.activity_dao().query(activity_id)
         activity_id = activity["_id"]
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/activity-eval.html',
                vendor_id=vendor_id,
                ops=ops,
-               budge_num=budge_num,
+               counter=counter,
                activity_id=activity_id)
 
     @tornado.web.authenticated  # if no session, redirect to login page

@@ -724,8 +724,9 @@ class WxActivityApplyStep2Handler(BaseHandler):
             "vendor_id":vendor_id
         }
         order_dao.order_dao().create(_order)
-        num = order_dao.order_dao().count_not_review_by_vendor(vendor_id)
-        budge_num_dao.budge_num_dao().update({"_id":vendor_id, "order":num})
+
+        # budge_num increase
+        self.counter_increase(vendor_id, "activity_order")
         # TODO notify this message to vendor's administrator by SMS
 
         wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
@@ -734,7 +735,6 @@ class WxActivityApplyStep2Handler(BaseHandler):
         wx_mch_key = wx_app_info['wx_mch_key']
         wx_mch_id = wx_app_info['wx_mch_id']
         wx_notify_domain = wx_app_info['wx_notify_domain']
-
 
         _timestamp = (int)(time.time())
         if _total_amount != 0:

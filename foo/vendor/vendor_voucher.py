@@ -91,11 +91,11 @@ class VendorVoucherListHandler(AuthorizationHandler):
                 _data['account_nickname'] = _customer['account_nickname']
                 _data['account_avatar'] = _customer['account_avatar']
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/vouchers.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 status=_status,
                 vouchers=_vouchers)
 
@@ -107,11 +107,11 @@ class VendorVoucherFreeCreateHandler(AuthorizationHandler):
 
         ops = self.get_ops_info()
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/vouchers-free-create.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num)
+                counter=counter)
 
     def post(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
@@ -147,11 +147,11 @@ class VendorVoucherPayCreateHandler(AuthorizationHandler):
 
         ops = self.get_ops_info()
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/vouchers-pay-create.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num)
+                counter=counter)
 
     def post(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
@@ -208,11 +208,11 @@ class VendorVoucherFreeEditHandler(AuthorizationHandler):
         _voucher['amount'] = float(_voucher['amount']) / 100
         _voucher['expired_time'] = timestamp_date(_voucher['expired_time'])
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/vouchers-free-edit.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 voucher=_voucher)
 
     def post(self, vendor_id, voucher_id):
@@ -273,11 +273,11 @@ class VendorVoucherFreeAllocateHandler(AuthorizationHandler):
             except:
                 _customer['comment'] = ''
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/vouchers-allocate.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 voucher=_voucher, customers=_customers)
 
     def post(self, vendor_id, voucher_id):
@@ -323,11 +323,11 @@ class VendorVoucherPayEditHandler(AuthorizationHandler):
         _voucher['price'] = float(_voucher['price']) / 100
         _voucher['expired_time'] = timestamp_date(_voucher['expired_time'])
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/vouchers-pay-edit.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 voucher=_voucher)
 
     def post(self, vendor_id, voucher_id):
@@ -425,6 +425,6 @@ class VendorVoucherPayAllocateHandler(AuthorizationHandler):
         num = voucher_order_dao.voucher_order_dao().count_not_review_by_vendor(vendor_id)
         budge_num_dao.budge_num_dao().update({"_id":vendor_id, "voucher_order":num})
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
 
         self.redirect('/vendors/' + vendor_id + '/vouchers?status=0')

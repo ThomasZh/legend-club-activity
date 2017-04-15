@@ -75,11 +75,11 @@ class VendorTriprouterListHandler(AuthorizationHandler):
                     break
         logging.info("got triprouter %r in uri", triprouters)
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/trip-router-list.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 triprouters=triprouters)
 
 
@@ -92,11 +92,11 @@ class VendorTriprouterCreateHandler(AuthorizationHandler):
         ops = self.get_ops_info()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/trip-router-create.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 categorys=categorys)
 
 
@@ -160,12 +160,12 @@ class VendorTriprouterEditStep1Handler(AuthorizationHandler):
         triprouter = trip_router_dao.trip_router_dao().query(trip_router_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
 
         self.render('vendor/trip-router-edit-step1.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 triprouter=triprouter, categorys=categorys)
 
 
@@ -214,11 +214,11 @@ class VendorTriprouterEditStep2Handler(AuthorizationHandler):
             article = {'_id':trip_router_id ,'title':triprouter['title'], 'subtitle':triprouter['location'], 'img':triprouter['bk_img_url'],'paragraphs':''}
             self.create_article(article)
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/trip-router-edit-step2.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 triprouter=triprouter,
                 travel_id=trip_router_id,
                 article=article)
@@ -298,11 +298,11 @@ class VendorTriprouterActivityListHandler(AuthorizationHandler):
                     activity['category'] = category['title']
                     break
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/trip-router-activitylist.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 triprouter=triprouter,
                 activitys=activitys)
 
@@ -317,12 +317,12 @@ class VendorTriprouterEvalListHandler(AuthorizationHandler):
 
         triprouter = trip_router_dao.trip_router_dao().query(trip_router_id)
         evaluations = evaluation_dao.evaluation_dao().query_by_triprouter(trip_router_id)
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/trip-router-evallist.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 triprouter=triprouter,
-                budge_num=budge_num,
+                counter=counter,
                 evaluations=evaluations)
 
 
@@ -396,11 +396,11 @@ class VendorTriprouterShareListHandler(AuthorizationHandler):
                     triprouter['share'] = True
                     break
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/trip-router-share.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 triprouters=triprouters)
 
 
@@ -457,9 +457,9 @@ class VendorTriprouterUseListHandler(AuthorizationHandler):
 
         triprouters = triprouters_me + triprouters_share
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/trip-router-use.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 triprouters=triprouters)

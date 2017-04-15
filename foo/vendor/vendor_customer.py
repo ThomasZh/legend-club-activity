@@ -105,12 +105,12 @@ class VendorCustomerListHandler(AuthorizationHandler):
             except:
                 _customer_profile['crets'] = 0
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/customers.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 access_token=access_token,
-                budge_num=budge_num,
+                counter=counter,
                 customers=customers,
                 keys_value="")
 
@@ -169,11 +169,11 @@ class VendorCustomerSearchHandler(AuthorizationHandler):
             except:
                 _customer_profile['crets'] = 0
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/customers.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 customers=customers,
                 keys_value=keys_value)
 
@@ -282,12 +282,12 @@ class VendorCustomerProfileHandler(AuthorizationHandler):
                     personal_task['category'] = category['title']
                     break
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/customer-profile.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 account_id=account_id,
-                budge_num=budge_num,
+                counter=counter,
                 profile=_customer_profile,
                 contacts=_contacts, orders=_orders, tasks =personal_tasks)
 
@@ -343,11 +343,11 @@ class VendorCustomerCretInfoHandler(AuthorizationHandler):
         except:
             _customer_profile['account_avatar'] = ''
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/customer-cret-info.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 profile=_customer_profile,
                 cret=_cret)
 

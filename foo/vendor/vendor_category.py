@@ -63,11 +63,11 @@ class VendorCategoryListHandler(AuthorizationHandler):
         ops = self.get_ops_info()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/category-list.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 categorys=categorys)
 
 
@@ -79,11 +79,11 @@ class VendorCategoryCreateHandler(AuthorizationHandler):
 
         ops = self.get_ops_info()
 
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/category-create.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num)
+                counter=counter)
 
     @tornado.web.authenticated  # if no session, redirect to login page
     def post(self, vendor_id):
@@ -117,11 +117,11 @@ class VendorCategoryEditHandler(AuthorizationHandler):
         ops = self.get_ops_info()
 
         category = category_dao.category_dao().query(category_id)
-        budge_num = budge_num_dao.budge_num_dao().query(vendor_id)
+        counter = self.get_counter(vendor_id)
         self.render('vendor/category-edit.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                budge_num=budge_num,
+                counter=counter,
                 category=category)
 
     @tornado.web.authenticated  # if no session, redirect to login page
