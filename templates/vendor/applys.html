@@ -217,7 +217,7 @@
       console.log(lastTimestamp);
       $.ajax({
         type: "GET",
-        url: "/bf/api/vendors/{{ vendor_id }}/applys?before="+lastTimestamp,
+        url: "/bf/api/vendors/{{ vendor_id }}/applys?page=1&limit=20",
         headers: {
           "Authorization": "Bearer {{ access_token }}"
         },
@@ -229,28 +229,28 @@
           for (var i in ajaxobj) {
             var inner_html = '<tr class="even pointer">';
               inner_html += '<td class="a-center">';
-                if (ajaxobj[i].review == true)
+                if (ajaxobj[i].check_status == true)
                   inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
                 else
                   inner_html += '<input type="checkbox" class="tableflat" value="'+ajaxobj[i]._id+'" onclick="OnReviewApply(this);">';
               inner_html += '</td>';
 
               inner_html += '<td class=" ">';
-                inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/'+ajaxobj[i].activity_id+'/detail/step1">'+ajaxobj[i].activity_title+'</a></td>';
+                inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/'+ajaxobj[i].item_id+'/detail/step1">'+ajaxobj[i].item_name+'</a></td>';
               inner_html += '</td>';
 
               inner_html += '<td class=" ">';
                 inner_html += '<ul class="list-inline">';
                   inner_html += '<li>';
-                    inner_html += '<img src="'+ajaxobj[i].account_avatar+'" class="avatar" alt="Avatar">';
+                    inner_html += '<img src="'+ajaxobj[i].avatar+'" class="avatar" alt="Avatar">';
                   inner_html += '</li>';
                 inner_html += '</ul>';
-                inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ajaxobj[i].account_id+'">'+ajaxobj[i].account_nickname+'</a>';
+                inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ajaxobj[i].account_id+'">'+ajaxobj[i].nickname+'</a>';
                 inner_html += '<br />';
               inner_html += '</td>';
 
               inner_html += '<td class=" ">';
-                inner_html += ajaxobj[i].name;
+                inner_html += ajaxobj[i].real_name;
               inner_html += '</td>';
 
               inner_html += '<td class=" ">';

@@ -98,7 +98,7 @@
           var contact = contacts[contactID];
           // 回填表单
           var applicantForm = $(this).parents('.applicant');
-          applicantForm.find('input[name="name"]').val(contact.name);
+          applicantForm.find('input[name="real_name"]').val(contact.real_name);
           applicantForm.find('input[name="id_code"]').val(contact.id_code);
           applicantForm.find('input[name="height"]').val(contact.height);
           applicantForm.find('input[name="phone"]').val(contact.phone);
@@ -121,7 +121,7 @@
       select += '      <option value="0">选择参加人员</option>';
       for(var i in applycants){
         var app = applycants[i];
-        select += '    <option value="'+app['_id']+'">'+app['name']+'</option>';
+        select += '    <option value="'+app['_id']+'">'+app['real_name']+'</option>';
       }
       select += '    </select>';
       select += '  </div>';
@@ -149,7 +149,7 @@
         // 表单项开始
         applicantForm += '  <div class="ui-form-item ui-border-b">';
         applicantForm += '    <label>真实姓名</label>';
-        applicantForm += '    <input type="text" name="name" placeholder="与身份证上姓名相符">';
+        applicantForm += '    <input type="text" name="real_name" placeholder="与身份证上姓名相符">';
         applicantForm += '  </div>';
         // 性别
         applicantForm += '  <div class="ui-form-item ui-border-b">';
@@ -211,7 +211,7 @@
       var members = [];
       $('.applicant').each(function(){
         var member = {};
-        member.name = $(this).find('input[name="name"]').val();
+        member.real_name = $(this).find('input[name="real_name"]').val();
         member.birth_day = $(this).find('input[name="birth_day"]').val();
         member.height = $(this).find('input[name="height"]').val();
         member.id_code = $(this).find('input[name="id_code"]').val();

@@ -931,77 +931,6 @@ class VendorActivityDetailStep5Handler(AuthorizationHandler):
         bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
 
-        for order in orders:
-            # 访客俱乐部名称
-            if order.has_key('guest_club_id'):
-                if order['guest_club_id']:
-                    guest_club_id = order["guest_club_id"]
-                    club = get_club_info(access_token,guest_club_id)
-                    if club:
-                        order['guest_club_name'] = club['name']
-                    else:
-                        order['guest_club_name'] = ""
-                else:
-                    order['guest_club_name'] = ""
-            else:
-                order['guest_club_name'] = ""
-
-            for ext_fee in order['ext_fees']:
-                # 价格转换成元
-                ext_fee['fee'] = float(ext_fee['fee']) / 100
-
-            for insurance in order['insurances']:
-                # 价格转换成元
-                insurance['fee'] = float(insurance['fee']) / 100
-
-            # 价格转换成元
-            # order['activity_amount'] = float(activity['amount']) / 100
-            try:
-                order['base_fees']
-            except:
-                order['base_fees'] = activity['base_fee_template']
-                # 数据库apply无base_fees时，取order的赋值给它，并更新其数据库字段
-                _json = {"_id":order['_id'],"base_fees":order['base_fees']}
-                logging.info("got base_fees json %r in uri", _json)
-                order_dao.order_dao().update(_json)
-
-            order['activity_amount'] = 0
-            if order['base_fees'] :
-                for base_fee in order['base_fees']:
-                    # 价格转换成元
-                    order['activity_amount'] = float(base_fee['fee']) / 100
-
-            # 价格转换成元
-            order['total_amount'] = float(order['total_amount']) / 100
-            order['create_time'] = timestamp_datetime(order['create_time'])
-
-            user = self.get_user_basic_info(order['account_id'])
-            order['account_nickname'] = user['nickname']
-            order['account_avatar'] = user['avatar']
-            try:
-                order['bonus']
-            except:
-                order['bonus'] = 0
-            # 价格转换成元
-            order['bonus'] = float(order['bonus']) / 100
-            try:
-                order['prepay_id']
-            except:
-                order['prepay_id'] = ''
-            try:
-                order['transaction_id']
-            except:
-                order['transaction_id'] = ''
-            try:
-                order['payed_total_fee']
-            except:
-                order['payed_total_fee'] = 0
-            # 价格转换成元
-            order['payed_total_fee'] = float(order['payed_total_fee']) / 100
-            for _voucher in order['vouchers']:
-                # 价格转换成元
-                _voucher['fee'] = float(_voucher['fee']) / 100
-
         counter = self.get_counter(vendor_id)
         self.render('vendor/activity-edit-step5.html',
                 vendor_id=vendor_id,
@@ -1021,6 +950,7 @@ class VendorActivityDetailStep6Handler(AuthorizationHandler):
         logging.info("got activity_id %r in uri", activity_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
@@ -1031,38 +961,23 @@ class VendorActivityDetailStep6Handler(AuthorizationHandler):
         bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
 
-        for _apply in applys:
-            _apply['create_time'] = timestamp_datetime(_apply['create_time'])
+        params = {"filter":"item", "item_id":activity_id, "page":1, "limit":20}
+        url = url_concat(API_DOMAIN + "/api/applies", params)
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        rs = data['rs']
+        applies = rs['data']
 
-            user = self.get_user_basic_info(_apply['account_id'])
-            _apply['account_nickname'] = user['nickname']
-            _apply['account_avatar'] = user['avatar']
-            try:
-                _apply['note']
-            except:
-                _apply['note'] = ''
-
+        for _apply in applies:
+            # 下单时间，timestamp -> %m月%d 星期%w
+            _apply['create_time'] = timestamp_datetime(float(_apply['create_time']))
             if _apply['gender'] == 'male':
                 _apply['gender'] = u'男'
             else:
                 _apply['gender'] = u'女'
-
-            try:
-                _apply['base_fees']
-            except:
-                order = order_dao.order_dao().query(_apply['order_id'])
-                _apply['base_fees'] = order['base_fees']
-                # 数据库apply无base_fees时，取order的赋值给它，并更新其数据库字段
-                _json = {"_id":_apply['_id'],"base_fees":order['base_fees']}
-                logging.info("got base_fees json %r in uri", _json)
-                apply_dao.apply_dao().update(_json)
-
-            if len(_apply['base_fees']) == 0:
-                order = order_dao.order_dao().query(_apply['order_id'])
-                _json = {"_id":_apply['_id'],"base_fees":order['base_fees']}
-                logging.info("got base_fees json %r in uri", _json)
-                apply_dao.apply_dao().update(_json)
-
 
         counter = self.get_counter(vendor_id)
         self.render('vendor/activity-edit-step6.html',
@@ -1071,7 +986,7 @@ class VendorActivityDetailStep6Handler(AuthorizationHandler):
                 activity_id=activity_id,
                 counter=counter,
                 activity=activity, categorys=categorys,
-                orders=orders, applys=applys, bonus=bonus,
+                orders=orders, applies=applies, bonus=bonus,
                 cret_template=cret_template)
 
 

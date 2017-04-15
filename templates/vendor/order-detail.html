@@ -251,25 +251,25 @@
                       </thead>
 
                       <tbody id="tbody">
-                      {% for apply in applys %}
+                      {% for apply in applies %}
                         <tr class="even pointer">
                           <td class="a-center ">
-                            {% if apply['review'] %}
-                              <input type="checkbox" class="tableflat" checked="checked" disabled="true" />
-                            {% else %}
+                            {% if apply['check_status'] == 0 %}
                               <input type="checkbox" class="tableflat" value="{{apply['_id']}}" onclick="OnReviewApply(this);" />
+                            {% else %}
+                              <input type="checkbox" class="tableflat" checked="checked" disabled="true" />
                             {% end %}
                           </td>
-                          <td class=" "><a href="/vendors/{{ vendor_id }}/activitys/{{apply['activity_id']}}/detail/step1">{{apply['activity_title']}}</a></td>
+                          <td class=" "><a href="/vendors/{{ vendor_id }}/activitys/{{ apply['item_id'] }}/detail/step1">{{ apply['item_name'] }}</a></td>
                           <td class=" ">
                             <ul class="list-inline">
                               <li>
-                                <img src="{{apply['account_avatar']}}" class="avatar" alt="Avatar">
+                                <img src="{{ apply['avatar'] }}" class="avatar" alt="Avatar">
                               </li>
                             </ul>
-                            <a href="/vendors/{{ vendor_id }}/customers/{{apply['account_id']}}">{{apply['account_nickname']}}</a>
+                            <a href="/vendors/{{ vendor_id }}/customers/{{apply['account_id']}}">{{ apply['nickname'] }}</a>
                           </td>
-                          <td>{{apply['name']}}</td>
+                          <td>{{apply['real_name']}}</td>
                           <td>{{apply['gender']}}</td>
                           <td>{{apply['id_code']}}</td>
                           <td>{{apply['phone']}}</td>

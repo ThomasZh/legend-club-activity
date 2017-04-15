@@ -284,6 +284,42 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class AuthorizationHandler(BaseHandler):
 
+    def create_apply(self, apply_index):
+        access_token = self.get_access_token()
+        headers = {"Authorization":"Bearer "+access_token}
+
+        url = API_DOMAIN + "/api/applies"
+        http_client = HTTPClient()
+        _json = json_encode(apply_index)
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        rs = data['rs']
+        return rs['_id']
+
+
+    def create_order(self, order_index):
+        access_token = self.get_access_token()
+        headers = {"Authorization":"Bearer "+access_token}
+
+        url = API_DOMAIN + "/api/orders"
+        http_client = HTTPClient()
+        _json = json_encode(order_index)
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("got response.body %r", response.body)
+
+
+    def check_apply(self, apply_id):
+        access_token = self.get_access_token()
+        headers = {"Authorization":"Bearer "+access_token}
+
+        url = API_DOMAIN + "/api/applies/" + apply_id + "/check"
+        http_client = HTTPClient()
+        _json = json_encode(headers)
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("got response %r", response.body)
+
+
     def check_order(self, order_id):
         access_token = self.get_access_token()
         headers = {"Authorization":"Bearer "+access_token}

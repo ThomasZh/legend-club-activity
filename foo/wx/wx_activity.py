@@ -559,7 +559,7 @@ class WxActivityApplyStep1Handler(BaseHandler):
                 customer_profile=customer_profile)
 
 
-class WxActivityApplyStep2Handler(BaseHandler):
+class WxActivityApplyStep2Handler(AuthorizationHandler):
     def post(self):
         vendor_id = self.get_argument("vendor_id", "")
         logging.info("got vendor_id %r", vendor_id)
@@ -678,7 +678,6 @@ class WxActivityApplyStep2Handler(BaseHandler):
             _status = ORDER_STATUS_WECHAT_PAY_SUCCESS
 
         # 创建订单索引
-        access_token = self.get_secure_cookie("access_token")
         order_index = {
             "_id": _order_id,
             "club_id": vendor_id,
@@ -692,12 +691,11 @@ class WxActivityApplyStep2Handler(BaseHandler):
             "pay_status": _status,
             "total_amount": _total_amount, #已经转换为分，注意转为数值
         }
-        url = API_DOMAIN + "/api/orders"
-        http_client = HTTPClient()
-        headers = {"Authorization":"Bearer " + access_token}
-        _json = json_encode(order_index)
-        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
-        logging.info("got response.body %r", response.body)
+        self.create_order(order_index)
+
+        # budge_num increase
+        self.counter_increase(vendor_id, "activity_order")
+        # TODO notify this message to vendor's administrator by SMS
 
         # status: 10=order but not pay it, 20=order and pay it.
         # pay_type: wxpay, alipay, paypal, applepay, huaweipay, ...
@@ -724,10 +722,6 @@ class WxActivityApplyStep2Handler(BaseHandler):
             "vendor_id":vendor_id
         }
         order_dao.order_dao().create(_order)
-
-        # budge_num increase
-        self.counter_increase(vendor_id, "activity_order")
-        # TODO notify this message to vendor's administrator by SMS
 
         wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
         wx_app_id = wx_app_info['wx_app_id']
@@ -904,7 +898,7 @@ class WxActivityApplyStep2Handler(BaseHandler):
 
 
 # 添加当前订单的成员
-class WxActivityApplyStep3Handler(tornado.web.RequestHandler):
+class WxActivityApplyStep3Handler(AuthorizationHandler):
     def get(self, vendor_id, activity_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
@@ -949,37 +943,24 @@ class WxActivityApplyStep3Handler(tornado.web.RequestHandler):
             _applicantList = JSON.loads(_applicantstr);
             # 处理多个申请人
             for item in _applicantList:
-                item["_id"] = str(uuid.uuid1()).replace('-', '')
-                item["activity_id"] = activity_id
-                item["order_id"] = _order_id
-                item["account_id"] = _account_id
-                item["create_time"] = time.time()
-                item["last_update_time"] = time.time()
-                item["review"] = False
-                item["vendor_id"] = vendor_id
-                # 保存此次申请人资料
                 _activity = activity_dao.activity_dao().query(activity_id)
-                item["activity_title"] = _activity['title']
-                # 取活动基本服务费用信息
-                item["base_fees"] = _old_order['base_fees']
 
-                vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, _account_id)
-                if(vendor_member):
-                    try:
-                        vendor_member['account_nickname']
-                    except:
-                        vendor_member['account_nickname'] = ''
-                    try:
-                        vendor_member['account_avatar']
-                    except:
-                        vendor_member['account_avatar'] = ''
-                item["account_avatar"] = vendor_member['account_avatar']
-                item["account_nickname"] = vendor_member['account_nickname']
-                apply_dao.apply_dao().create(item)
+                item["club_id"] = vendor_id
+                item["item_type"] = "activity"
+                item["item_id"] = activity_id
+                item["item_name"] = _activity['title']
+                item["order_id"] = _order_id
+                item["booking_time"] = _activity['begin_time']
+                apply_id = self.create_apply(item)
+
+                # budge_num increase
+                self.counter_increase(vendor_id, "activity_apply")
+                # TODO notify this message to vendor's administrator by SMS
+
                 # 更新联系人资料
-                _contact = contact_dao.contact_dao().query_contact(vendor_id, _account_id, item["name"])
+                _contact = contact_dao.contact_dao().query_contact(vendor_id, _account_id, item["real_name"])
                 if not _contact: # 如果不存在
-                    item["_id"] = str(uuid.uuid1()).replace('-', '')
+                    item["_id"] = apply_id
                     # 移除多余的参数直接入库
                     item.pop("activity_id", None)
                     item.pop("order_id", None)
@@ -991,11 +972,6 @@ class WxActivityApplyStep3Handler(tornado.web.RequestHandler):
             # 更新活动报名人数
             total_applicant_num = apply_dao.apply_dao().count_by_activity(activity_id)
             activity_dao.activity_dao().update({"_id":activity_id, "total_applicant_num":total_applicant_num})
-
-            # 更新活动申请数目
-            num = apply_dao.apply_dao().count_not_review_by_vendor(vendor_id)
-            budge_num_dao.budge_num_dao().update({"_id":vendor_id, "application":num})
-            # TODO notify this message to vendor's administrator by SMS
 
             # 更新订单状态
             json = {'_id': _order_id, 'status': ORDER_STATUS_BF_APPLY}

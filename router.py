@@ -141,13 +141,7 @@ def map():
         # 我分销某人的订单
         (r"/vendors/([a-z0-9]*)/orders-other-me", getattr(vendor_order, 'VendorOrdersOtherMeHandler')),
 
-        # 联盟里别人活动我的订单
-        (r"/vendors/([a-z0-9]*)/league/orders-me", getattr(vendor_order, 'VendorLeagueMyOrderListHandler')),
-        # 联盟里我的活动别人订单
-        (r"/vendors/([a-z0-9]*)/league/orders-other", getattr(vendor_order, 'VendorLeagueOtherOrderListHandler')),
-
         # order
-        (r"/vendors/([a-z0-9]*)/orders", getattr(vendor_order, 'VendorOrderListHandler')),
         (r"/vendors/([a-z0-9]*)/orders/([a-z0-9]*)", getattr(vendor_order, 'VendorOrderInfoHandler')),
         (r"/vendors/([a-z0-9]*)/applys", getattr(vendor_order, 'VendorApplyListHandler')),
         (r"/vendors/([a-z0-9]*)/order/vouchers", getattr(vendor_order, 'VendorVoucherOrderListHandler')),
@@ -211,12 +205,8 @@ def map():
         (r"/bf/api/vendors/([a-z0-9]*)/articles/([a-z0-9]*)/paragraphs", getattr(api_blog, 'ApiBlogParagraphListXHR')),
 
 
-        # 联盟订单
-        (r"/bf/api/vendors/([a-z0-9]*)/league/orders-me", getattr(api_order, 'ApiLeagueMyOrderListXHR')),
-        (r"/bf/api/vendors/([a-z0-9]*)/league/orders-other", getattr(api_order, 'ApiLeagueOtherOrderListXHR')),
-
-        (r"/bf/api/vendors/([a-z0-9]*)/orders", getattr(api_order, 'ApiOrderListXHR')),
-        (r"/bf/api/vendors/([a-z0-9]*)/orders/activitys/([a-z0-9]*)", getattr(api_order, 'ApiActivityOrderListXHR')),
+        (r"/bf/api/vendors/([a-z0-9]*)/orders", getattr(api_order, 'ApiOrdersXHR')),
+        (r"/bf/api/vendors/([a-z0-9]*)/orders/activitys/([a-z0-9]*)", getattr(api_order, 'ApiActivityOrdersXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/orders/([a-z0-9]*)", getattr(api_order, 'ApiOrderInfoXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/orders/([a-z0-9]*)/review", getattr(api_order, 'ApiOrderReviewXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/orders/([a-z0-9]*)/delete", getattr(api_order, 'ApiOrderDeleteXHR')),

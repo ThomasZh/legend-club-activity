@@ -141,7 +141,7 @@
             <div class="right">
               <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step6">
               <span class="count_top"><i class="fa fa-user"></i> 会员报名</span>
-              <div class="count green">{{len(applys)}}<small>人次</small></div>
+              <div class="count green">{{ len(applies) }}<small>人次</small></div>
               <span class="count_bottom"><i class="red">Step6  </i> 报名信息</span>
               </a>
             </div>
@@ -245,27 +245,25 @@
                       </tr>
                     </thead>
                     <tbody>
-                    {% for apply in applys %}
-                      {% for base_fee in apply['base_fees'] %}
-                        {% if act_base_fee['name'] == base_fee['name'] %}
+                    {% for apply in applies %}
                         <tr>
                           <td class="a-center ">
-                            {% if apply['review'] %}
-                              <input type="checkbox" class="tableflat" checked="checked" disabled="true">
-                            {% else %}
+                            {% if apply['check_status'] == 0 %}
                               <input type="checkbox" class="tableflat" value="{{apply['_id']}}" onclick="OnReview(this);">
+                            {% else %}
+                              <input type="checkbox" class="tableflat" checked="checked" disabled="true">
                             {% end %}
                           </td>
                           <td>
                             <ul class="list-inline">
                               <li>
-                                <img src="{{apply['account_avatar']}}" class="avatar" alt="Avatar">
+                                <img src="{{ apply['avatar'] }}" class="avatar" alt="Avatar">
                               </li>
                             </ul>
-                            <a href="/vendors/{{ vendor_id }}/customers/{{apply['account_id']}}">{{apply['account_nickname']}}</a>
+                            <a href="/vendors/{{ vendor_id }}/customers/{{ apply['account_id'] }}">{{ apply['nickname'] }}</a>
                             <br />
                           </td>
-                          <td>{{apply['name']}}</td>
+                          <td>{{apply['real_name']}}</td>
                           <td>{{apply['gender']}}</td>
                           <td>{{apply['id_code']}}</td>
                           <td>{{apply['phone']}}</td>
@@ -280,8 +278,6 @@
                               <i class="fa fa-eye"></i> 订单 </a>
                           </td>
                         </tr>
-                        {% end %}
-                      {% end %}
                     {% end %}
                     </tbody>
                   </table>
