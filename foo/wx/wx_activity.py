@@ -569,19 +569,6 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
         guest_club_id = self.get_argument("guest_club_id")
         logging.info("got guest_club_id %r", guest_club_id)
 
-        vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, _account_id)
-        if(vendor_member):
-            try:
-                vendor_member['account_nickname']
-            except:
-                vendor_member['account_nickname'] = ''
-            try:
-                vendor_member['account_avatar']
-            except:
-                vendor_member['account_avatar'] = ''
-        _avatar = vendor_member['account_avatar']
-        _nickname = vendor_member['account_nickname']
-
         _timestamp = time.time()
         # 一分钟内不能创建第二个订单,
         # 防止用户点击回退按钮，产生第二个订单
@@ -600,9 +587,11 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
         logging.info("got _total_amount %r", _total_amount)
         # 订单申报数目
         _applicant_num = self.get_argument("applicant_num", 1)
-
         # 活动金额，即已选的基本服务项金额
         activity_amount = 0
+
+        _activity = activity_dao.activity_dao().query(activity_id)
+        _title = _activity['title']
 
         #基本服务
         _base_fee_ids = self.get_body_argument("base_fees", [])
@@ -610,8 +599,6 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
         # 转为列表
         _base_fee_ids = JSON.loads(_base_fee_ids)
         _base_fees = []
-        _activity = activity_dao.activity_dao().query(activity_id)
-        _title = _activity['title']
         base_fee_template = _activity['base_fee_template']
         for _base_fee_id in _base_fee_ids:
             for template in base_fee_template:
@@ -628,8 +615,6 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
         # 转为列表
         _ext_fee_ids = JSON.loads(_ext_fee_ids)
         _ext_fees = []
-        _activity = activity_dao.activity_dao().query(activity_id)
-        _title = _activity['title']
         ext_fee_template = _activity['ext_fee_template']
         for _ext_fee_id in _ext_fee_ids:
             for template in ext_fee_template:
@@ -641,7 +626,6 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
         # 保险选项,数组
         _insurance_ids = self.get_body_argument("insurances", [])
         _insurance_ids = JSON.loads(_insurance_ids)
-
         _insurances = []
         _insurance_templates = insurance_template_dao.insurance_template_dao().query_by_vendor(vendor_id)
         for _insurance_id in _insurance_ids:
@@ -700,29 +684,13 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
 
         # status: 10=order but not pay it, 20=order and pay it.
         # pay_type: wxpay, alipay, paypal, applepay, huaweipay, ...
-        _order = {
-            "_id": _order_id,
-            "guest_club_id": guest_club_id,
-            "activity_id": activity_id,
-            "account_id": _account_id,
-            "account_avatar": _avatar,
-            "account_nickname": _nickname,
-            "activity_title": _title,
-            "create_time": _timestamp,
-            "last_update_time": _timestamp,
-            "review": False,
-            "status": _status,
-            "pay_type": "wxpay",
-            "total_amount": _total_amount, #已经转换为分，注意转为数值
-            "applicant_num": _applicant_num,
-            "base_fees": _base_fees, #数组
-            "ext_fees": _ext_fees, #数组
-            "insurances": _insurances, #数组
-            "vouchers": _vouchers, #数组
-            "bonus": _bonus, ##分，注意转为数值
-            "vendor_id":vendor_id
-        }
-        order_dao.order_dao().create(_order)
+        order_index['applicant_num'] = _applicant_num
+        order_index['base_fees'] = _base_fees
+        order_index['ext_fees'] = _ext_fees
+        order_index['insurances'] = _insurances
+        order_index['vouchers'] = _vouchers
+        order_index['bonus'] = _bonus
+        self.create_symbol_object(order_index)
 
         wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
         wx_app_id = wx_app_info['wx_app_id']
@@ -742,7 +710,6 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
 
             _store_id = 'Aplan'
             logging.info("got _store_id %r", _store_id)
-            _activity = activity_dao.activity_dao().query(activity_id)
             _product_description = _activity['title']
             logging.info("got _product_description %r", _product_description)
 
@@ -798,27 +765,15 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
             _order_return['app_id'] = wx_app_id
 
             # 微信统一下单返回成功
-            _json = ""
             unified_json = ""
             if(_order_return['return_msg'] == 'OK'):
-                _json = {'_id': _order_id, 'prepay_id': prepayId, 'status': ORDER_STATUS_WECHAT_UNIFIED_SUCCESS}
-                unified_json = {'prepay_id': prepayId, 'pay_status': ORDER_STATUS_WECHAT_UNIFIED_SUCCESS}
+                unified_json = {'_id':_order_id,'prepay_id': prepayId, 'pay_status': ORDER_STATUS_WECHAT_UNIFIED_SUCCESS}
             else:
-                _json = {'_id': _order_id, 'prepay_id': prepayId, 'status': ORDER_STATUS_WECHAT_UNIFIED_FAILED}
-                unified_json = {'prepay_id': prepayId, 'pay_status': ORDER_STATUS_WECHAT_UNIFIED_FAILED}
-            order_dao.order_dao().update(_json)
-
+                unified_json = {'_id':_order_id,'prepay_id': prepayId, 'pay_status': ORDER_STATUS_WECHAT_UNIFIED_FAILED}
             # 微信统一下单返回成功
             # TODO: 更新订单索引中，订单状态pay_status,prepay_id
-            access_token = self.get_secure_cookie("access_token")
-            url = API_DOMAIN + "/api/orders/" + _order_id + "/unified"
-            http_client = HTTPClient()
-            headers = {"Authorization":"Bearer " + access_token}
-            _unified_json = json_encode(unified_json)
-            response = http_client.fetch(url, method="POST", headers=headers, body=_unified_json)
-            logging.info("got response.body %r", response.body)
+            self.update_order_unified(unified_json)
 
-            _activity = activity_dao.activity_dao().query(activity_id)
             # FIXME, 将服务模板转为字符串，客户端要用
             _servTmpls = _activity['ext_fee_template']
             _activity['json_serv_tmpls'] = tornado.escape.json_encode(_servTmpls);
@@ -826,16 +781,15 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
             _activity['end_time'] = timestamp_friendly_date(float(_activity['end_time'])) # timestamp -> %m月%d 星期%w
             # 金额转换成元
             # _activity['amount'] = float(activity_amount) / 100
-            for base_fee in _order['base_fees']:
+            for base_fee in order_index['base_fees']:
                 # 价格转换成元
-                _order['activity_amount'] = float(base_fee['fee']) / 100
+                order_index['activity_amount'] = float(base_fee['fee']) / 100
 
             self.render('wx/order-confirm.html',
                     vendor_id=vendor_id,
                     return_msg=response.body, order_return=_order_return,
-                    activity=_activity, order=_order)
+                    activity=_activity, order_index=order_index)
         else: #_total_amount == 0:
-            _activity = activity_dao.activity_dao().query(activity_id)
             # FIXME, 将服务模板转为字符串，客户端要用
             _servTmpls = _activity['ext_fee_template']
             _activity['json_serv_tmpls'] = tornado.escape.json_encode(_servTmpls);
@@ -843,16 +797,16 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
             _activity['end_time'] = timestamp_friendly_date(float(_activity['end_time'])) # timestamp -> %m月%d 星期%w
             # 金额转换成元
             # _activity['amount'] = float(activity_amount) / 100
-            for base_fee in _order['base_fees']:
+            for base_fee in order_index['base_fees']:
                 # 价格转换成元
-                _order['activity_amount'] = float(base_fee['fee']) / 100
+                order_index['activity_amount'] = float(base_fee['fee']) / 100
 
             # 如使用积分抵扣，则将积分减去
-            _bonus = _order['bonus']
+            _bonus = order_index['bonus']
             if _bonus < 0:
-                _old_bonus = bonus_dao.bonus_dao().query_not_safe_by_res(_order['activity_id'], _order['account_id'], 3)
+                _old_bonus = bonus_dao.bonus_dao().query_not_safe_by_res(order_index['item_id'], _order['account_id'], 3)
                 if not _old_bonus:
-                    _customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, _order['account_id'])
+                    _customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, order_index['account_id'])
                     try:
                         _customer_profile['bonus']
                     except:
@@ -860,7 +814,7 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
                     logging.info("got bonus %r", _customer_profile['bonus'])
 
                     # 消费积分纪录
-                    _json = {'vendor_id':vendor_id, 'account_id':_order['account_id'], 'res_id':_order['activity_id'],
+                    _json = {'vendor_id':vendor_id, 'account_id':order_index['account_id'], 'res_id':order_index['item_id'],
                             'create_time':_timestamp, 'bonus':_bonus, 'type':3}
                     bonus_dao.bonus_dao().create(_json)
 
@@ -868,7 +822,7 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
                     _bonus = int(_customer_profile['bonus']) + int(_bonus)
                     if _bonus < 0:
                         _bonus = 0
-                    _json = {'vendor_id':vendor_id, 'account_id':_order['account_id'], 'last_update_time':_timestamp,
+                    _json = {'vendor_id':vendor_id, 'account_id':order_index['account_id'], 'last_update_time':_timestamp,
                             'bonus':_bonus}
                     vendor_member_dao.vendor_member_dao().update(_json)
 
@@ -876,12 +830,12 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
             for _voucher in _vouchers:
                 # status=2, 已使用
                 voucher_dao.voucher_dao().update({'_id':_voucher['_id'], 'status':2, 'last_update_time':_timestamp})
-                _customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, _order['account_id'])
+                _customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, order_index['account_id'])
                 # 修改个人代金券信息
                 _voucher_amount = int(_customer_profile['vouchers']) - int(_voucher['fee'])
                 if _voucher_amount < 0:
                     _voucher_amount = 0
-                _json = {'vendor_id':vendor_id, 'account_id':_order['account_id'], 'last_update_time':_timestamp,
+                _json = {'vendor_id':vendor_id, 'account_id':order_index['account_id'], 'last_update_time':_timestamp,
                         'vouchers':_voucher_amount}
                 vendor_member_dao.vendor_member_dao().update(_json)
 
@@ -895,7 +849,7 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
                         'app_id': wx_app_id,
                         'return_msg':'OK'},
                     activity=_activity,
-                    order=_order)
+                    order_index=order_index)
 
 
 # 添加当前订单的成员
@@ -927,8 +881,8 @@ class WxActivityApplyStep3Handler(AuthorizationHandler):
         _order_id = self.get_argument("order_id", "")
 
         # 查询过去是否填报，有则跳过此步骤。主要是防止用户操作回退键，重新回到此页面
-        _old_order = order_dao.order_dao().query(_order_id)
-        if _old_order['status'] > 30:
+        _old_order = self.get_symbol_object(_order_id)
+        if _old_order['pay_status'] > 30:
             _activity = activity_dao.activity_dao().query(activity_id)
             _qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
             # 为活动添加二维码属性
@@ -940,12 +894,12 @@ class WxActivityApplyStep3Handler(AuthorizationHandler):
                     order_id=_order_id,
                     account_id=_account_id)
         else:
+            _activity = activity_dao.activity_dao().query(activity_id)
+
             _applicantstr = self.get_body_argument("applicants", [])
             _applicantList = JSON.loads(_applicantstr);
             # 处理多个申请人
             for apply_index in _applicantList:
-                _activity = activity_dao.activity_dao().query(activity_id)
-
                 apply_index["club_id"] = vendor_id
                 apply_index["item_type"] = "activity"
                 apply_index["item_id"] = activity_id
@@ -973,15 +927,6 @@ class WxActivityApplyStep3Handler(AuthorizationHandler):
                     apply_index["_id"] = _contact["_id"]
                     contact_dao.contact_dao().update(apply_index)
 
-            # 更新活动报名人数
-            total_applicant_num = apply_dao.apply_dao().count_by_activity(activity_id)
-            activity_dao.activity_dao().update({"_id":activity_id, "total_applicant_num":total_applicant_num})
-
-            # 更新订单状态
-            json = {'_id': _order_id, 'status': ORDER_STATUS_BF_APPLY}
-            order_dao.order_dao().update(json)
-
-            _activity = activity_dao.activity_dao().query(activity_id)
             _bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
             _qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
             # 为活动添加二维码属性
@@ -993,11 +938,10 @@ class WxActivityApplyStep3Handler(AuthorizationHandler):
                     bonus_template=_bonus_template)
 
 
-
 # 微信支付结果通用通知
 # 该链接是通过【统一下单API】中提交的参数notify_url设置，如果链接无法访问，商户将无法接收到微信通知。
 # 通知url必须为直接可访问的url，不能携带参数。示例：notify_url：“https://pay.weixin.qq.com/wxpay/pay.action”
-class WxOrderNotifyHandler(tornado.web.RequestHandler):
+class WxOrderNotifyHandler(BaseHandler):
     def post(self):
         # 返回参数
         #<xml>
@@ -1033,35 +977,30 @@ class WxOrderNotifyHandler(tornado.web.RequestHandler):
         _result_code = _pay_return['result_code']
         if _result_code == 'SUCCESS' :
             # 查询过去是否填报，有则跳过此步骤。主要是防止用户操作回退键，重新回到此页面
-            _old_order = order_dao.order_dao().query(_order_id)
+            order_index = self.get_order_index(_order_id)
             # 用于更新积分、优惠券
-            vendor_id = _old_order['vendor_id']
-            if _old_order['status'] > 30:
+            vendor_id = order_index['club_id']
+            if order_index['pay_status'] > 30:
                 return
             else:
-                _timestamp = int(time.time())
-                json = {'_id':_order_id,
-                    'last_update_time': _timestamp, "status": ORDER_STATUS_WECHAT_PAY_SUCCESS,
-                    'transaction_id':_pay_return['transaction_id'], 'payed_total_fee':_pay_return['total_fee']}
-                order_dao.order_dao().update(json)
-
                 # 调用微信支付接口，返回成功
                 # TODO: 更新订单索引中，订单状态pay_status,transaction_id,payed_total_fee
-                url = API_DOMAIN + "/api/orders/" + _order_id + "/payed"
-                http_client = HTTPClient()
-                payed_json = {"pay_status": ORDER_STATUS_WECHAT_PAY_SUCCESS,
+                order_payed = {
+                    '_id':_order_id,
+                    "pay_status": ORDER_STATUS_WECHAT_PAY_SUCCESS,
                     'transaction_id':_pay_return['transaction_id'],
-                    'payed_total_fee':_pay_return['total_fee']}
-                _payed_json = json_encode(payed_json)
-                response = http_client.fetch(url, method="POST", body=_payed_json)
-                logging.info("got response.body %r", response.body)
+                    'payed_total_fee':_pay_return['total_fee']
+                }
+                self.update_order_payed(order_payed)
+
+                order = self.get_symbol_object(_order_id)
 
                 # 如使用积分抵扣，则将积分减去
-                _bonus = _old_order['bonus']
+                _bonus = order['bonus']
                 if _bonus < 0:
-                    _old_bonus = bonus_dao.bonus_dao().query_not_safe(_old_order['activity_id'], _old_order['account_id'], 3)
+                    _old_bonus = bonus_dao.bonus_dao().query_not_safe(order['item_id'], order['account_id'], 3)
                     if not _old_bonus:
-                        _customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, _old_order['account_id'])
+                        _customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, order['account_id'])
                         try:
                             _customer_profile['bonus']
                         except:
@@ -1082,34 +1021,26 @@ class WxOrderNotifyHandler(tornado.web.RequestHandler):
                         vendor_member_dao.vendor_member_dao().update(_json)
 
                 # 如使用代金券抵扣，则将代金券减去
-                _vouchers = _old_order['vouchers']
+                _vouchers = order['vouchers']
                 for _voucher in _vouchers:
                     # status=2, 已使用
                     voucher_dao.voucher_dao().update({'_id':_voucher['_id'], 'status':2, 'last_update_time':_timestamp})
-                    _customer_profile = mongodao().query_vendor_member_not_safe(vendor_id, _old_order['account_id'])
+                    _customer_profile = mongodao().query_vendor_member_not_safe(vendor_id, order['account_id'])
                     # 修改个人代金券信息
                     _voucher_amount = int(_customer_profile['vouchers']) - int(_voucher['fee'])
                     if _voucher_amount < 0:
                         _voucher_amount = 0
-                    _json = {'vendor_id':vendor_id, 'account_id':_old_order['account_id'], 'last_update_time':_timestamp,
+                    _json = {'vendor_id':vendor_id, 'account_id':order['account_id'], 'last_update_time':_timestamp,
                         'vouchers':_voucher_amount}
                     vendor_member_dao.vendor_member_dao().update(_json)
         else:
-            _timestamp = (int)(time.time())
-            json = {'_id':_order_id,
-                'last_update_time': _timestamp, "status": ORDER_STATUS_WECHAT_PAY_FAILED}
-            order_dao.order_dao().update(json)
-
             # 调用微信支付接口，返回成功
             # TODO: 更新订单索引中，订单状态pay_status,transaction_id,payed_total_fee
-            url = API_DOMAIN + "/api/orders/" + _order_id + "/payed"
-            http_client = HTTPClient()
-            payed_json = {"pay_status": ORDER_STATUS_WECHAT_PAY_FAILED,
+            order_payed = {'_id':_order_id,
+                "pay_status": ORDER_STATUS_WECHAT_PAY_FAILED,
                 'transaction_id':DEFAULT_USER_ID,
                 'payed_total_fee':0}
-            _payed_json = json_encode(payed_json)
-            response = http_client.fetch(url, method="POST", body=_payed_json)
-            logging.info("got response.body %r", response.body)
+            self.update_order_payed(order_payed)
 
 
 class WxOrderWaitHandler(tornado.web.RequestHandler):

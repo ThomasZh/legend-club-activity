@@ -140,6 +140,72 @@ def time_span(ts):
 
 class BaseHandler(tornado.web.RequestHandler):
 
+    def get_order_index(self, order_id):
+        headers = {"Authorization":"Bearer "+DEFAULT_USER_ID}
+
+        url = API_DOMAIN + "/api/orders/" + order_id
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got order_index response.body=[%r]", response.body)
+        data = json_decode(response.body)
+        if data['err_code'] == 404:
+            return None
+        return data['rs']
+
+
+    def update_order_unified(self, order_unified):
+        headers = {"Authorization":"Bearer "+DEFAULT_USER_ID}
+
+        url = API_DOMAIN + "/api/orders/" + order_unified['_id'] + "/unified"
+        http_client = HTTPClient()
+        _json = json_encode(order_unified)
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("got response.body %r", response.body)
+
+
+    def update_order_payed(self, order_payed):
+        headers = {"Authorization":"Bearer "+DEFAULT_USER_ID}
+
+        url = API_DOMAIN + "/api/orders/" + order_payed['_id'] + "/payed"
+        http_client = HTTPClient()
+        _json = json_encode(order_payed)
+        response = http_client.fetch(url, method="POST", body=_json)
+        logging.info("got response.body %r", response.body)
+
+
+    def get_symbol_object(self, _id):
+        url = API_DOMAIN + "/api/symbols/" + _id
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="GET")
+        logging.info("got symbol_object=[%r]", response.body)
+        data = json_decode(response.body)
+        if data['err_code'] == 404:
+            return None
+        symbol_object = data['rs']
+        return symbol_object
+
+
+    def create_symbol_object(self, symbol_object):
+        url = API_DOMAIN + "/api/symbols"
+        _json = json_encode(symbol_object)
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="POST", body=_json)
+        logging.info("create symbol_object=[%r]", response.body)
+        data = json_decode(response.body)
+        if data['err_code'] == 404:
+            return None
+        symbol_object = data['rs']
+        return symbol_object['_id']
+
+
+    def update_symbol_object(self, symbol_object):
+        url = API_DOMAIN + "/api/symbols/" + symbol_object['_id']
+        _json = json_encode(symbol_object)
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="PUT", body=_json)
+        logging.info("create symbol_object=[%r]", response.body)
+
+
     def get_counter(self, item_id):
         url = API_DOMAIN + "/api/counters/" + item_id
         http_client = HTTPClient()

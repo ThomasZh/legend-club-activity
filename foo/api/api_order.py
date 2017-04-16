@@ -130,12 +130,10 @@ class ApiOrderInfoXHR(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got order_id %r in uri", order_id)
 
-        _order = order_dao.order_dao().query(order_id)
+        _order = self.get_symbol_object(order_id)
         # 价格转换成元
         _order['total_amount'] = float(_order['total_amount']) / 100
-        try:
-            _order['payed_total_fee']
-        except:
+        if not _order.has_key('payed_total_fee'):
             _order['payed_total_fee'] = 0
         _order['payed_total_fee'] = float(_order['payed_total_fee']) / 100
         for ext_fee in _order['ext_fees']:
@@ -153,7 +151,6 @@ class ApiOrderInfoXHR(AuthorizationHandler):
 
         _json = JSON.dumps(_order, default=json_util.default)
         logging.info("got order %r", _json)
-
         self.write(_json)
         self.finish()
 

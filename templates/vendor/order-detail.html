@@ -120,89 +120,89 @@
                     <tbody id="tbody">
                       <tr class="even pointer">
                         <td class="a-center ">
-                          {% if order['review'] %}
+                          {% if order_index['check_status'] %}
                             <input type="checkbox" class="tableflat" checked="checked" disabled="true">
                           {% else %}
-                            <input type="checkbox" class="tableflat" value="{{order['_id']}}" onclick="OnReviewOrder(this);">
+                            <input type="checkbox" class="tableflat" value="{{ order_index['_id'] }}" onclick="OnReviewOrder(this);">
                           {% end %}
                         </td>
                         <td class=" ">
-                          {{order['_id']}}
-                          {% if order['status'] == 20 %}
-                            <br />{{order['prepay_id']}}
-                          {% elif order['status'] > 20 %}
-                            <br />{{order['prepay_id']}}
-                            <br />{{order['transaction_id']}}
+                          {{ order_index['_id'] }}
+                          {% if order_index['pay_status'] == 20 %}
+                            <br />{{ order_index['prepay_id'] }}
+                          {% elif order_index['pay_status'] > 20 %}
+                            <br />{{ order_index['prepay_id'] }}
+                            <br />{{ order_index['transaction_id'] }}
                           {% end %}
                         </td>
                         <td class=" ">
-                          <a href="/vendors/{{ vendor_id }}/activitys/{{order['activity_id']}}/detail/step1">{{order['activity_title']}}</a>
+                          <a href="/vendors/{{ vendor_id }}/activitys/{{ order_index['item_id'] }}/detail/step1">{{ order['item_name'] }}</a>
                         </td>
                         <td>
                           <ul class="list-inline">
                             <li>
-                              <img src="{{order['account_avatar']}}" class="avatar" alt="Avatar">
+                              <img src="{{ order_index['avatar'] }}" class="avatar" alt="Avatar">
                             </li>
                           </ul>
-                          <a href="/vendors/{{ vendor_id }}/customers/{{order['account_id']}}">{{order['account_nickname']}}</a>
+                          <a href="/vendors/{{ vendor_id }}/customers/{{ order_index['account_id'] }}">{{ order_index['nickname'] }}</a>
                           <br />
                         </td>
                         <td>{{order['applicant_num']}}</td>
                         <td>活动费用: {{order['activity_amount']}}元<br />
                           {% for fee in order['ext_fees'] %}
-                            {{fee['name']}}: {{fee['fee']}}元<br />
+                            {{ fee['name'] }}: {{ fee['fee'] }}元<br />
                           {% end %}
                           {% for insurance in order['insurances'] %}
-                            {{insurance['name']}}: {{insurance['fee']}}元<br />
+                            {{ insurance['name'] }}: {{ insurance['fee'] }}元<br />
                           {% end %}
                           {% for voucher in order['vouchers'] %}
-                            使用代金券抵: {{voucher['fee']}}元<br />
+                            使用代金券抵: {{ voucher['fee'] }}元<br />
                           {% end %}
                           {% if order['bonus'] < 0 %}
-                            使用积分抵: {{order['bonus']}}元
+                            使用积分抵: {{ order['bonus'] }}元
                           {% end %}
                         </td>
-                        <td>订单总额: {{order['total_amount']}}元
-                          {% if order['status'] > 20 %}
-                            <br />实际支付: {{order['payed_total_fee']}}元
+                        <td>订单总额: {{ order_index['total_amount'] }}元
+                          {% if order_index['pay_status'] > 20 %}
+                            <br />实际支付: {{ order_index['payed_total_fee'] }}元
                           {% end %}
                         </td>
-                        <td class=" ">{{order['create_time']}}</td>
-                        {% if order['status'] == 20 %}
+                        <td class=" ">{{ order_index['create_time'] }}</td>
+                        {% if order_index['pay_status'] == 20 %}
                         <td>
                           <a href="#" class="btn btn-warning btn-xs"> 待付款 </a>
                         </td>
-                        {% elif order['status'] == 21 %}
+                        {% elif order_index['pay_status'] == 21 %}
                         <td>
                           <a href="#" class="btn btn-danger btn-xs"> 下单失败 </a>
                         </td>
-                        {% elif order['status'] == 31 %}
+                        {% elif order_index['pay_status'] == 31 %}
                         <td>
                           <a href="#" class="btn btn-danger btn-xs"> 支付失败 </a>
                         </td>
-                        {% elif order['status'] == 30 %}
+                        {% elif order_index['pay_status'] == 30 %}
                         <td>
                           <a href="#" class="btn btn-info btn-xs"> 待报名 </a>
                         </td>
-                        {% elif order['status'] == 50 %}
+                        {% elif order_index['pay_status'] == 50 %}
                         <td>
                           <a href="#" class="btn btn-info btn-xs"> 待骑行 </a>
                         </td>
-                        {% elif order['status'] == 60 %}
+                        {% elif order_index['pay_status'] == 60 %}
                         <td>
                           <a href="#" class="btn btn-info btn-xs"> 待评价 </a>
                         </td>
-                        {% elif order['status'] == 70 %}
+                        {% elif order_index['pay_status'] == 70 %}
                         <td>
                           <a href="#" class="btn btn-success btn-xs"> 活动完成 </a>
                         </td>
-                        {% elif order['status'] == 10 %}
+                        {% elif order_index['pay_status'] == 10 %}
                         <td>
                           <a href="#" class="btn btn-danger btn-xs"> 初始化成功 </a>
                         </td>
                         {% else%}
                         <td>
-                          <a href="#" class="btn btn-success btn-xs"> {{ order['status'] }} </a>
+                          <a href="#" class="btn btn-success btn-xs"> {{ order_index['pay_status'] }} </a>
                         </td>
                         {% end %}
                       </tr>

@@ -199,49 +199,29 @@ class VendorOrderInfoHandler(AuthorizationHandler):
 
         ops = self.get_ops_info()
 
-        order = order_dao.order_dao().query(order_id)
-        _activity = activity_dao.activity_dao().query(order['activity_id'])
-        order['activity_title'] = _activity['title']
+        order_index = self.get_order_index(order_id)
+        order_index['create_time'] = timestamp_datetime(order_index['create_time'])
+        order = self.get_symbol_object(order_id)
 
-        if not order['base_fees']:
-            order['activity_amount'] = 0
-        else:
-            for base_fee in order['base_fees']:
-                # 价格转换成元
-                order['activity_amount'] = float(base_fee['fee']) / 100
-
-        order['create_time'] = timestamp_datetime(order['create_time'])
-
-        if order['account_id'] == DEFAULT_USER_ID:
-            order['account_nickname'] = DEFAULT_USER_NICKNAME
-            order['account_avatar'] = DEFAULT_USER_AVATAR
-        else:
-            params = {"filter":"basic", "by":"account_id"}
-            url = url_concat(API_DOMAIN + "/api/profiles/" + order['account_id'], params)
-            http_client = HTTPClient()
-            response = http_client.fetch(url, method="GET")
-            logging.info("got profile basic response.body %r", response.body)
-            data = json_decode(response.body)
-            profile = data['rs']
-
-            order['account_nickname'] = profile['nickname']
-            order['account_avatar'] = profile['avatar']
-        try:
-            order['prepay_id']
-        except:
-            order['prepay_id'] = ''
-        try:
-            order['transaction_id']
-        except:
-            order['transaction_id'] = ''
-        try:
-            order['payed_total_fee']
-        except:
-            order['payed_total_fee'] = 0
+        for base_fee in order['base_fees']:
+            # 价格转换成元
+            order['activity_amount'] = float(base_fee['fee']) / 100
 
         for _voucher in order['vouchers']:
             # 价格转换成元
             _voucher['fee'] = float(_voucher['fee']) / 100
+
+        for ext_fee in order['ext_fees']:
+            # 价格转换成元
+            ext_fee['fee'] = float(ext_fee['fee']) / 100
+
+        for insurance in order['insurances']:
+            # 价格转换成元
+            insurance['fee'] = float(insurance['fee']) / 100
+
+        order['total_amount'] = float(order['total_amount']) / 100
+        order['bonus'] = float(order['bonus']) / 100
+        order_index['payed_total_fee'] = float(order_index['payed_total_fee']) / 100
 
         params = {"filter":"order", "order_id":order_id, "page":1, "limit":20}
         url = url_concat(API_DOMAIN + "/api/applies", params)
@@ -261,30 +241,10 @@ class VendorOrderInfoHandler(AuthorizationHandler):
             else:
                 _apply['gender'] = u'女'
 
-        for ext_fee in order['ext_fees']:
-            # 价格转换成元
-            ext_fee['fee'] = float(ext_fee['fee']) / 100
-
-        for insurance in order['insurances']:
-            # 价格转换成元
-            insurance['fee'] = float(insurance['fee']) / 100
-
-        # order['activity_amount'] = float(_activity['amount']) / 100
-        if not order['base_fees']:
-            order['activity_amount'] = 0
-        else:
-            for base_fee in order['base_fees']:
-                # 价格转换成元
-                order['activity_amount'] = float(base_fee['fee']) / 100
-
-        order['total_amount'] = float(order['total_amount']) / 100
-        order['bonus'] = float(order['bonus']) / 100
-        order['payed_total_fee'] = float(order['payed_total_fee']) / 100
-
         counter = self.get_counter(vendor_id)
         self.render('vendor/order-detail.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 access_token=access_token,
                 counter=counter,
-                activity=_activity, order=order, applies=applies)
+                order_index=order_index, order=order, applies=applies)
