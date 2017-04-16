@@ -131,7 +131,11 @@
             <div class="right">
               <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step5">
               <span class="count_top"><i class="fa fa-money"></i> 订单</span>
-              <div class="count">{{len(orders)}}<small>笔</small></div>
+              {% if activity_counter.has_key('order') %}
+              <div class="count">{{ activity_counter['order'] }}<small>笔</small></div>
+              {% else %}
+              <div class="count">0 <small>笔</small></div>
+              {% end %}
               <span class="count_bottom"><i class="green">Step5 </i> 付费信息</span>
               </a>
             </div>
@@ -141,7 +145,11 @@
             <div class="right">
               <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step6">
               <span class="count_top"><i class="fa fa-user"></i> 会员报名</span>
-              <div class="count green">{{ len(applies) }}<small>人次</small></div>
+              {% if activity_counter.has_key('apply') %}
+              <div class="count">{{ activity_counter['apply'] }}<small>人次</small></div>
+              {% else %}
+              <div class="count">0 <small>人次</small></div>
+              {% end %}
               <span class="count_bottom"><i class="red">Step6  </i> 报名信息</span>
               </a>
             </div>

@@ -686,8 +686,6 @@ class VendorActivityDetailStep1Handler(AuthorizationHandler):
 
         triprouters = trip_router_dao.trip_router_dao().query_by_vendor(vendor_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
-        applys = apply_dao.apply_dao().query_by_activity(activity_id)
-        orders = order_dao.order_dao().query_by_activity(activity_id)
         cret_template = cret_template_dao.cret_template_dao().query(activity_id)
         bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
         try:
@@ -701,13 +699,15 @@ class VendorActivityDetailStep1Handler(AuthorizationHandler):
         bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
 
         counter = self.get_counter(vendor_id)
+        activity_counter = self.get_counter(activity_id)
         self.render('vendor/activity-edit-step1.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 activity_id=activity_id,
-                counter=counter, triprouters=triprouters,
+                counter=counter, activity_counter=activity_counter,
+                triprouters=triprouters,
                 activity=_activity, categorys=categorys,
-                orders=orders, applys=applys, bonus=bonus,
+                bonus=bonus,
                 cret_template=cret_template)
 
     @tornado.web.authenticated  # if no session, redirect to login page
@@ -766,8 +766,6 @@ class VendorActivityDetailStep2Handler(AuthorizationHandler):
 
         activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
-        applys = apply_dao.apply_dao().query_by_activity(activity_id)
-        orders = order_dao.order_dao().query_by_activity(activity_id)
         cret_template = cret_template_dao.cret_template_dao().query(activity_id)
         bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
         bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
@@ -782,14 +780,15 @@ class VendorActivityDetailStep2Handler(AuthorizationHandler):
         wx_notify_domain = wx_app_info['wx_notify_domain']
 
         counter = self.get_counter(vendor_id)
+        activity_counter = self.get_counter(activity_id)
         self.render('vendor/activity-edit-step2.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 wx_notify_domain=wx_notify_domain,
                 activity_id=activity_id,
-                counter=counter,
+                counter=counter, activity_counter=activity_counter,
                 activity=activity, categorys=categorys,
-                orders=orders, applys=applys, bonus=bonus,
+                bonus=bonus,
                 cret_template=cret_template,
                 qrcode=qrcode)
 
@@ -822,21 +821,20 @@ class VendorActivityDetailStep3Handler(AuthorizationHandler):
 
         activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
-        applys = apply_dao.apply_dao().query_by_activity(activity_id)
-        orders = order_dao.order_dao().query_by_activity(activity_id)
         cret_template = cret_template_dao.cret_template_dao().query(activity_id)
         bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
         bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
 
         counter = self.get_counter(vendor_id)
+        activity_counter = self.get_counter(activity_id)
         self.render('vendor/activity-edit-step3.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 activity_id=activity_id,
-                counter=counter,
+                counter=counter, activity_counter=activity_counter,
                 activity=activity, categorys=categorys,
-                orders=orders, applys=applys, bonus=bonus,
+                bonus=bonus,
                 cret_template=cret_template)
 
     @tornado.web.authenticated  # if no session, redirect to login page
@@ -877,21 +875,20 @@ class VendorActivityDetailStep4Handler(AuthorizationHandler):
 
         activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
-        applys = apply_dao.apply_dao().query_by_activity(activity_id)
-        orders = order_dao.order_dao().query_by_activity(activity_id)
         cret_template = cret_template_dao.cret_template_dao().query(activity_id)
         bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
         bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
 
         counter = self.get_counter(vendor_id)
+        activity_counter = self.get_counter(activity_id)
         self.render('vendor/activity-edit-step4.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 activity_id=activity_id,
-                counter=counter,
+                counter=counter, activity_counter=activity_counter,
                 activity=activity, categorys=categorys,
-                orders=orders, applys=applys, bonus=bonus,
+                bonus=bonus,
                 cret_template=cret_template, bonus_template=bonus_template)
 
     @tornado.web.authenticated  # if no session, redirect to login page
@@ -924,22 +921,21 @@ class VendorActivityDetailStep5Handler(AuthorizationHandler):
 
         activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
-        applys = apply_dao.apply_dao().query_by_activity(activity_id)
-        orders = order_dao.order_dao().query_by_activity(activity_id)
         cret_template = cret_template_dao.cret_template_dao().query(activity_id)
         bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
         bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
 
         counter = self.get_counter(vendor_id)
+        activity_counter = self.get_counter(activity_id)
         self.render('vendor/activity-edit-step5.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 access_token=access_token,
                 activity_id=activity_id,
-                counter=counter,
+                counter=counter, activity_counter=activity_counter,
                 activity=activity, categorys=categorys,
-                orders=orders, applys=applys, bonus=bonus,
+                bonus=bonus,
                 cret_template=cret_template)
 
 
@@ -954,8 +950,6 @@ class VendorActivityDetailStep6Handler(AuthorizationHandler):
 
         activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
-        applys = apply_dao.apply_dao().query_by_activity(activity_id)
-        orders = order_dao.order_dao().query_by_activity(activity_id)
         cret_template = cret_template_dao.cret_template_dao().query(activity_id)
         bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
         bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
@@ -980,13 +974,14 @@ class VendorActivityDetailStep6Handler(AuthorizationHandler):
                 _apply['gender'] = u'女'
 
         counter = self.get_counter(vendor_id)
+        activity_counter = self.get_counter(activity_id)
         self.render('vendor/activity-edit-step6.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 activity_id=activity_id,
-                counter=counter,
+                counter=counter, activity_counter=activity_counter,
                 activity=activity, categorys=categorys,
-                orders=orders, applies=applies, bonus=bonus,
+                applies=applies, bonus=bonus,
                 cret_template=cret_template)
 
 
@@ -1001,8 +996,6 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
 
         activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
-        applys = apply_dao.apply_dao().query_by_activity(activity_id)
-        orders = order_dao.order_dao().query_by_activity(activity_id)
         cret_template = cret_template_dao.cret_template_dao().query(activity_id)
         bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
         bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
@@ -1014,13 +1007,14 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
             self.create_article(article)
 
         counter = self.get_counter(vendor_id)
+        activity_counter = self.get_counter(activity_id)
         self.render('vendor/activity-edit-step7.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 travel_id=activity_id,
-                counter=counter,
+                counter=counter, activity_counter=activity_counter,
                 activity=activity, categorys=categorys,
-                orders=orders, applys=applys, bonus=bonus,
+                bonus=bonus,
                 cret_template=cret_template,
                 article=article)
 
@@ -1065,20 +1059,19 @@ class VendorActivityDetailStep8Handler(AuthorizationHandler):
             ext_fee_template['fee'] = float(ext_fee_template['fee']) / 100
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
-        applys = apply_dao.apply_dao().query_by_activity(activity_id)
-        orders = order_dao.order_dao().query_by_activity(activity_id)
         cret_template = cret_template_dao.cret_template_dao().query(activity_id)
         bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
         bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
-        counter = self.get_counter(vendor_id)
 
+        counter = self.get_counter(vendor_id)
+        activity_counter = self.get_counter(activity_id)
         self.render('vendor/activity-edit-step8.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                counter=counter,
+                counter=counter, activity_counter=activity_counter,
                 activity=activity, categorys=categorys,
-                orders=orders, applys=applys, bonus=bonus,
+                bonus=bonus,
                 cret_template=cret_template)
 
     @tornado.web.authenticated  # if no session, redirect to login page
@@ -1132,19 +1125,19 @@ class VendorActivityDetailStep9Handler(AuthorizationHandler):
 
         activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
-        applys = apply_dao.apply_dao().query_by_activity(activity_id)
-        orders = order_dao.order_dao().query_by_activity(activity_id)
         cret_template = cret_template_dao.cret_template_dao().query(activity_id)
         bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
         bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
+
         counter = self.get_counter(vendor_id)
+        activity_counter = self.get_counter(activity_id)
         self.render('vendor/activity-edit-step9.html',
                 vendor_id=vendor_id,
                 ops=ops,
-                counter=counter,
+                counter=counter, activity_counter=activity_counter,
                 activity=activity, categorys=categorys,
-                orders=orders, applys=applys, bonus=bonus,
+                bonus=bonus,
                 cret_template=cret_template)
 
     @tornado.web.authenticated  # if no session, redirect to login page

@@ -695,6 +695,7 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
 
         # budge_num increase
         self.counter_increase(vendor_id, "activity_order")
+        self.counter_increase(activity_id, "order")
         # TODO notify this message to vendor's administrator by SMS
 
         # status: 10=order but not pay it, 20=order and pay it.
@@ -942,32 +943,33 @@ class WxActivityApplyStep3Handler(AuthorizationHandler):
             _applicantstr = self.get_body_argument("applicants", [])
             _applicantList = JSON.loads(_applicantstr);
             # 处理多个申请人
-            for item in _applicantList:
+            for apply_index in _applicantList:
                 _activity = activity_dao.activity_dao().query(activity_id)
 
-                item["club_id"] = vendor_id
-                item["item_type"] = "activity"
-                item["item_id"] = activity_id
-                item["item_name"] = _activity['title']
-                item["order_id"] = _order_id
-                item["booking_time"] = _activity['begin_time']
-                apply_id = self.create_apply(item)
+                apply_index["club_id"] = vendor_id
+                apply_index["item_type"] = "activity"
+                apply_index["item_id"] = activity_id
+                apply_index["item_name"] = _activity['title']
+                apply_index["order_id"] = _order_id
+                apply_index["booking_time"] = _activity['begin_time']
+                apply_id = self.create_apply(apply_index)
 
                 # budge_num increase
                 self.counter_increase(vendor_id, "activity_apply")
+                self.counter_increase(activity_id, "apply")
                 # TODO notify this message to vendor's administrator by SMS
 
                 # 更新联系人资料
-                _contact = contact_dao.contact_dao().query_contact(vendor_id, _account_id, item["real_name"])
+                _contact = contact_dao.contact_dao().query_contact(vendor_id, _account_id, apply_index["real_name"])
                 if not _contact: # 如果不存在
-                    item["_id"] = apply_id
+                    apply_index["_id"] = apply_id
                     # 移除多余的参数直接入库
-                    item.pop("activity_id", None)
-                    item.pop("order_id", None)
-                    contact_dao.contact_dao().create(item)
+                    apply_index.pop("item_id", None)
+                    apply_index.pop("order_id", None)
+                    contact_dao.contact_dao().create(apply_index)
                 else: # 用新资料更新
-                    item["_id"] = _contact["_id"]
-                    contact_dao.contact_dao().update(item)
+                    apply_index["_id"] = _contact["_id"]
+                    contact_dao.contact_dao().update(apply_index)
 
             # 更新活动报名人数
             total_applicant_num = apply_dao.apply_dao().count_by_activity(activity_id)
