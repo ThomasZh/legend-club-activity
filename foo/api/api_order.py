@@ -248,7 +248,7 @@ class ApiActivityExportXHR(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        # _session_ticket = self.get_secure_cookie("session_ticket")
+        access_token = self.get_access_token()
 
         # utf8,gbk,gb2312
         _unicode = 'utf8'
@@ -270,29 +270,33 @@ class ApiActivityExportXHR(AuthorizationHandler):
 
             # table
             rownum = 1
-            _applys = apply_dao.apply_dao().query_by_activity(activity_id)
-            for _apply in _applys:
-                for apply_base_fee in _apply['base_fees']:
-                    if apply_base_fee['name'] == base_fee['name']:
+            params = {"filter":"item", "item_id":activity_id, "page":1, "limit":200}
+            url = url_concat(API_DOMAIN + "/api/applies", params)
+            http_client = HTTPClient()
+            headers = {"Authorization":"Bearer " + access_token}
+            response = http_client.fetch(url, method="GET", headers=headers)
+            logging.info("got response.body %r", response.body)
+            data = json_decode(response.body)
+            rs = data['rs']
+            applies = rs['data']
 
-                        _apply['create_time'] = timestamp_datetime(_apply['create_time'])
-                        try:
-                            _apply['note']
-                        except:
-                            _apply['note'] = ''
-                        if _apply['gender'] == 'male':
-                            _apply['gender'] = unicode(u'男').encode(_unicode)
-                        else:
-                            _apply['gender'] = unicode(u'女').encode(_unicode)
+            for _apply in applies:
+                if base_fee['name'] == _apply['group_name']:
+                    # 下单时间，timestamp -> %m月%d 星期%w
+                    _apply['create_time'] = timestamp_datetime(float(_apply['create_time']))
+                    if _apply['gender'] == 'male':
+                        _apply['gender'] = u'男'
+                    else:
+                        _apply['gender'] = u'女'
 
-                        _table.write(rownum, 0, _apply['name'])
-                        _table.write(rownum, 1, _apply['gender'])
-                        _table.write(rownum, 2, _apply['id_code'])
-                        _table.write(rownum, 3, _apply['phone'])
-                        _table.write(rownum, 4, _apply['height'])
-                        _table.write(rownum, 5, _apply['note'])
-                        _table.write(rownum, 6, _apply['create_time'])
-                        rownum = rownum + 1
+                    _table.write(rownum, 0, _apply['real_name'])
+                    _table.write(rownum, 1, _apply['gender'])
+                    _table.write(rownum, 2, _apply['id_code'])
+                    _table.write(rownum, 3, _apply['phone'])
+                    _table.write(rownum, 4, _apply['height'])
+                    _table.write(rownum, 5, _apply['note'])
+                    _table.write(rownum, 6, _apply['create_time'])
+                    rownum = rownum + 1
 
         _file.save('static/report/'+activity_id+'.xls')     # Save file
         self.finish(JSON.dumps("http://riding.time2box.com/static/report/"+activity_id+".xls"))

@@ -952,6 +952,8 @@ class WxActivityApplyStep3Handler(AuthorizationHandler):
                 apply_index["item_name"] = _activity['title']
                 apply_index["order_id"] = _order_id
                 apply_index["booking_time"] = _activity['begin_time']
+                # 取活动基本服务费用信息
+                apply_index["group_name"] = _old_order['base_fees'][0]['name']
                 apply_id = self.create_apply(apply_index)
 
                 # budge_num increase

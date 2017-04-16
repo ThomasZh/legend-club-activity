@@ -146,6 +146,8 @@ class BaseHandler(tornado.web.RequestHandler):
         response = http_client.fetch(url, method="GET")
         logging.info("got get_counter %r", response.body)
         data = json_decode(response.body)
+        if data['err_code'] == 404:
+            return None
         counter = data['rs']
         return counter
 
