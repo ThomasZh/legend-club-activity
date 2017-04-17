@@ -142,7 +142,7 @@ class BaseHandler(tornado.web.RequestHandler):
     def bonus_decrease(self, club_id, account_id, num):
         headers = {"Authorization":"Bearer "+DEFAULT_USER_ID}
 
-        _json = json_encode({"bonus", num, "action":"decrease"})
+        _json = json_encode({"bonus":num, "action":"decrease"})
 
         url = API_DOMAIN + "/api/clubs/" + club_id + "/users/" + account_id
         http_client = HTTPClient()
@@ -153,7 +153,7 @@ class BaseHandler(tornado.web.RequestHandler):
     def bonus_increase(self, club_id, account_id, num):
         headers = {"Authorization":"Bearer "+DEFAULT_USER_ID}
 
-        _json = json_encode({"bonus", num, "action":"increase"})
+        _json = json_encode({"bonus":num, "action":"increase"})
 
         url = API_DOMAIN + "/api/clubs/" + club_id + "/users/" + account_id
         http_client = HTTPClient()
