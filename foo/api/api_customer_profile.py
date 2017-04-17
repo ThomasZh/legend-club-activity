@@ -81,7 +81,7 @@ class ApiCustomerListXHR(AuthorizationHandler):
         rs = data['rs']
         users = rs['data']
 
-        _json = JSON.dumps(users, default=json_util.default)
+        _json = JSON.dumps(rs, default=json_util.default)
         logging.info("got _customer_profile %r", _json)
         self.write(_json)
         self.finish()

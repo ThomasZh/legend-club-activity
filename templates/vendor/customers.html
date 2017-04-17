@@ -16,17 +16,9 @@
   <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
 
   <!-- Custom styling plus plugins -->
-  <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
+  <link href="{{ static_url('css/custom.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
-
-
   <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
-
-  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-  <!--[if lt IE 9]>
-          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
 
 </head>
 
@@ -93,50 +85,17 @@
 
                 <div class="x_content">
                   <div class="row" id="customerList">
-                    {% for customer in customers %}
-                    <div class="col-md-4 col-sm-4 col-xs-12 animated fadeInDown">
-                      <div class="well profile_view">
-                        <div class="col-sm-12">
-                          <div class="left col-xs-7">
-                            <h2>{{ customer['nickname'] }}</h2>
-                            <ul class="list-unstyled">
-                              <li><i class="fa fa-phone"></i> 1234567890 </li>
-                            </ul>
-                          </div>
-                          <div class="right col-xs-5 text-center">
-                              <img src="{{ customer['avatar'] }}" alt="" class="img-circle img-responsive">
-                          </div>
-                        </div>
-                        <div class="col-xs-12 bottom text-center">
-                          <div class="col-xs-12 col-sm-6 emphasis">
-                            <p class="">L{{ customer['_rank'] }}会员</p>
-                          </div>
-                          <div class="col-xs-12 col-sm-6 emphasis">
-                            <button type="button" class="btn btn-success btn-xs">
-                              <i class="fa fa-tags"> 领队 会员 非会员 </i> </button>
-                            <a href="/vendors/{{ vendor_id }}/customers/{{ customer['account_id'] }}" type="button" class="btn btn-primary btn-xs" >
-                            	<i class="fa fa-user"></i> 查看详情 </a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    {% end %}
 
                 </div>
 
-                <div class="ln_solid"></div>
-                <div class="form-group">
-                  <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                    {% if len(customers) == 0 %}
-                      <input type="hidden" id="new_timestamp" value="">
-                    {% else %}
-                      <input type="hidden" id="new_timestamp" value="{{ customer['create_time'] }}">
-                      <ul class="pager">
-                        <li class="next"><a id="OnGetMore">加载更多 &rarr;</a></li>
-                      </ul>
-                    {% end %}
+                <div class="clearfix"></div>
+                <div class="col-md-5 col-sm-12 col-xs-12 center-margin">
+                  <button class="btn btn-success" type="button" id="prev">上一页</button>
+                  <span class="pageBox"></span>
 
-                   </div>
+                  <button class="btn btn-success" type="button" id="next">下一页</button>
+                  共<span id="total_page" style="padding:0 5px;"></span>页
+
                 </div>
               </div>
               </div>
@@ -155,58 +114,166 @@
 
   </div>
 
-  <div id="custom_notifications" class="custom-notifications dsp_none">
-    <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
-    </ul>
-    <div class="clearfix"></div>
-    <div id="notif-group" class="tabbed_notifications"></div>
-  </div>
-  <script type="text/javascript">
-    var preAllow = true;   // when ajax not completed, cannot do the next request
-    var lastTimestamp = $('#new_timestamp').val();
-    console.log(lastTimestamp);
-    function query() {
-      $.get("/bf/api/vendors/{{ vendor_id }}/customer-profile/customers?before="+lastTimestamp,function(data,status){
-        var ajaxobj = eval("("+data+")");
-        for (var i in ajaxobj) {
-          var inner_html = '<div class="col-md-4 col-sm-4 col-xs-12 animated fadeInDown">';
-          inner_html += '<div class="well profile_view">';
-          inner_html += '<div class="col-sm-12">';
-          inner_html += '<div class="left col-xs-7">';
-          inner_html += '<h2>';
-          inner_html += ajaxobj[i].nickname;
-          inner_html += '</h2>';
-          inner_html += '<ul class="list-unstyled">';
-          inner_html += '<li><i class="fa fa-phone"></i> 1234567890 </li>';
-          inner_html += '</ul></div>'
-          inner_html += '<div class="right col-xs-5 text-center">';
-          inner_html += '<img src="'+ajaxobj[i].avatar+'" alt="" class="img-circle img-responsive">';
-          inner_html += '</div></div>';
-          inner_html += '<div class="col-xs-12 bottom text-center">';
-          inner_html += '<div class="col-xs-12 col-sm-6 emphasis">';
-          inner_html += '<p class="">L'+ajaxobj[i]._rank+'</p></div>';
-          inner_html += '<div class="col-xs-12 col-sm-6 emphasis">';
-          inner_html += '<button type="button" class="btn btn-success btn-xs">';
-          inner_html += '<i class="fa fa-tags"> 领队 会员 非会员 </i> </button>';
-          inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ajaxobj[i].account_id+'" type="button" class="btn btn-primary btn-xs" >';
-          inner_html += '<i class="fa fa-user"></i> 查看详情 </a>';
-          inner_html += '</div></div></div></div>';
+  <script>
 
-          $('#customerList').append(inner_html);
-          $('#new_timestamp').val('');
-          lastTimestamp = ajaxobj[i].create_time;
-        }
-        preAllow = true;
-      });
-    }
+          var preAllow = true;   // when ajax not completed, cannot do the next request
+          var limit = 9;//每页显示数
+          var currentPage = 0;//当前页
+          var total_page = 0;//总页数
+          // var lastTimestamp = $('#new_timestamp').val();
+          function query(pageNum) {
+            $.ajax({
+              type: "GET",
+              url: "/bf/api/vendors/{{ vendor_id }}/customer-profile/customers?page=1&limit="+limit,
+              headers: {
+                "Authorization": "Bearer {{ access_token }}"
+              },
+              dataType: "json",
+              contentType: 'application/json',
+              success: function(data, status, xhr) {
+                  console.log(data);
+                  currentPage = 1;
+              var ajaxobj = data.data;
+                  total_page = data.total_pgae;//总页
+                  $("#total_page").html(total_page);
+              // num = ajaxobj.length;
+              for (var i in ajaxobj) {
+                var inner_html = '<div class="col-md-4 col-sm-4 col-xs-12 animated fadeInDown">';
+                inner_html += '<div class="well profile_view">';
+                inner_html += '<div class="col-sm-12">';
+                inner_html += '<div class="left col-xs-7">';
+                inner_html += '<h2>';
+                inner_html += ajaxobj[i].nickname;
+                inner_html += '</h2>';
+                inner_html += '<ul class="list-unstyled">';
+                inner_html += '<li><i class="fa fa-phone"></i> 1234567890 </li>';
+                inner_html += '</ul></div>'
+                inner_html += '<div class="right col-xs-5 text-center">';
+                inner_html += '<img src="'+ajaxobj[i].avatar+'" alt="" class="img-circle img-responsive">';
+                inner_html += '</div></div>';
+                inner_html += '<div class="col-xs-12 bottom text-center">';
+                inner_html += '<div class="col-xs-12 col-sm-6 emphasis">';
+                inner_html += '<p class="">L'+ajaxobj[i]._rank+'</p></div>';
+                inner_html += '<div class="col-xs-12 col-sm-6 emphasis">';
+                inner_html += '<button type="button" class="btn btn-success btn-xs">';
+                inner_html += '<i class="fa fa-tags"> 领队 会员 非会员 </i> </button>';
+                inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ajaxobj[i].account_id+'" type="button" class="btn btn-primary btn-xs" >';
+                inner_html += '<i class="fa fa-user"></i> 查看详情 </a>';
+                inner_html += '</div></div></div></div>';
 
-    $("#OnGetMore").click(function(){ // This event fires when a button is clicked
-      if(preAllow){
-          preAllow = false;
-          query();
-      }
-    });
-    </script>
+                $('#customerList').append(inner_html);
+                // member_num += 1;
+              };
+            if(total_page>5){
+                for (var k=1;k<=5;k++){
+                  var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
+                  $(".pageBox").append(inner_html);
+                };
+              }else if(total_page<=5){
+                for (var k=1;k<=total_page;k++){
+                  var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
+                  $(".pageBox").append(inner_html);
+                };
+              }
+              $("#num1").addClass("on");
+            }
+            });
+          };
+
+          function gotoPage(pageNum) {
+            $.ajax({
+              type: "GET",
+              url: "/bf/api/vendors/{{ vendor_id }}/customer-profile/customers?page="+ pageNum +"&limit="+limit,
+              headers: {
+                "Authorization": "Bearer {{ access_token }}"
+              },
+              dataType: "json",
+              contentType: 'application/json',
+              success: function(data, status, xhr) {
+                  // console.log(data);
+                  currentPage = pageNum;
+              var ajaxobj = data.data;
+                  total_page = data.total_pgae;//总页
+              $('#customerList').html("");
+
+              for (var i in ajaxobj) {
+                var inner_html = '<div class="col-md-4 col-sm-4 col-xs-12 animated fadeInDown">';
+                inner_html += '<div class="well profile_view">';
+                inner_html += '<div class="col-sm-12">';
+                inner_html += '<div class="left col-xs-7">';
+                inner_html += '<h2>';
+                inner_html += ajaxobj[i].nickname;
+                inner_html += '</h2>';
+                inner_html += '<ul class="list-unstyled">';
+                inner_html += '<li><i class="fa fa-phone"></i> 1234567890 </li>';
+                inner_html += '</ul></div>'
+                inner_html += '<div class="right col-xs-5 text-center">';
+                inner_html += '<img src="'+ajaxobj[i].avatar+'" alt="" class="img-circle img-responsive">';
+                inner_html += '</div></div>';
+                inner_html += '<div class="col-xs-12 bottom text-center">';
+                inner_html += '<div class="col-xs-12 col-sm-6 emphasis">';
+                inner_html += '<p class="">L'+ajaxobj[i]._rank+'</p></div>';
+                inner_html += '<div class="col-xs-12 col-sm-6 emphasis">';
+                inner_html += '<button type="button" class="btn btn-success btn-xs">';
+                inner_html += '<i class="fa fa-tags"> 领队 会员 非会员 </i> </button>';
+                inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ajaxobj[i].account_id+'" type="button" class="btn btn-primary btn-xs" >';
+                inner_html += '<i class="fa fa-user"></i> 查看详情 </a>';
+                inner_html += '</div></div></div></div>';
+
+                $('#customerList').append(inner_html);
+                // member_num += 1;
+              };
+
+              pageNext = parseInt((currentPage-1)/5) + 1;
+
+                start = (pageNext-1)*5+1;
+                end = pageNext*5;
+                if(end > total_page){
+                  end = total_page;
+                }
+
+                $(".pageBox").html("");
+                for (var k=start;k<=end;k++){
+                  var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
+
+                  $(".pageBox").append(inner_html);
+                };
+                 $("#num"+currentPage).addClass("on").siblings().removeClass("on");
+
+              }
+            });
+
+          };
+
+          $(function(){
+            query();
+            $(document).on('click','.pageBox > button',function(){
+              var num = $(this).text();
+              gotoPage(num);
+              //  $(this).addClass("current").siblings().removeClass("current");
+            })
+
+            $("#prev").on("click",function(){
+                if(currentPage<=1){
+
+                }else{
+                    gotoPage(--currentPage);
+                    // $("#num"+currentPage).addClass("current").siblings().removeClass("current");
+                }
+            });
+
+            $("#next").on("click",function(){
+                if(currentPage>=total_page){
+
+                }else{
+                    gotoPage(++currentPage);
+                    // $("#num"+currentPage).addClass("current").siblings().removeClass("current");
+                }
+            })
+          });
+  </script>
+
+
   <!-- icheck -->
   <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
 

@@ -322,7 +322,7 @@
           function gotoPage(pageNum) {
             $.ajax({
               type: "GET",
-              url: "/bf/api/vendors/{{ vendor_id }}/orders?distributor_id=all&page="+pageNum+"&limit="+limit+"",
+              url: "/bf/api/vendors/{{ vendor_id }}/orders?distributor_id=all&page="+pageNum+"&limit="+limit,
               headers: {
                 "Authorization": "Bearer {{ access_token }}"
               },
