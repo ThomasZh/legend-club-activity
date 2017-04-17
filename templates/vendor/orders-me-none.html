@@ -142,6 +142,7 @@
                     <span class="pageBox"></span>
 
                     <button class="btn btn-success" type="button" id="next">下一页</button>
+                    共<span id="total_page" style="padding:0 5px;"></span>页
 
                   </div>
                 </div>
@@ -206,6 +207,7 @@
                   currentPage = 1;
               var pageData = data.data;
                   total_page = data.total_pgae;//总页
+                  $("#total_page").html(total_page);
               // num = ajaxobj.length;
               for (var i in pageData) {
 

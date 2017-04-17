@@ -219,7 +219,7 @@
                     <span class="pageBox"></span>
 
                     <button class="btn btn-success" type="button" id="next">下一页</button>
-
+                    共<span id="total_page" style="padding:0 5px;"></span>页
                   </div>
                   <!-- end project list -->
 
@@ -277,16 +277,16 @@
                   currentPage = 1;
               var pageData = data.data;
                   total_page = data.total_pgae;//总页
+                  $("#total_page").html(total_page);
               // num = ajaxobj.length;
               for (var i in pageData) {
 
                   var inner_html = '<tr id="tr'+pageData[i]._id +'">';
                       inner_html += '<td class="a-center ">';
-                        if (pageData[i].check_status)
-                          inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
-                        else{
-                          inner_html += '<input type="checkbox" class="tableflat" value="'+ pageData[i]._id +'" onclick="OnReviewOrder(this);">';
-                        }
+                      if (pageData[i].check_status == '0')
+                        inner_html += '<input type="checkbox" class="tableflat" value="'+pageData[i]._id+'" onclick="javascript:OnReviewOrder(this);">';
+                      else
+                        inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
                       inner_html += '</td>';
                       inner_html += '<td class=" ">';
                       inner_html +=  pageData[i]._id;
@@ -366,11 +366,10 @@
               for (var i in pageData) {
                 var inner_html = '<tr id="tr'+pageData[i]._id +'">';
                     inner_html += '<td class="a-center ">';
-                      if (pageData[i].check_status)
-                        inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
-                      else{
-                        inner_html += '<input type="checkbox" class="tableflat" value="'+ pageData[i]._id +'" onclick="OnReviewOrder(this);">';
-                      }
+                    if (pageData[i].check_status == '0')
+                      inner_html += '<input type="checkbox" class="tableflat" value="'+pageData[i]._id+'" onclick="javascript:OnReviewOrder(this);">';
+                    else
+                      inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
                     inner_html += '</td>';
                     inner_html += '<td class=" ">';
                     inner_html +=  pageData[i]._id;
@@ -466,26 +465,12 @@
   </script>
 
   <script>
-    function OnReview(e){
-    	applyId = e.value;
-    	$.get("/bf/api/vendors/{{ vendor_id }}/applys/"+applyId+"/review",function(data,status){
-			  ajaxobj = eval("("+data+")");
-        e.disabled="true";
-		  });
-    }
-    function OnReviewOrder(e){
-    	orderId = e.value;
-      $.ajax({
-        type: "POST",
-        url: "http://7x24hs.com/api/orders/"+orderId+"/check",
-        headers: {
-          "Authorization": "Bearer {{ access_token }}"
-        },
-        success: function(data){
-          console.log(data);
-        }
-      });
-    }
+  function OnReviewOrder(e) {
+    orderId = e.value;
+    $.get("/bf/api/vendors/{{ vendor_id }}/orders/" + orderId + "/review", function(data, status) {
+      e.disabled = "true";
+    });
+  };
     function OnDeleteOrder(e) {
       orderId = e.value;
       var msg = "Are you sure you want to delete this item?";

@@ -137,17 +137,17 @@
 
                     <tbody id="tbody"></tbody>
                   </table>
-                </div>
+                  <div class="clearfix"></div>
+                  <div class="col-md-5 col-sm-12 col-xs-12 center-margin">
+                    <button class="btn btn-success" type="button" id="prev">上一页</button>
+                    <span class="pageBox"></span>
 
-                <!-- <div class="ln_solid"></div> -->
-                <div class="form-group">
-                  <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                    <!-- Pager -->
-                    <ul class="pager">
-                      <li class="next"><a id="OnGetMore">加载更多 &rarr;</a></li>
-                    </ul>
+                    <button class="btn btn-success" type="button" id="next">下一页</button>
+                    共<span id="total_page" style="padding:0 5px;"></span>页
+
                   </div>
                 </div>
+
 
               </div>
             </div>
@@ -209,6 +209,7 @@
                   currentPage = 1;
               var ajaxobj = data.data;
                   total_page = data.total_pgae;//总页
+                  $("#total_page").html(total_page);
               // num = ajaxobj.length;
               for (var i in ajaxobj) {
 

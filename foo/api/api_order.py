@@ -187,7 +187,7 @@ class ApiApplyListXHR(AuthorizationHandler):
 
         _json = json_encode(applies)
         logging.info("got _json %r", _json)
-        self.write(JSON.dumps(_json, default=json_util.default))
+        self.write(JSON.dumps(rs, default=json_util.default))
         self.finish()
 
 
