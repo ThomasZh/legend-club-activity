@@ -151,46 +151,15 @@ class VendorCustomerProfileHandler(AuthorizationHandler):
         logging.info("got account_id %r in uri", account_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
-        _customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
-        try:
-            _customer_profile['account_nickname']
-        except:
-            _customer_profile['account_nickname'] = ''
-        try:
-            _customer_profile['account_avatar']
-        except:
-            _customer_profile['account_avatar'] = ''
-        logging.info("got account_avatar %r", _customer_profile['account_avatar'])
-        try:
-            _customer_profile['comment']
-        except:
-            _customer_profile['comment'] = ''
-        try:
-            _customer_profile['bonus']
-        except:
-            _customer_profile['bonus'] = 0
-        logging.info("got bonus %r", _customer_profile['bonus'])
-        try:
-            _customer_profile['history_bonus']
-        except:
-            _customer_profile['history_bonus'] = 0
-        logging.info("got history_bonus %r", _customer_profile['history_bonus'])
-        try:
-            _customer_profile['vouchers']
-        except:
-            _customer_profile['vouchers'] = 0
-        # 转换成元
-        _customer_profile['vouchers'] = float(_customer_profile['vouchers']) / 100
-        logging.info("got vouchers %r", _customer_profile['vouchers'])
-        try:
-            _customer_profile['distance']
-        except:
-            _customer_profile['distance'] = 0
-        try:
-            _customer_profile['rank']
-        except:
-            _customer_profile['rank'] = 0
+        url = API_DOMAIN + "/api/clubs/"+vendor_id+"/users/" + account_id
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        _customer_profile = data['rs']
 
         _contacts = contact_dao.contact_dao().query_by_account(vendor_id, account_id)
         before = time.time()

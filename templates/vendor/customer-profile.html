@@ -96,14 +96,14 @@
 
                   <br />
                   <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left"
-                    action="/vendors/{{ vendor_id }}/customers/{{profile['account_id']}}" method="POST">
+                    action="/vendors/{{ vendor_id }}/customers/{{ profile['account_id'] }}" method="POST">
   					        {% raw xsrf_form_html() %}
 
                     <div class="item form-group">
                       <label class="control-label col-md-3 col-sm-3 col-xs-12" for="bk_img_url">头像
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
-                        <img src="{{profile['account_avatar']}}" width="50" height="50" alt="Avatar">
+                        <img src="{{ profile['avatar'] }}" width="50" height="50" alt="Avatar">
                       </div>
                     </div>
                     <div class="item form-group">
@@ -111,22 +111,14 @@
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
                         <input type="text" readonly="readonly"
-                          value="{{profile['account_nickname']}}" class="form-control col-md-7 col-xs-12">
-                      </div>
-                    </div>
-                    <div class="item form-group">
-                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="comment">评语(仅管理员可见)
-                      </label>
-                      <div class="col-md-6 col-sm-6 col-xs-12">
-                        <input type="text" id="comment" name="comment" value="{{profile['comment']}}"
-                          class="form-control col-md-7 col-xs-12">
+                          value="{{ profile['nickname'] }}" class="form-control col-md-7 col-xs-12">
                       </div>
                     </div>
                     <div class="item form-group">
                       <label class="control-label col-md-3 col-sm-3 col-xs-12" for="comment">当前积分 <span class="required">*</span>
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
-                        <input type="number" id="bonus" name="bonus" value="{{profile['bonus']}}"
+                        <input type="number" id="bonus" name="bonus" value="{{ profile['remaining_points'] }}"
                           class="form-control col-md-7 col-xs-12">
                       </div>
                     </div>
@@ -134,7 +126,7 @@
                       <label class="control-label col-md-3 col-sm-3 col-xs-12" for="comment">历史累计积分 <span class="required">*</span>
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
-                        <input type="number" id="history_bonus" name="history_bonus" value="{{profile['history_bonus']}}"
+                        <input type="number" id="history_bonus" name="history_bonus" value="{{ profile['accumulated_points'] }}"
                           class="form-control col-md-7 col-xs-12">
                       </div>
                     </div>
@@ -142,7 +134,7 @@
                       <label class="control-label col-md-3 col-sm-3 col-xs-12" for="comment">代金券总额(元) <span class="required">*</span>
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
-                        <input type="number" id="vouchers" name="vouchers" value="{{profile['vouchers']}}"
+                        <input type="number" id="vouchers" name="vouchers" value="{{ profile['remaining_vouchers'] }}"
                           class="form-control col-md-7 col-xs-12">
                       </div>
                     </div>
@@ -150,7 +142,7 @@
                       <label class="control-label col-md-3 col-sm-3 col-xs-12" for="comment">历史累计里程(km) <span class="required">*</span>
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
-                        <input type="number" id="distance" name="distance" value="{{profile['distance']}}"
+                        <input type="number" id="distance" name="distance" value="{{ profile['mileage'] }}"
                           class="form-control col-md-7 col-xs-12">
                       </div>
                     </div>
@@ -158,7 +150,7 @@
                       <label class="control-label col-md-3 col-sm-3 col-xs-12" for="comment">等级(0-10) <span class="required">*</span>
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
-                        <input type="number" id="rank" name="rank" value="{{profile['rank']}}"
+                        <input type="number" id="rank" name="rank" value="{{ profile['_rank'] }}"
                           class="form-control col-md-7 col-xs-12">
                       </div>
                     </div>
