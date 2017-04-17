@@ -137,8 +137,52 @@ def time_span(ts):
         return "%d小时前" % (delta.seconds / 60 / 60)
 
 
-
 class BaseHandler(tornado.web.RequestHandler):
+
+    def bonus_decrease(self, club_id, account_id, num):
+        headers = {"Authorization":"Bearer "+DEFAULT_USER_ID}
+
+        _json = json_encode({"bonus", num, "action":"decrease"})
+
+        url = API_DOMAIN + "/api/clubs/" + club_id + "/users/" + account_id
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="PUT", headers=headers, body=_json)
+        logging.info("got update_bonus response.body=[%r]", response.body)
+
+
+    def bonus_increase(self, club_id, account_id, num):
+        headers = {"Authorization":"Bearer "+DEFAULT_USER_ID}
+
+        _json = json_encode({"bonus", num, "action":"increase"})
+
+        url = API_DOMAIN + "/api/clubs/" + club_id + "/users/" + account_id
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="PUT", headers=headers, body=_json)
+        logging.info("got update_bonus response.body=[%r]", response.body)
+
+
+    def get_club_user(self, club_id, account_id):
+        headers = {"Authorization":"Bearer "+DEFAULT_USER_ID}
+
+        url = API_DOMAIN + "/api/clubs/" + club_id + "/users/" + account_id
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got club_user response.body=[%r]", response.body)
+        data = json_decode(response.body)
+        if data['err_code'] == 404:
+            return None
+        return data['rs']
+
+
+    def create_club_user(self, club_id, account_id):
+        headers = {"Authorization":"Bearer "+DEFAULT_USER_ID}
+
+        url = API_DOMAIN + "/api/clubs/" + club_id + "/users/" + account_id
+        http_client = HTTPClient()
+        _json = json_encode(headers)
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("create club_user response.body=[%r]", response.body)
+
 
     def get_order_index(self, order_id):
         headers = {"Authorization":"Bearer "+DEFAULT_USER_ID}

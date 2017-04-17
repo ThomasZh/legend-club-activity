@@ -174,51 +174,16 @@ class ApiCustomerProfileVoucherListXHR(tornado.web.RequestHandler):
         self.finish()
 
 
-class ApiCustomerProfileMyInfoXHR(tornado.web.RequestHandler):
+class ApiCustomerProfileMyInfoXHR(BaseHandler):
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
 
         _account_id = self.get_secure_cookie("account_id")
         logging.info("got _account_id %r", _account_id)
-
-        _customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, _account_id)
-        try:
-            _customer_profile['account_nickname']
-        except:
-            _customer_profile['account_nickname'] = ''
-        try:
-            _customer_profile['account_avatar']
-        except:
-            _customer_profile['account_avatar'] = ''
-        logging.info("got account_avatar %r", _customer_profile['account_avatar'])
-        try:
-            _customer_profile['comment']
-        except:
-            _customer_profile['comment'] = ''
-        try:
-            _customer_profile['bonus']
-        except:
-            _customer_profile['bonus'] = 0
-        # 金额转换成元
-        _customer_profile['bonus'] = float(_customer_profile['bonus']) / 100
-        logging.info("got bonus %r", _customer_profile['bonus'])
-        try:
-            _customer_profile['history_bonus']
-        except:
-            _customer_profile['history_bonus'] = 0
-        logging.info("got history_bonus %r", _customer_profile['history_bonus'])
-        try:
-            _customer_profile['distance']
-        except:
-            _customer_profile['distance'] = 0
-        try:
-            _customer_profile['rank']
-        except:
-            _customer_profile['rank'] = 0
+        _customer_profile = self.get_club_user(vendor_id, _account_id)
 
         _json = JSON.dumps(_customer_profile, default=json_util.default)
         logging.info("got _customer_profile %r", _json)
-
         self.write(_json)
         self.finish()
 
@@ -234,6 +199,7 @@ class ApiCustomerProfileMyContactListXHR(tornado.web.RequestHandler):
         contacts = contact_dao.contact_dao().query_by_account(vendor_id, account_id);
         self.write(JSON.dumps(contacts, default=json_util.default))
         self.finish()
+
 
 # 获取当前用户的历史活动
 class ApiCustomerProfileHistoryActivityXHR(tornado.web.RequestHandler):

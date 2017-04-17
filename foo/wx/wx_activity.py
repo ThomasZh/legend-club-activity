@@ -346,7 +346,7 @@ class WxActivityQrcodeHandler(tornado.web.RequestHandler):
                 activity=_activity)
 
 
-class WxActivityApplyStep0Handler(tornado.web.RequestHandler):
+class WxActivityApplyStep0Handler(BaseHandler):
     def get(self, vendor_id, activity_id, guest_club_id):
 
         logging.info("guest_club_id+++++++++++%r",guest_club_id)
@@ -383,55 +383,24 @@ class WxActivityApplyStep0Handler(tornado.web.RequestHandler):
                 avatar=user['avatar']
                 nickname=user['nickname']
 
-                timestamp = time.time()
-                vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
-                if not vendor_member:
-                    memeber_id = str(uuid.uuid1()).replace('-', '')
-                    _json = {'_id':memeber_id, 'vendor_id':vendor_id,
-                        'account_id':account_id, 'account_nickname':nickname, 'account_avatar':avatar,
-                        'comment':'...',
-                        'bonus':0, 'history_bonus':0, 'vouchers':0, 'crets':0,
-                        'rank':0, 'tour_leader':False,
-                        'distance':0,
-                        'create_time':timestamp, 'last_update_time':timestamp}
-                    vendor_member_dao.vendor_member_dao().create(_json)
-                    logging.info("create vendor member %r", account_id)
-                else:
-                    _json = {'vendor_id':vendor_id,
-                        'account_id':account_id, 'account_nickname':nickname, 'account_avatar':avatar,
-                        'last_update_time':timestamp}
-                    vendor_member_dao.vendor_member_dao().update(_json)
+                self.create_club_user(vendor_id, account_id)
 
                 activity = activity_dao.activity_dao().query(activity_id)
                 activity['begin_time'] = timestamp_friendly_date(float(activity['begin_time'])) # timestamp -> %m月%d 星期%w
                 activity['end_time'] = timestamp_friendly_date(float(activity['end_time'])) # timestamp -> %m月%d 星期%w
 
-                # 金额转换成元
-                # activity['amount'] = float(activity['amount']) / 100
-
-                customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
-                try:
-                    customer_profile['bonus']
-                except:
-                    customer_profile['bonus'] = 0
-                # 金额转换成元
-                customer_profile['bonus'] = float(customer_profile['bonus']) / 100
-                logging.info("got bonus %r", customer_profile['bonus'])
-
                 self.render('wx/activity-apply-step1.html',
                         guest_club_id = guest_club_id,
                         vendor_id=vendor_id,
                         wx_app_id=wx_app_id,
-                        activity=activity,
-                        customer_profile=customer_profile)
-
+                        activity=activity)
             except:
                 self.redirect(redirect_url)
         else:
             self.redirect(redirect_url)
 
 
-class WxActivityApplyStep01Handler(tornado.web.RequestHandler):
+class WxActivityApplyStep01Handler(BaseHandler):
     def get(self, vendor_id, activity_id, guest_club_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
@@ -488,7 +457,6 @@ class WxActivityApplyStep01Handler(tornado.web.RequestHandler):
         logging.info("got response.body %r", response.body)
         data = json_decode(response.body)
         session_ticket = data['rs']
-
         account_id = session_ticket['account_id']
 
         self.set_secure_cookie("access_token", session_ticket['access_token'])
@@ -498,6 +466,8 @@ class WxActivityApplyStep01Handler(tornado.web.RequestHandler):
         # self.set_secure_cookie("nickname",nickname)
         # self.set_secure_cookie("avatar",avatar)
 
+        self.create_club_user(vendor_id, account_id)
+
         self.redirect('/bf/wx/vendors/' + vendor_id + '/activitys/'+activity_id+'_'+guest_club_id+'/apply/step1')
 
 
@@ -506,57 +476,19 @@ class WxActivityApplyStep1Handler(BaseHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
 
-        # 从comm中统一取
-        myinfo = self.get_myinfo_login()
-        account_id = myinfo['account_id']
-        nickname = myinfo['nickname']
-        avatar =myinfo['avatar']
-
         wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
         wx_app_id = wx_app_info['wx_app_id']
         logging.info("got wx_app_id %r in uri", wx_app_id)
-
-        timestamp = time.time()
-        vendor_member = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
-        if not vendor_member:
-            memeber_id = str(uuid.uuid1()).replace('-', '')
-            _json = {'_id':memeber_id, 'vendor_id':vendor_id,
-                'account_id':account_id, 'account_nickname':nickname, 'account_avatar':avatar,
-                'comment':'...',
-                'bonus':0, 'history_bonus':0, 'vouchers':0, 'crets':0,
-                'rank':0, 'tour_leader':False,
-                'distance':0,
-                'create_time':timestamp, 'last_update_time':timestamp}
-            vendor_member_dao.vendor_member_dao().create(_json)
-            logging.info("create vendor member %r", account_id)
-        else:
-            _json = {'vendor_id':vendor_id,
-                'account_id':account_id, 'account_nickname':nickname, 'account_avatar':avatar,
-                'last_update_time':timestamp}
-            vendor_member_dao.vendor_member_dao().update(_json)
 
         activity = activity_dao.activity_dao().query(activity_id)
         activity['begin_time'] = timestamp_friendly_date(float(activity['begin_time'])) # timestamp -> %m月%d 星期%w
         activity['end_time'] = timestamp_friendly_date(float(activity['end_time'])) # timestamp -> %m月%d 星期%w
 
-        # 金额转换成元
-        # activity['amount'] = float(activity['amount']) / 100
-
-        customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, account_id)
-        try:
-            customer_profile['bonus']
-        except:
-            customer_profile['bonus'] = 0
-        # 金额转换成元
-        customer_profile['bonus'] = float(customer_profile['bonus']) / 100
-        logging.info("got bonus %r", customer_profile['bonus'])
-
         self.render('wx/activity-apply-step1.html',
                 guest_club_id = guest_club_id,
                 vendor_id=vendor_id,
                 wx_app_id=wx_app_id,
-                activity=activity,
-                customer_profile=customer_profile)
+                activity=activity)
 
 
 class WxActivityApplyStep2Handler(AuthorizationHandler):
@@ -804,27 +736,11 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
             # 如使用积分抵扣，则将积分减去
             _bonus = order_index['bonus']
             if _bonus < 0:
-                _old_bonus = bonus_dao.bonus_dao().query_not_safe_by_res(order_index['item_id'], _order['account_id'], 3)
-                if not _old_bonus:
-                    _customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, order_index['account_id'])
-                    try:
-                        _customer_profile['bonus']
-                    except:
-                        _customer_profile['bonus'] = 0
-                    logging.info("got bonus %r", _customer_profile['bonus'])
-
-                    # 消费积分纪录
-                    _json = {'vendor_id':vendor_id, 'account_id':order_index['account_id'], 'res_id':order_index['item_id'],
-                            'create_time':_timestamp, 'bonus':_bonus, 'type':3}
-                    bonus_dao.bonus_dao().create(_json)
-
-                    # 修改个人积分信息
-                    _bonus = int(_customer_profile['bonus']) + int(_bonus)
-                    if _bonus < 0:
-                        _bonus = 0
-                    _json = {'vendor_id':vendor_id, 'account_id':order_index['account_id'], 'last_update_time':_timestamp,
-                            'bonus':_bonus}
-                    vendor_member_dao.vendor_member_dao().update(_json)
+                # 消费积分纪录
+                _json = {'vendor_id':vendor_id, 'account_id':order_index['account_id'], 'res_id':order_index['item_id'],
+                        'create_time':_timestamp, 'bonus':_bonus, 'type':3}
+                bonus_dao.bonus_dao().create(_json)
+                self.bonus_decrease(vendor_id, _order['account_id'], _bonus)
 
             # 如使用代金券抵扣，则将代金券减去
             for _voucher in _vouchers:
