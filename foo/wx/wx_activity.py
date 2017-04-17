@@ -596,6 +596,7 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
         # 创建订单索引
         order_index = {
             "_id": _order_id,
+            "order_tyoe": "buy_activity",
             "club_id": vendor_id,
             "item_type": "activity",
             "item_id": activity_id,
@@ -697,14 +698,14 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
             _order_return['app_id'] = wx_app_id
 
             # 微信统一下单返回成功
-            unified_json = ""
+            order_unified = None
             if(_order_return['return_msg'] == 'OK'):
-                unified_json = {'_id':_order_id,'prepay_id': prepayId, 'pay_status': ORDER_STATUS_WECHAT_UNIFIED_SUCCESS}
+                order_unified = {'_id':_order_id,'prepay_id': prepayId, 'pay_status': ORDER_STATUS_WECHAT_UNIFIED_SUCCESS}
             else:
-                unified_json = {'_id':_order_id,'prepay_id': prepayId, 'pay_status': ORDER_STATUS_WECHAT_UNIFIED_FAILED}
+                order_unified = {'_id':_order_id,'prepay_id': prepayId, 'pay_status': ORDER_STATUS_WECHAT_UNIFIED_FAILED}
             # 微信统一下单返回成功
             # TODO: 更新订单索引中，订单状态pay_status,prepay_id
-            self.update_order_unified(unified_json)
+            self.update_order_unified(order_unified)
 
             # FIXME, 将服务模板转为字符串，客户端要用
             _servTmpls = _activity['ext_fee_template']
@@ -896,7 +897,7 @@ class WxOrderNotifyHandler(BaseHandler):
             order_index = self.get_order_index(_order_id)
             # 用于更新积分、优惠券
             vendor_id = order_index['club_id']
-            if order_index['pay_status'] > 30:
+            if order_index['pay_status'] == 30:
                 return
             else:
                 # 调用微信支付接口，返回成功
@@ -910,31 +911,28 @@ class WxOrderNotifyHandler(BaseHandler):
                 self.update_order_payed(order_payed)
 
                 order = self.get_symbol_object(_order_id)
-
                 # 如使用积分抵扣，则将积分减去
                 _bonus = order['bonus']
                 if _bonus < 0:
-                    _old_bonus = bonus_dao.bonus_dao().query_not_safe(order['item_id'], order['account_id'], 3)
-                    if not _old_bonus:
-                        _customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, order['account_id'])
-                        try:
-                            _customer_profile['bonus']
-                        except:
-                            _customer_profile['bonus'] = 0
-                        logging.info("got bonus %r", _customer_profile['bonus'])
+                    # 产生一个积分使用订单
+                    order_id = str(uuid.uuid1()).replace('-', '')
+                    order_index = {
+                        "_id": order_id,
+                        "order_tyoe": "using_point",
+                        "club_id": vendor_id,
+                        "item_type": order_index['item_type'],
+                        "item_id": order_index['item_id'],
+                        "item_name": order_index['item_name'],
+                        "distributor_type": "club",
+                        "distributor_id": DEFAULT_USER_ID,
+                        "pay_type": "none",
+                        "pay_status": ORDER_STATUS_WECHAT_PAY_SUCCESS,
+                        "total_amount": _bonus, #已经转换为分，注意转为数值
+                    }
+                    self.create_order(order_index)
 
-                        # 消费积分纪录
-                        _json = {'vendor_id':vendor_id, 'account_id':_old_order['account_id'], 'res_id':_old_order['activity_id'],
-                            'create_time':_timestamp, 'bonus':_bonus, 'type':3}
-                        bonus_dao.bonus_dao().create(_json)
-
-                        # 修改个人积分信息
-                        _bonus = int(_customer_profile['bonus']) + int(_bonus)
-                        if _bonus < 0:
-                            _bonus = 0
-                        _json = {'vendor_id':vendor_id, 'account_id':_old_order['account_id'], 'last_update_time':_timestamp,
-                            'bonus':_bonus}
-                        vendor_member_dao.vendor_member_dao().update(_json)
+                    # 修改个人积分信息
+                    self.points_increase(vendor_id, order_index['account_id'], bonus)
 
                 # 如使用代金券抵扣，则将代金券减去
                 _vouchers = order['vouchers']
@@ -964,6 +962,7 @@ class WxOrderWaitHandler(tornado.web.RequestHandler):
         logging.info("wait for a moments")
 
         self.render('wx/orders-wait.html')
+
 
 # 添加当前订单的成员
 class WxHhaHandler(tornado.web.RequestHandler):
@@ -1292,6 +1291,24 @@ class WxVoucherBuyStep2Handler(BaseHandler):
             _status = ORDER_STATUS_WECHAT_PAY_SUCCESS
         _order_id = str(uuid.uuid1()).replace('-', '')
         _timestamp = time.time()
+
+        # 创建订单索引
+        order_index = {
+            "_id": _order_id,
+            "order_tyoe": "buy_voucher",
+            "club_id": vendor_id,
+            "item_type": "voucher",
+            "item_id": _voucher_id,
+            "item_name": _title,
+            "distributor_type": "club",
+            "distributor_id": guest_club_id,
+            "create_time": _timestamp,
+            "pay_type": "wxpay",
+            "pay_status": _status,
+            "total_amount": _amount, #已经转换为分，注意转为数值
+        }
+        self.create_order(order_index)
+
         _order = {"_id":_order_id, "vendor_id":vendor_id,
                 "account_id":account_id, "account_avatar":_avatar, "account_nickname":_nickname,
                 "voucher_id":_voucher_id, "voucher_price":_price, "voucher_amount":_amount,

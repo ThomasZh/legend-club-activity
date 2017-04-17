@@ -64,60 +64,24 @@ class ApiCustomerListXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id,):
         logging.info("got vendor_id %r in uri", vendor_id)
-        sBefore = self.get_argument("before", "") #格式 2016-06-01 22:36
-        logging.info("got sBefore>>>> %r in uri", sBefore)
-        if sBefore != "":
-          iBefore = float(datetime_timestamp(sBefore))
-        else:
-          iBefore = 0
-        logging.info("got iBefore>>>> %r in uri", iBefore)
+        page = self.get_argument("page", 1)
+        logging.debug("get page=[%r] from argument", page)
+        limit = self.get_argument("limit", 20)
+        logging.debug("get limit=[%r] from argument", limit)
 
-        customers = vendor_member_dao.vendor_member_dao().query_pagination(vendor_id, iBefore, PAGE_SIZE_LIMIT)
-        for _customer_profile in customers:
-            _customer_profile['create_time'] = timestamp_datetime(float(_customer_profile['create_time']));
-            try:
-                _customer_profile['account_nickname']
-            except:
-                _customer_profile['account_nickname'] = ''
-            try:
-                _customer_profile['account_avatar']
-            except:
-                _customer_profile['account_avatar'] = ''
-            logging.info("got account_avatar %r", _customer_profile['account_avatar'])
-            try:
-                _customer_profile['comment']
-            except:
-                _customer_profile['comment'] = ''
-            try:
-                _customer_profile['bonus']
-            except:
-                _customer_profile['bonus'] = 0
-            logging.info("got bonus %r", _customer_profile['bonus'])
-            try:
-                _customer_profile['history_bonus']
-            except:
-                _customer_profile['history_bonus'] = 0
-            logging.info("got history_bonus %r", _customer_profile['history_bonus'])
-            try:
-                _customer_profile['vouchers']
-            except:
-                _customer_profile['vouchers'] = 0
-            # 转换成元
-            _customer_profile['vouchers'] = float(_customer_profile['vouchers']) / 100
-            try:
-                _customer_profile['distance']
-            except:
-                _customer_profile['distance'] = 0
-            try:
-                _customer_profile['rank']
-            except:
-                _customer_profile['rank'] = 0
-            try:
-                _customer_profile['crets']
-            except:
-                _customer_profile['crets'] = 0
+        access_token = self.get_access_token()
 
-        _json = JSON.dumps(customers, default=json_util.default)
+        params = {"page":page, "limit":limit}
+        url = url_concat(API_DOMAIN + "/api/clubs/"+vendor_id+"/users", params)
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        rs = data['rs']
+        users = rs['data']
+
+        _json = JSON.dumps(users, default=json_util.default)
         logging.info("got _customer_profile %r", _json)
         self.write(_json)
         self.finish()

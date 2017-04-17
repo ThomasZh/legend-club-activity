@@ -98,34 +98,23 @@
                       <div class="well profile_view">
                         <div class="col-sm-12">
                           <div class="left col-xs-7">
-                            <h2>
-                              {% if customer['account_nickname'] %}
-                                {{customer['account_nickname']}}
-                              {% else %}
-                                anonymous
-                              {% end %}
-                            </h2>
-                            <p> {{customer['comment']}} </p>
+                            <h2>{{ customer['nickname'] }}</h2>
                             <ul class="list-unstyled">
                               <li><i class="fa fa-phone"></i> 1234567890 </li>
                             </ul>
                           </div>
                           <div class="right col-xs-5 text-center">
-                            {% if customer['account_avatar'] %}
-                              <img src="{{customer['account_avatar']}}" alt="" class="img-circle img-responsive">
-                            {% else %}
-                              <img src="/static/admin/images/user.png" alt="" class="img-circle img-responsive">
-                            {% end %}
+                              <img src="{{ customer['avatar'] }}" alt="" class="img-circle img-responsive">
                           </div>
                         </div>
                         <div class="col-xs-12 bottom text-center">
                           <div class="col-xs-12 col-sm-6 emphasis">
-                            <p class="">L{{customer['rank']}}会员</p>
+                            <p class="">L{{ customer['_rank'] }}会员</p>
                           </div>
                           <div class="col-xs-12 col-sm-6 emphasis">
                             <button type="button" class="btn btn-success btn-xs">
                               <i class="fa fa-tags"> 领队 会员 非会员 </i> </button>
-                            <a href="/vendors/{{ vendor_id }}/customers/{{customer['account_id']}}" type="button" class="btn btn-primary btn-xs" >
+                            <a href="/vendors/{{ vendor_id }}/customers/{{ customer['account_id'] }}" type="button" class="btn btn-primary btn-xs" >
                             	<i class="fa fa-user"></i> 查看详情 </a>
                           </div>
                         </div>
@@ -185,26 +174,17 @@
           inner_html += '<div class="col-sm-12">';
           inner_html += '<div class="left col-xs-7">';
           inner_html += '<h2>';
-          if(ajaxobj[i].account_nickname != ""){
-            inner_html += ajaxobj[i].account_nickname;
-          }else{
-            inner_html += 'anonymous';
-          }
+          inner_html += ajaxobj[i].nickname;
           inner_html += '</h2>';
-          inner_html += '<p>'+ajaxobj[i].comment+'</p>';
           inner_html += '<ul class="list-unstyled">';
           inner_html += '<li><i class="fa fa-phone"></i> 1234567890 </li>';
           inner_html += '</ul></div>'
           inner_html += '<div class="right col-xs-5 text-center">';
-          if (ajaxobj[i].account_avatar != ""){
-              inner_html += '<img src="'+ajaxobj[i].account_avatar+'" alt="" class="img-circle img-responsive">';
-          }else{
-              inner_html += '<img src="/static/admin/images/user.png" alt="" class="img-circle img-responsive">';
-          }
+          inner_html += '<img src="'+ajaxobj[i].avatar+'" alt="" class="img-circle img-responsive">';
           inner_html += '</div></div>';
           inner_html += '<div class="col-xs-12 bottom text-center">';
           inner_html += '<div class="col-xs-12 col-sm-6 emphasis">';
-          inner_html += '<p class="">L'+ajaxobj[i].rank+'</p></div>';
+          inner_html += '<p class="">L'+ajaxobj[i]._rank+'</p></div>';
           inner_html += '<div class="col-xs-12 col-sm-6 emphasis">';
           inner_html += '<button type="button" class="btn btn-success btn-xs">';
           inner_html += '<i class="fa fa-tags"> 领队 会员 非会员 </i> </button>';

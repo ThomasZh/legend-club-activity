@@ -139,26 +139,26 @@ def time_span(ts):
 
 class BaseHandler(tornado.web.RequestHandler):
 
-    def bonus_decrease(self, club_id, account_id, num):
+    def points_decrease(self, club_id, account_id, num):
         headers = {"Authorization":"Bearer "+DEFAULT_USER_ID}
 
-        _json = json_encode({"bonus":num, "action":"decrease"})
+        _json = json_encode({"points":num, "action":"decrease"})
 
         url = API_DOMAIN + "/api/clubs/" + club_id + "/users/" + account_id
         http_client = HTTPClient()
         response = http_client.fetch(url, method="PUT", headers=headers, body=_json)
-        logging.info("got update_bonus response.body=[%r]", response.body)
+        logging.info("got points_decrease response.body=[%r]", response.body)
 
 
-    def bonus_increase(self, club_id, account_id, num):
+    def points_increase(self, club_id, account_id, num):
         headers = {"Authorization":"Bearer "+DEFAULT_USER_ID}
 
-        _json = json_encode({"bonus":num, "action":"increase"})
+        _json = json_encode({"points":num, "action":"increase"})
 
         url = API_DOMAIN + "/api/clubs/" + club_id + "/users/" + account_id
         http_client = HTTPClient()
         response = http_client.fetch(url, method="PUT", headers=headers, body=_json)
-        logging.info("got update_bonus response.body=[%r]", response.body)
+        logging.info("got points_increase response.body=[%r]", response.body)
 
 
     def get_club_user(self, club_id, account_id):
@@ -615,20 +615,3 @@ def html_markdown(html):
     markdown_content = h.handle(html)
     logging.info("got markdown content %r", markdown_content)
     return markdown_content
-
-def get_club_info(access_token,club_id):
-    try:
-        headers={"Authorization":"Bearer "+access_token}
-        url = API_DOMAIN+"/api/clubs/"+club_id
-        http_client = HTTPClient()
-        response = http_client.fetch(url, method="GET", headers=headers)
-        data = json_decode(response.body)
-        err_code = data['err_code']
-        if err_code == 200:
-            club = data['rs']
-        else:
-            club = None
-        logging.info("got club info>>>>>>>>>>> %r",club)
-        return club
-    except:
-        return

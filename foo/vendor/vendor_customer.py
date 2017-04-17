@@ -60,50 +60,17 @@ class VendorCustomerListHandler(AuthorizationHandler):
 
         ops = self.get_ops_info()
 
-        customers = vendor_member_dao.vendor_member_dao().query_pagination(vendor_id, 0, PAGE_SIZE_LIMIT)
-        for _customer_profile in customers:
-            _customer_profile['create_time'] = timestamp_datetime(_customer_profile['create_time']);
-            try:
-                _customer_profile['account_nickname']
-            except:
-                _customer_profile['account_nickname'] = ''
-            try:
-                _customer_profile['account_avatar']
-            except:
-                _customer_profile['account_avatar'] = ''
-            logging.info("got account_avatar %r", _customer_profile['account_avatar'])
-            try:
-                _customer_profile['comment']
-            except:
-                _customer_profile['comment'] = ''
-            try:
-                _customer_profile['bonus']
-            except:
-                _customer_profile['bonus'] = 0
-            logging.info("got bonus %r", _customer_profile['bonus'])
-            try:
-                _customer_profile['history_bonus']
-            except:
-                _customer_profile['history_bonus'] = 0
-            logging.info("got history_bonus %r", _customer_profile['history_bonus'])
-            try:
-                _customer_profile['vouchers']
-            except:
-                _customer_profile['vouchers'] = 0
-            # 转换成元
-            _customer_profile['vouchers'] = float(_customer_profile['vouchers']) / 100
-            try:
-                _customer_profile['distance']
-            except:
-                _customer_profile['distance'] = 0
-            try:
-                _customer_profile['rank']
-            except:
-                _customer_profile['rank'] = 0
-            try:
-                _customer_profile['crets']
-            except:
-                _customer_profile['crets'] = 0
+        access_token = self.get_access_token()
+
+        params = {"page":1, "limit":20}
+        url = url_concat(API_DOMAIN + "/api/clubs/"+vendor_id+"/users", params)
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        rs = data['rs']
+        customers = rs['data']
 
         counter = self.get_counter(vendor_id)
         self.render('vendor/customers.html',
@@ -113,7 +80,6 @@ class VendorCustomerListHandler(AuthorizationHandler):
                 counter=counter,
                 customers=customers,
                 keys_value="")
-
 
 
 class VendorCustomerSearchHandler(AuthorizationHandler):
