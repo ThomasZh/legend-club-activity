@@ -200,6 +200,7 @@ class VendorOrderInfoHandler(AuthorizationHandler):
         ops = self.get_ops_info()
 
         order_index = self.get_order_index(order_id)
+        logging.info("got order_index %r in uri", order_index)
         order_index['create_time'] = timestamp_datetime(order_index['create_time'])
         order = self.get_symbol_object(order_id)
 
@@ -247,4 +248,6 @@ class VendorOrderInfoHandler(AuthorizationHandler):
                 ops=ops,
                 access_token=access_token,
                 counter=counter,
-                order_index=order_index, order=order, applies=applies)
+                order_index=order_index,
+                order=order,
+                applies=applies)
