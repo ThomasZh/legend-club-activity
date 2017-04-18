@@ -219,9 +219,9 @@ class VendorOrderInfoHandler(AuthorizationHandler):
             # 价格转换成元
             insurance['fee'] = float(insurance['fee']) / 100
 
-        order['total_amount'] = float(order['total_amount']) / 100
-        order['bonus'] = float(order['bonus']) / 100
-        order_index['payed_total_fee'] = float(order_index['payed_total_fee']) / 100
+        order['amount'] = float(order['amount']) / 100
+        order['points_used'] = float(order['points_used']) / 100
+        order_index['actual_payment'] = float(order_index['actual_payment']) / 100
 
         params = {"filter":"order", "order_id":order_id, "page":1, "limit":20}
         url = url_concat(API_DOMAIN + "/api/applies", params)

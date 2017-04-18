@@ -51,7 +51,7 @@ from dao import order_dao
 from dao import group_qrcode_dao
 from dao import vendor_member_dao
 
- 
+
 from global_const import ACTIVITY_STATUS_DRAFT
 from global_const import ACTIVITY_STATUS_POP
 from global_const import ACTIVITY_STATUS_DOING
@@ -98,7 +98,7 @@ class ApiActivityCompletedListXHR(tornado.web.RequestHandler):
         docs_list = list(_array)
         self.write(JSON.dumps(docs_list, default=json_util.default))
         self.finish()
-        
+
 # 获取参加某活动的成员
 class ApiActivityMemberListXHR(tornado.web.RequestHandler):
     def get(self, vendor_id, activity_id):
@@ -147,6 +147,23 @@ class ApiActivityShareXHR(tornado.web.RequestHandler):
 
         _account_id = self.get_argument("account_id", "")
         logging.info("got _account_id %r", _account_id)
+
+        # 产生一个积分使用订单
+        order_id = str(uuid.uuid1()).replace('-', '')
+        order_index = {
+            "_id": order_id,
+            "order_type": "bonus",
+            "club_id": vendor_id,
+            "item_type": "activity",
+            "item_id": activity_id,
+            "item_name": order_index['item_name'],
+            "distributor_type": "personal",
+            "distributor_id": _account_id,
+            "pay_type": "none",
+            "pay_status": ORDER_STATUS_WECHAT_PAY_SUCCESS,
+            "total_amount": _bonus, #已经转换为分，注意转为数值
+        }
+        self.create_order(order_index)
 
         _bonus = bonus_dao.bonus_dao().query_not_safe_by_res(activity_id, _account_id, 1)
         if not _bonus:

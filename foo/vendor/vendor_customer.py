@@ -62,23 +62,12 @@ class VendorCustomerListHandler(AuthorizationHandler):
 
         access_token = self.get_access_token()
 
-        params = {"page":1, "limit":20}
-        url = url_concat(API_DOMAIN + "/api/clubs/"+vendor_id+"/users", params)
-        http_client = HTTPClient()
-        headers = {"Authorization":"Bearer " + access_token}
-        response = http_client.fetch(url, method="GET", headers=headers)
-        logging.info("got response.body %r", response.body)
-        data = json_decode(response.body)
-        rs = data['rs']
-        customers = rs['data']
-
         counter = self.get_counter(vendor_id)
         self.render('vendor/customers.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 access_token=access_token,
                 counter=counter,
-                customers=customers,
                 keys_value="")
 
 
@@ -162,39 +151,25 @@ class VendorCustomerProfileHandler(AuthorizationHandler):
         _customer_profile = data['rs']
 
         _contacts = contact_dao.contact_dao().query_by_account(vendor_id, account_id)
-        before = time.time()
-        _orders = order_dao.order_dao().query_pagination_by_account(account_id, before, PAGE_SIZE_LIMIT)
-        logging.info("got personal_orders----------- %r in uri", len(_orders))
-        for order in _orders:
-            _activity = activity_dao.activity_dao().query(order['activity_id'])
-            order['activity_title'] = _activity['title']
-            order['create_time'] = timestamp_datetime(order['create_time'])
-            logging.info("got activity_title %r", order['activity_title'])
-            order['activity_begin_time'] = timestamp_datetime(_activity['begin_time'])
-            order['activity_distance'] = _activity['distance']
-            order['activity_status'] = _activity['status']
 
-            order_fees = []
-            for ext_fee_id in order['ext_fees']:
-                for template in _activity['ext_fee_template']:
-                    if ext_fee_id == template['_id']:
-                        json = {"_id":ext_fee_id, "name":template['name'], "fee":template['fee']}
-                        order_fees.append(json)
-                        break
-            order['fees'] = order_fees
+        access_token = self.get_access_token()
 
-            order_insurances = []
-            for insurance_id in order['insurances']:
-                _insurance = insurance_template_dao.insurance_template_dao().query(insurance_id)
-                order_insurances.append(_insurance)
-            order['insurances'] = order_insurances
+        params = {"filter":"account", "account_id":account_id, "page":1, "limit":20,}
+        url = url_concat(API_DOMAIN + "/api/orders", params)
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        rs = data['rs']
+        orders = rs['data']
 
-            _cret = cret_dao.cret_dao().query_by_account(order['activity_id'], order['account_id'])
-            if _cret:
-                logging.info("got _cret_id %r", _cret['_id'])
-                order['cret_id'] = _cret['_id']
-            else:
-                order['cret_id'] = None
+        for order in orders:
+            # 下单时间，timestamp -> %m月%d 星期%w
+            order['create_time'] = timestamp_datetime(float(order['create_time']))
+            # 合计金额
+            order['amount'] = float(order['amount']) / 100
+            order['actual_payment'] = float(order['actual_payment']) / 100
 
         # 取任务
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
@@ -224,7 +199,7 @@ class VendorCustomerProfileHandler(AuthorizationHandler):
                 account_id=account_id,
                 counter=counter,
                 profile=_customer_profile,
-                contacts=_contacts, orders=_orders, tasks =personal_tasks)
+                contacts=_contacts, orders=orders, tasks =personal_tasks)
 
 
     @tornado.web.authenticated  # if no session, redirect to login page

@@ -70,7 +70,7 @@
     // 根据订单申请人数来创建表单
     $.getJSON('/bf/api/vendors/{{ vendor_id }}/orders/'+orderID, function(result){
       // console.log(result);
-      createApplicantFormBy(Number(result.applicant_num));
+      createApplicantFormBy(Number(result.quantity));
       $('.ui-loading-wrap').addClass('hidden');//隐藏进度条
     });
 

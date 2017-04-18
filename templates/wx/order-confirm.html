@@ -76,7 +76,7 @@
     </div>
     <!-- ui-flex ui-flex-align-center ui-flex-pack-center: 垂直加水平居中 -->
     <div class="ui-col ui-flex ui-flex-align-center ui-flex-pack-center green mock-green-btn">
-      {% if order_index['total_amount'] == 0 %}
+      {% if order_index['amount'] == 0 %}
         <a id="wexin-pay-btn" onclick="callpay();" class="ui-txt-white pay-btn full-width">填写报名</a>
       {% else %}
         <a id="wexin-pay-btn" onclick="callpay();" class="ui-txt-white pay-btn full-width">微信支付</a>
@@ -126,7 +126,7 @@
   	}
 
   	function callpay() {
-      if ({{ order_index['total_amount'] }} == 0) {
+      if ({{ order_index['amount'] }} == 0) {
         location.href = "/bf/wx/vendors/{{ vendor_id }}/activitys/{{activity['_id']}}/apply/step3?order_id={{order_index['_id']}}";
       } else {
   		  if (typeof WeixinJSBridge == "undefined"){
@@ -181,9 +181,9 @@
 
       $('.ui-loading-wrap').addClass('hidden');
       // 人数
-      $('.applicant_num').html(order.applicant_num+'人');
+      $('.applicant_num').html(order.quantity+'人');
       // 总金额
-      $('.total_fees').html(order.total_amount);
+      $('.total_fees').html(order.amount);
       // 购买的附加服务
       var ext_fees = order['ext_fees'];
       for(var i in ext_fees){
@@ -218,7 +218,7 @@
       }
 
       // 获取积分选项，并与订单中的配置比较显示
-      var bonus = order['bonus'];
+      var bonus = order['points_used'];
       if (bonus < 0) {
         var inrHTML = '<p class="padding-left-10">'
           +'使用积分抵'

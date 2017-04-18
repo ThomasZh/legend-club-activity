@@ -82,8 +82,8 @@ class ApiOrdersXHR(AuthorizationHandler):
             # 下单时间，timestamp -> %m月%d 星期%w
             order['create_time'] = timestamp_datetime(float(order['create_time']))
             # 合计金额
-            order['total_amount'] = float(order['total_amount']) / 100
-            order['payed_total_fee'] = float(order['payed_total_fee']) / 100
+            order['amount'] = float(order['amount']) / 100
+            order['actual_payment'] = float(order['actual_payment']) / 100
 
         self.write(JSON.dumps(rs, default=json_util.default))
         self.finish()
@@ -116,8 +116,8 @@ class ApiActivityOrdersXHR(AuthorizationHandler):
             # 下单时间，timestamp -> %m月%d 星期%w
             order['create_time'] = timestamp_datetime(float(order['create_time']))
             # 合计金额
-            order['total_amount'] = float(order['total_amount']) / 100
-            order['payed_total_fee'] = float(order['payed_total_fee']) / 100
+            order['amount'] = float(order['amount']) / 100
+            order['actual_payment'] = float(order['actual_payment']) / 100
 
         self.write(JSON.dumps(rs, default=json_util.default))
         self.finish()
@@ -132,10 +132,8 @@ class ApiOrderInfoXHR(AuthorizationHandler):
 
         _order = self.get_symbol_object(order_id)
         # 价格转换成元
-        _order['total_amount'] = float(_order['total_amount']) / 100
-        if not _order.has_key('payed_total_fee'):
-            _order['payed_total_fee'] = 0
-        _order['payed_total_fee'] = float(_order['payed_total_fee']) / 100
+        _order['amount'] = float(_order['amount']) / 100
+        _order['actual_payment'] = float(_order['actual_payment']) / 100
         for ext_fee in _order['ext_fees']:
             # 价格转换成元
             ext_fee['fee'] = float(ext_fee['fee']) / 100
@@ -143,7 +141,7 @@ class ApiOrderInfoXHR(AuthorizationHandler):
             # 价格转换成元
             insurance['fee'] = float(insurance['fee']) / 100
         # 价格转换成元
-        _order['bonus'] = float(_order['bonus']) / 100
+        _order['points_used'] = float(_order['points_used']) / 100
 
         for _voucher in _order['vouchers']:
             # 价格转换成元

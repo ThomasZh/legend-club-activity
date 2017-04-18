@@ -253,18 +253,14 @@
                       <tr>
                         <td>#</td>
                         <td>
-                          <a href="/vendors/{{ vendor_id }}/activitys/{{order['activity_id']}}/detail/step1">{{order['activity_title']}}</a>
+                          <a href="/vendors/{{ vendor_id }}/activitys/{{order['item_id']}}/detail/step1">{{order['item_name']}}</a>
                           <br />
-                          <small>{{order['activity_begin_time']}}</small>
+                          <small>{{order['create_time']}}</small>
                         </td>
-                        <td>{{order['activity_distance']}}</td>
-                        <td>{{order['applicant_num']}}</td>
+                        <td>{{order['bonus_points']}}</td>
+                        <td>{{order['quantity']}}</td>
                         <td>{{order['create_time']}}</td>
                         <td>
-                          {% if order['cret_id'] %}
-                            <a href="/vendors/{{ vendor_id }}/crets/{{order['cret_id']}}" class="btn btn-primary btn-xs">
-                            <i class="fa fa-eye"></i> 证书 </a>
-                          {% end %}
                           <a href="/vendors/{{ vendor_id }}/orders/{{order['_id']}}" class="btn btn-info btn-xs">
                             <i class="fa fa-eye"></i> 订单 </a>
                         </td>

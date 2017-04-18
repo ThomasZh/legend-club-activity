@@ -596,17 +596,24 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
         # 创建订单索引
         order_index = {
             "_id": _order_id,
-            "order_tyoe": "buy_activity",
+            "order_type": "buy_activity",
             "club_id": vendor_id,
             "item_type": "activity",
             "item_id": activity_id,
-            "item_name": _title,
+            "item_name": _activity['title'],
             "distributor_type": "club",
             "distributor_id": guest_club_id,
             "create_time": _timestamp,
             "pay_type": "wxpay",
             "pay_status": _status,
-            "total_amount": _total_amount, #已经转换为分，注意转为数值
+            "quantity": _applicant_num,
+            "amount": _total_amount, #已经转换为分，注意转为数值
+            "base_fees": _base_fees,
+            "ext_fees": _ext_fees,
+            "insurances": _insurances,
+            "vouchers": _vouchers,
+            "points_used": _bonus,
+            "bonus_points": _activity['distance'], # 活动累计里程
         }
         self.create_order(order_index)
 
@@ -614,16 +621,6 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
         self.counter_increase(vendor_id, "activity_order")
         self.counter_increase(activity_id, "order")
         # TODO notify this message to vendor's administrator by SMS
-
-        # status: 10=order but not pay it, 20=order and pay it.
-        # pay_type: wxpay, alipay, paypal, applepay, huaweipay, ...
-        order_index['applicant_num'] = _applicant_num
-        order_index['base_fees'] = _base_fees
-        order_index['ext_fees'] = _ext_fees
-        order_index['insurances'] = _insurances
-        order_index['vouchers'] = _vouchers
-        order_index['bonus'] = _bonus
-        self.create_symbol_object(order_index)
 
         wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
         wx_app_id = wx_app_info['wx_app_id']
@@ -735,13 +732,9 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
                 order_index['activity_amount'] = float(base_fee['fee']) / 100
 
             # 如使用积分抵扣，则将积分减去
-            _bonus = order_index['bonus']
-            if _bonus < 0:
-                # 消费积分纪录
-                _json = {'vendor_id':vendor_id, 'account_id':order_index['account_id'], 'res_id':order_index['item_id'],
-                        'create_time':_timestamp, 'bonus':_bonus, 'type':3}
-                bonus_dao.bonus_dao().create(_json)
-                self.bonus_decrease(vendor_id, _order['account_id'], _bonus)
+            if order_index['points_used'] < 0:
+                # 修改个人积分信息
+                self.points_increase(vendor_id, order_index['account_id'], order_index['points_used'])
 
             # 如使用代金券抵扣，则将代金券减去
             for _voucher in _vouchers:
@@ -906,7 +899,7 @@ class WxOrderNotifyHandler(BaseHandler):
                     '_id':_order_id,
                     "pay_status": ORDER_STATUS_WECHAT_PAY_SUCCESS,
                     'transaction_id':_pay_return['transaction_id'],
-                    'payed_total_fee':_pay_return['total_fee']
+                    'actual_payment':_pay_return['total_fee']
                 }
                 self.update_order_payed(order_payed)
 
@@ -914,23 +907,6 @@ class WxOrderNotifyHandler(BaseHandler):
                 # 如使用积分抵扣，则将积分减去
                 _bonus = order['bonus']
                 if _bonus < 0:
-                    # 产生一个积分使用订单
-                    order_id = str(uuid.uuid1()).replace('-', '')
-                    order_index = {
-                        "_id": order_id,
-                        "order_tyoe": "using_point",
-                        "club_id": vendor_id,
-                        "item_type": order_index['item_type'],
-                        "item_id": order_index['item_id'],
-                        "item_name": order_index['item_name'],
-                        "distributor_type": "club",
-                        "distributor_id": DEFAULT_USER_ID,
-                        "pay_type": "none",
-                        "pay_status": ORDER_STATUS_WECHAT_PAY_SUCCESS,
-                        "total_amount": _bonus, #已经转换为分，注意转为数值
-                    }
-                    self.create_order(order_index)
-
                     # 修改个人积分信息
                     self.points_increase(vendor_id, order_index['account_id'], bonus)
 
@@ -953,7 +929,7 @@ class WxOrderNotifyHandler(BaseHandler):
             order_payed = {'_id':_order_id,
                 "pay_status": ORDER_STATUS_WECHAT_PAY_FAILED,
                 'transaction_id':DEFAULT_USER_ID,
-                'payed_total_fee':0}
+                'actual_payment':0}
             self.update_order_payed(order_payed)
 
 

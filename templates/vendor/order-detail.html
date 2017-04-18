@@ -120,10 +120,10 @@
                     <tbody id="tbody">
                       <tr class="even pointer">
                         <td class="a-center ">
-                          {% if order_index['check_status'] %}
-                            <input type="checkbox" class="tableflat" checked="checked" disabled="true">
-                          {% else %}
+                          {% if order_index['check_status'] == 0 %}
                             <input type="checkbox" class="tableflat" value="{{ order_index['_id'] }}" onclick="OnReviewOrder(this);">
+                          {% else %}
+                            <input type="checkbox" class="tableflat" checked="true" disabled="true">
                           {% end %}
                         </td>
                         <td class=" ">
@@ -147,7 +147,7 @@
                           <a href="/vendors/{{ vendor_id }}/customers/{{ order_index['account_id'] }}">{{ order_index['nickname'] }}</a>
                           <br />
                         </td>
-                        <td>{{order['applicant_num']}}</td>
+                        <td>{{order['quantity']}}</td>
                         <td>活动费用: {{order['activity_amount']}}元<br />
                           {% for fee in order['ext_fees'] %}
                             {{ fee['name'] }}: {{ fee['fee'] }}元<br />
@@ -158,13 +158,13 @@
                           {% for voucher in order['vouchers'] %}
                             使用代金券抵: {{ voucher['fee'] }}元<br />
                           {% end %}
-                          {% if order['bonus'] < 0 %}
-                            使用积分抵: {{ order['bonus'] }}元
+                          {% if order['points_used'] < 0 %}
+                            使用积分抵: {{ order['points_used'] }}元
                           {% end %}
                         </td>
-                        <td>订单总额: {{ order_index['total_amount'] }}元
+                        <td>订单总额: {{ order_index['amount'] }}元
                           {% if order_index['pay_status'] > 20 %}
-                            <br />实际支付: {{ order_index['payed_total_fee'] }}元
+                            <br />实际支付: {{ order_index['actual_payment'] }}元
                           {% end %}
                         </td>
                         <td class=" ">{{ order_index['create_time'] }}</td>
