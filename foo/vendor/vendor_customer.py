@@ -194,6 +194,7 @@ class VendorCustomerProfileHandler(AuthorizationHandler):
 
         counter = self.get_counter(vendor_id)
         self.render('vendor/customer-profile.html',
+                access_token=access_token,
                 vendor_id=vendor_id,
                 ops=ops,
                 account_id=account_id,

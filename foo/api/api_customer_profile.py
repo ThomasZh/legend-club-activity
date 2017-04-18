@@ -165,6 +165,41 @@ class ApiCustomerProfileMyContactListXHR(tornado.web.RequestHandler):
         self.finish()
 
 
+# 获取当前用户的订单(分页)
+class ApiCustomerOrdersXHR(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id, account_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+        page = self.get_argument("page", 1)
+        logging.debug("get page=[%r] from argument", page)
+        limit = self.get_argument("limit", 20)
+        logging.debug("get limit=[%r] from argument", limit)
+
+        access_token = self.get_access_token()
+
+        params = {"filter":"account", "account_id":account_id, "page":page, "limit":limit}
+        url = url_concat(API_DOMAIN + "/api/orders", params)
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        rs = data['rs']
+        orders = rs['data']
+
+        for order in orders:
+            # 下单时间，timestamp -> %m月%d 星期%w
+            order['create_time'] = timestamp_datetime(float(order['create_time']))
+            # 合计金额
+            order['amount'] = float(order['amount']) / 100
+            order['actual_payment'] = float(order['actual_payment']) / 100
+
+        _json = JSON.dumps(rs, default=json_util.default)
+        logging.info("got _customer_profile %r", _json)
+        self.write(_json)
+        self.finish()
+
+
 # 获取当前用户的历史活动
 class ApiCustomerProfileHistoryActivityXHR(tornado.web.RequestHandler):
     def get(self,vender_id):
