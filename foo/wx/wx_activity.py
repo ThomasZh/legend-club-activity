@@ -501,15 +501,26 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
         guest_club_id = self.get_argument("guest_club_id")
         logging.info("got guest_club_id %r", guest_club_id)
 
+        access_token = self.get_access_token()
+
+        # 取得自己的最后一笔订单
+        params = {"filter":"account", "account_id":_account_id, "page":1, "limit":1,}
+        url = url_concat(API_DOMAIN + "/api/orders", params)
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        rs = data['rs']
+        orders = rs['data']
+
         _timestamp = time.time()
         # 一分钟内不能创建第二个订单,
         # 防止用户点击回退按钮，产生第二个订单
-        _old_orders = order_dao.order_dao().query_by_account(activity_id, _account_id)
-        if len(_old_orders) > 0:
-            for _old_order in _old_orders:
-                if (_timestamp - _old_order['create_time']) < 60:
+        if len(orders) > 0:
+            for order in orders:
+                if (_timestamp - order['create_time']) < 60:
                     self.redirect('/bf/wx/orders/wait')
-                    # return
 
         # 订单总金额
         _total_amount = self.get_argument("total_amount", 0)
@@ -520,10 +531,13 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
         # 订单申报数目
         _applicant_num = self.get_argument("applicant_num", 1)
         # 活动金额，即已选的基本服务项金额
-        activity_amount = 0
+        amount = 0
+        actual_payment = 0
+        quantity = int(_applicant_num)
 
         _activity = activity_dao.activity_dao().query(activity_id)
-        _title = _activity['title']
+        _bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
+        bonus_points = int(_bonus_template['activity_shared'])
 
         #基本服务
         _base_fee_ids = self.get_body_argument("base_fees", [])
@@ -538,6 +552,8 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
                     _base_fee = {"_id":_base_fee_id, "name":template['name'], "fee":template['fee']}
                     _base_fees.append(_base_fee)
                     activity_amount = template['fee']
+                    amount = amount + template['fee']
+                    actual_payment = actual_payment + int(template['fee']) * quantity
                     break;
 
         # 附加服务项编号数组
@@ -553,6 +569,8 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
                 if _ext_fee_id == template['_id']:
                     _ext_fee = {"_id":_ext_fee_id, "name":template['name'], "fee":template['fee']}
                     _ext_fees.append(_ext_fee)
+                    amount = amount + template['fee']
+                    actual_payment = actual_payment + int(template['fee']) * quantity
                     break;
 
         # 保险选项,数组
@@ -565,6 +583,8 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
                 if _insurance_id == _insurance_template['_id']:
                     _insurance = {"_id":_insurance_id, "name":_insurance_template['title'], "fee":_insurance_template['amount']}
                     _insurances.append(_insurance)
+                    amount = amount + _insurance['fee']
+                    actual_payment = actual_payment + int(_insurance['fee']) * quantity
                     break;
 
         #代金券选项,数组
@@ -576,6 +596,7 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
             _voucher = voucher_dao.voucher_dao().query_not_safe(_vouchers_id)
             _json = {'_id':_vouchers_id, 'fee':_voucher['amount']}
             _vouchers.append(_json)
+            actual_payment = actual_payment - int(_json['fee'])
 
         # 积分选项,数组
         _bonus = 0
@@ -587,10 +608,12 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
                 # 价格转换成分
                 _bonus = - int(float(_bonus) * 100)
         logging.info("got _bonus %r", _bonus)
+        points = _bonus
+        actual_payment = actual_payment + points
 
         _order_id = str(uuid.uuid1()).replace('-', '')
         _status = ORDER_STATUS_BF_INIT
-        if _total_amount == 0:
+        if actual_payment == 0:
             _status = ORDER_STATUS_WECHAT_PAY_SUCCESS
 
         # 创建订单索引
@@ -606,14 +629,15 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
             "create_time": _timestamp,
             "pay_type": "wxpay",
             "pay_status": _status,
-            "quantity": _applicant_num,
-            "amount": _total_amount, #已经转换为分，注意转为数值
+            "quantity": quantity,
+            "amount": amount, #已经转换为分，注意转为数值
+            "actual_payment": actual_payment, #已经转换为分，注意转为数值
             "base_fees": _base_fees,
             "ext_fees": _ext_fees,
             "insurances": _insurances,
             "vouchers": _vouchers,
-            "points_used": _bonus,
-            "bonus_points": _activity['distance'], # 活动累计里程
+            "points_used": points,
+            "bonus_points": bonus_points, # 活动奖励积分
         }
         self.create_order(order_index)
 
@@ -783,6 +807,7 @@ class WxActivityApplyStep3Handler(AuthorizationHandler):
                 order_id=_order_id,
                 account_id=_account_id)
 
+
     def post(self, vendor_id, activity_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
@@ -803,6 +828,7 @@ class WxActivityApplyStep3Handler(AuthorizationHandler):
                     activity=_activity,
                     order_id=_order_id,
                     account_id=_account_id)
+            return
         else:
             _activity = activity_dao.activity_dao().query(activity_id)
 
@@ -950,6 +976,7 @@ class WxHhaHandler(tornado.web.RequestHandler):
         self.render('wx/hold-harmless-agreements.html',
                 vendor_id=vendor_id,
                 vendor_hha=vendor_hha)
+
 
 # 显示分享的代金券页面 可购买
 class WxVoucherShareHandler(tornado.web.RequestHandler):

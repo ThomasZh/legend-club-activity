@@ -32,12 +32,8 @@ from tornado.httpclient import HTTPClient
 from tornado.httputil import url_concat
 from bson import json_util
 
-from comm import BaseHandler
-from comm import timestamp_datetime
-from comm import datetime_timestamp
-from comm import timestamp_date
-from comm import date_timestamp
-from comm import timestamp_friendly_date
+from global_const import *
+from comm import *
 
 from dao import budge_num_dao
 from dao import category_dao
@@ -50,16 +46,6 @@ from dao import apply_dao
 from dao import order_dao
 from dao import group_qrcode_dao
 from dao import vendor_member_dao
-
-
-from global_const import ACTIVITY_STATUS_DRAFT
-from global_const import ACTIVITY_STATUS_POP
-from global_const import ACTIVITY_STATUS_DOING
-from global_const import ACTIVITY_STATUS_RECRUIT
-from global_const import ACTIVITY_STATUS_COMPLETED
-from global_const import ACTIVITY_STATUS_CANCELED
-from global_const import STP
-from global_const import PAGE_SIZE_LIMIT
 
 
 # 受欢迎活动列表
@@ -77,6 +63,7 @@ class ApiActivityPopularListXHR(tornado.web.RequestHandler):
         docs_list = list(_array)
         self.write(JSON.dumps(docs_list, default=json_util.default))
         self.finish()
+
 
 # 完成活动列表
 class ApiActivityCompletedListXHR(tornado.web.RequestHandler):
@@ -98,6 +85,7 @@ class ApiActivityCompletedListXHR(tornado.web.RequestHandler):
         docs_list = list(_array)
         self.write(JSON.dumps(docs_list, default=json_util.default))
         self.finish()
+
 
 # 获取参加某活动的成员
 class ApiActivityMemberListXHR(tornado.web.RequestHandler):
@@ -140,7 +128,7 @@ class ApiActivityInfoXHR(tornado.web.RequestHandler):
 
 
 # 分享活动获得积分
-class ApiActivityShareXHR(tornado.web.RequestHandler):
+class ApiActivityShareXHR(BaseHandler):
     def get(self, vendor_id, activity_id):
         logging.info("got vendor_id %r in uri", vendor_id)
         logging.info("got activity_id %r in uri", activity_id)
@@ -148,62 +136,10 @@ class ApiActivityShareXHR(tornado.web.RequestHandler):
         _account_id = self.get_argument("account_id", "")
         logging.info("got _account_id %r", _account_id)
 
-        # 产生一个积分使用订单
-        order_id = str(uuid.uuid1()).replace('-', '')
-        order_index = {
-            "_id": order_id,
-            "order_type": "bonus",
-            "club_id": vendor_id,
-            "item_type": "activity",
-            "item_id": activity_id,
-            "item_name": order_index['item_name'],
-            "distributor_type": "personal",
-            "distributor_id": _account_id,
-            "pay_type": "none",
-            "pay_status": ORDER_STATUS_WECHAT_PAY_SUCCESS,
-            "total_amount": _bonus, #已经转换为分，注意转为数值
-        }
-        self.create_order(order_index)
-
-        _bonus = bonus_dao.bonus_dao().query_not_safe_by_res(activity_id, _account_id, 1)
-        if not _bonus:
-            _bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
-            _timestamp = time.time()
-            _json = {'vendor_id':vendor_id, 'account_id':_account_id, 'res_id':activity_id,
-                    'create_time':_timestamp, 'bonus':int(_bonus_template['activity_shared']), 'type':1}
-            bonus_dao.bonus_dao().create(_json)
-
-            _customer_profile = vendor_member_dao.vendor_member_dao().query_not_safe(vendor_id, _account_id)
-            try:
-                _customer_profile['comment']
-            except:
-                _customer_profile['comment'] = ''
-            try:
-                _customer_profile['bonus']
-            except:
-                _customer_profile['bonus'] = 0
-            logging.info("got bonus %r", _customer_profile['bonus'])
-            try:
-                _customer_profile['history_bonus']
-            except:
-                _customer_profile['history_bonus'] = 0
-            logging.info("got history_bonus %r", _customer_profile['history_bonus'])
-            try:
-                _customer_profile['distance']
-            except:
-                _customer_profile['distance'] = 0
-            try:
-                _customer_profile['rank']
-            except:
-                _customer_profile['rank'] = 0
-
-            _bonus_num = int(_customer_profile['bonus']) + int(_bonus_template['activity_shared'])
-            _history_bonus = int(_customer_profile['history_bonus']) + int(_bonus_template['activity_shared'])
-            _json = {'vendor_id':vendor_id, 'account_id':_account_id, 'last_update_time':_timestamp,
-                    'bonus':_bonus_num, 'history_bonus':_history_bonus}
-            vendor_member_dao.vendor_member_dao().update(_json)
-        else:
-            logging.info("got _bonus['bonus'] %r", _bonus['bonus'])
+        _bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
+        bonus_points = int(_bonus_template['activity_shared'])
+        # 修改个人积分信息
+        self.points_increase(vendor_id, _account_id, bonus_points)
 
         _json = {'rs':'success'}
         logging.info("got result code>>>>>>>>>>>>>>>>>>> %r", _json)
