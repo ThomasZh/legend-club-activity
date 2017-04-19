@@ -222,6 +222,7 @@ def map():
         (r"/bf/api/vendors/([a-z0-9]*)/customer-profile/my", getattr(api_customer_profile, 'ApiCustomerProfileMyInfoXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/customer-profile/contacts", getattr(api_customer_profile, 'ApiCustomerProfileMyContactListXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/customers/([a-z0-9]*)/orders", getattr(api_customer_profile, 'ApiCustomerOrdersXHR')),
+        (r"/bf/api/vendors/([a-z0-9]*)/customers/([a-z0-9]*)/points", getattr(api_customer_profile, 'ApiCustomerPointsXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/customer-profile/customers", getattr(api_customer_profile, 'ApiCustomerListXHR')),
 
         # 推荐活动列表

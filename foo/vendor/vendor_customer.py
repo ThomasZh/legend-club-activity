@@ -209,26 +209,25 @@ class VendorCustomerProfileHandler(AuthorizationHandler):
         logging.info("got account_id %r in uri", account_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
-        _comment = self.get_argument("comment", "")
-        logging.info("got _comment %r", _comment)
-        _bonus = self.get_argument("bonus", "")
-        logging.info("got _bonus %r", _bonus)
+        points = self.get_argument("points", "")
+        logging.info("got points %r", points)
         _history_bonus = self.get_argument("history_bonus", "")
         logging.info("got _history_bonus %r", _history_bonus)
-        _vouchers = self.get_argument("vouchers", "")
-        logging.info("got _vouchers %r", _vouchers)
-        _vouchers = float(_vouchers) * 100 # 转换成分
-        _distance = self.get_argument("distance", "")
-        logging.info("got _distance %r", _distance)
-        _rank = self.get_argument("rank", "")
-        logging.info("got _rank %r", _rank)
+        mileage = self.get_argument("mileage", "")
+        logging.info("got mileage %r", mileage)
+        star = self.get_argument("star", "")
+        logging.info("got star %r", star)
 
-        _timestamp = time.time()
-        _json = {'vendor_id':ops['club_id'], 'account_id':account_id, 'last_update_time':_timestamp,
-                'bonus':_bonus, 'history_bonus':_history_bonus, 'vouchers':_vouchers,
-                'rank':_rank, 'comment':_comment, 'distance':_distance}
-        vendor_member_dao.vendor_member_dao().update(_json)
+        json = {'_rank':0, 'star':star, 'points':points,'crets':0, 'mileage':mileage}
+
+        url = "http://7x24hs.com/api/clubs/"+vendor_id+"/users/"+account_id
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer "+access_token}
+        _json = json_encode(json)
+        response = http_client.fetch(url, method="PUT", headers=headers, body=_json)
+        logging.info("got response.body %r", response.body)
 
         self.redirect('/vendors/' + vendor_id + '/customers/' + account_id)
 

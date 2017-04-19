@@ -114,71 +114,20 @@
 
   </div>
 
+
+    <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
+    <!-- icheck -->
+    <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
+
+    <script src="{{ static_url('admin/js/custom.js') }}"></script>
+    <!-- pace -->
+    <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
+
   <script>
 
-          var preAllow = true;   // when ajax not completed, cannot do the next request
           var limit = 9;//每页显示数
           var currentPage = 0;//当前页
           var total_page = 0;//总页数
-          // var lastTimestamp = $('#new_timestamp').val();
-          function query(pageNum) {
-            $.ajax({
-              type: "GET",
-              url: "/bf/api/vendors/{{ vendor_id }}/customer-profile/customers?page=1&limit="+limit,
-              headers: {
-                "Authorization": "Bearer {{ access_token }}"
-              },
-              dataType: "json",
-              contentType: 'application/json',
-              success: function(data, status, xhr) {
-                  console.log(data);
-                  currentPage = 1;
-              var ajaxobj = data.data;
-                  total_page = data.total_pgae;//总页
-                  $("#total_page").html(total_page);
-              // num = ajaxobj.length;
-              for (var i in ajaxobj) {
-                var inner_html = '<div class="col-md-4 col-sm-4 col-xs-12 animated fadeInDown">';
-                inner_html += '<div class="well profile_view">';
-                inner_html += '<div class="col-sm-12">';
-                inner_html += '<div class="left col-xs-7">';
-                inner_html += '<h2>';
-                inner_html += ajaxobj[i].nickname;
-                inner_html += '</h2>';
-                inner_html += '<ul class="list-unstyled">';
-                inner_html += '<li><i class="fa fa-phone"></i> 1234567890 </li>';
-                inner_html += '</ul></div>'
-                inner_html += '<div class="right col-xs-5 text-center">';
-                inner_html += '<img src="'+ajaxobj[i].avatar+'" alt="" class="img-circle img-responsive">';
-                inner_html += '</div></div>';
-                inner_html += '<div class="col-xs-12 bottom text-center">';
-                inner_html += '<div class="col-xs-12 col-sm-6 emphasis">';
-                inner_html += '<p class="">L'+ajaxobj[i]._rank+'</p></div>';
-                inner_html += '<div class="col-xs-12 col-sm-6 emphasis">';
-                inner_html += '<button type="button" class="btn btn-success btn-xs">';
-                inner_html += '<i class="fa fa-tags"> 领队 会员 非会员 </i> </button>';
-                inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ajaxobj[i].account_id+'" type="button" class="btn btn-primary btn-xs" >';
-                inner_html += '<i class="fa fa-user"></i> 查看详情 </a>';
-                inner_html += '</div></div></div></div>';
-
-                $('#customerList').append(inner_html);
-                // member_num += 1;
-              };
-            if(total_page>5){
-                for (var k=1;k<=5;k++){
-                  var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
-                  $(".pageBox").append(inner_html);
-                };
-              }else if(total_page<=5){
-                for (var k=1;k<=total_page;k++){
-                  var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
-                  $(".pageBox").append(inner_html);
-                };
-              }
-              $("#num1").addClass("on");
-            }
-            });
-          };
 
           function gotoPage(pageNum) {
             $.ajax({
@@ -194,6 +143,7 @@
                   currentPage = pageNum;
               var ajaxobj = data.data;
                   total_page = data.total_pgae;//总页
+                  $("#total_page").html(total_page);
               $('#customerList').html("");
 
               for (var i in ajaxobj) {
@@ -246,7 +196,7 @@
           };
 
           $(function(){
-            query();
+            gotoPage("1");
             $(document).on('click','.pageBox > button',function(){
               var num = $(this).text();
               gotoPage(num);
@@ -272,14 +222,6 @@
             })
           });
   </script>
-
-
-  <!-- icheck -->
-  <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
-
-  <script src="{{ static_url('admin/js/custom.js') }}"></script>
-  <!-- pace -->
-  <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
 
 </body>
 

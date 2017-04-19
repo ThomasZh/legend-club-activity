@@ -188,106 +188,9 @@
   <script type="text/javascript" src="{{ static_url('admin/js/datepicker/daterangepicker.js') }}"></script>
   <script>
 
-          var preAllow = true;   // when ajax not completed, cannot do the next request
           var limit = 8;//每页显示数
           var currentPage = 0;//当前页
           var total_page = 0;//总页数
-          function query(pageNum) {
-            $.ajax({
-              type: "GET",
-              url: "/bf/api/vendors/{{ vendor_id }}/applys?page=1&limit="+limit,
-              headers: {
-                "Authorization": "Bearer {{ access_token }}"
-              },
-              dataType: "json",
-              contentType: 'application/json',
-              success: function(data, status, xhr) {
-                  console.log(data);
-                  currentPage = 1;
-              var ajaxobj = data.data;
-                  total_page = data.total_pgae;//总页
-                  $("#total_page").html(total_page);
-              // num = ajaxobj.length;
-              for (var i in ajaxobj) {
-
-                var inner_html = '<tr class="even pointer">';
-                  inner_html += '<td class="a-center">';
-                    if (ajaxobj[i].check_status == true)
-                      inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
-                    else
-                      inner_html += '<input type="checkbox" class="tableflat" value="'+ajaxobj[i]._id+'" onclick="OnReviewApply(this);">';
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/'+ajaxobj[i].item_id+'/detail/step1">'+ajaxobj[i].item_name+'</a></td>';
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += '<ul class="list-inline">';
-                      inner_html += '<li>';
-                        inner_html += '<img src="'+ajaxobj[i].avatar+'" class="avatar" alt="Avatar">';
-                      inner_html += '</li>';
-                    inner_html += '</ul>';
-                    inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ajaxobj[i].account_id+'">'+ajaxobj[i].nickname+'</a>';
-                    inner_html += '<br />';
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += ajaxobj[i].real_name;
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += ajaxobj[i].gender;
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += ajaxobj[i].id_code;
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += ajaxobj[i].phone;
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += ajaxobj[i].height;
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += ajaxobj[i].note;
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += ajaxobj[i].create_time;
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += '<a href="#" class="btn btn-success btn-xs"> 成功 </a>';
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+ajaxobj[i].order_id+'" class="btn btn-info btn-xs"><i class="fa fa-eye"></i> 订单 </a>';
-                  inner_html += '</td>';
-
-                  inner_html += '</tr>';
-
-                $('#tbody').append(inner_html);
-                // member_num += 1;
-              };
-            if(total_page>5){
-                for (var k=1;k<=5;k++){
-                  var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
-                  $(".pageBox").append(inner_html);
-                };
-              }else if(total_page<=5){
-                for (var k=1;k<=total_page;k++){
-                  var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
-                  $(".pageBox").append(inner_html);
-                };
-              }
-              $("#num1").addClass("on");
-            }
-            });
-          };
 
           function gotoPage(pageNum) {
             $.ajax({
@@ -303,6 +206,7 @@
                   currentPage = pageNum;
               var ajaxobj = data.data;
                   total_page = data.total_pgae;//总页
+                  $("#total_page").html(total_page);
               $('#tbody').html("");
 
               for (var i in ajaxobj) {
@@ -392,7 +296,7 @@
           };
 
           $(function(){
-            query();
+            gotoPage("1");
             $(document).on('click','.pageBox > button',function(){
               var num = $(this).text();
               gotoPage(num);

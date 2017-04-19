@@ -191,115 +191,9 @@
 
   <script>
 
-          var preAllow = true;   // when ajax not completed, cannot do the next request
           var limit = 8;//每页显示数
           var currentPage = 0;//当前页
           var total_page = 0;//总页数
-          function query(pageNum) {
-            $.ajax({
-              type: "GET",
-              url: "/bf/api/vendors/{{ vendor_id }}/orders?distributor_id=not_none&page=1&limit="+limit+"",
-              headers: {
-                "Authorization": "Bearer {{ access_token }}"
-              },
-              dataType: "json",
-              contentType: 'application/json',
-              success: function(data, status, xhr) {
-                  console.log(data);
-                  currentPage = 1;
-              var ajaxobj = data.data;
-                  total_page = data.total_pgae;//总页
-                  $("#total_page").html(total_page);
-              // num = ajaxobj.length;
-              for (var i in ajaxobj) {
-
-                var inner_html = '<tr class="even pointer">';
-                  inner_html += '<td class="a-center">';
-                  if (pageData[i].check_status == '0')
-                    inner_html += '<input type="checkbox" class="tableflat" value="'+pageData[i]._id+'" onclick="javascript:OnReviewOrder(this);">';
-                  else
-                    inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += ajaxobj[i]._id;
-                    if (ajaxobj[i].status == 20)
-                      inner_html += '<br />' + ajaxobj[i].prepay_id;
-                    else if (ajaxobj[i].status > 20) {
-                      inner_html += '<br />' + ajaxobj[i].prepay_id;
-                      inner_html += '<br />' + ajaxobj[i].transaction_id;
-                    }
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/' + ajaxobj[i].item_id + '/detail/step1">'+ajaxobj[i].item_name+'</a>';
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += '<ul class="list-inline">';
-                      inner_html += '<li>';
-                        inner_html += '<img src="'+ajaxobj[i].avatar+'" class="avatar" alt="Avatar">';
-                      inner_html += '</li>';
-                    inner_html += '</ul>';
-                    inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ajaxobj[i].account_id+'">'+ajaxobj[i].nickname+'</a>';
-                    inner_html += '<br />';
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += ajaxobj[i].amount+'元<br />';
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += ajaxobj[i].actual_payment + '元';
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += ajaxobj[i].create_time;
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-
-                  if (ajaxobj[i].pay_status <= 20)
-                    inner_html += '<a href="#" class="btn btn-warning btn-xs"> 待付款 </a>';
-                  else if(ajaxobj[i].pay_status == 21)
-                    inner_html += '<a href="#" class="btn btn-danger btn-xs"> 下单失败 </a>';
-                  else if (ajaxobj[i].pay_status == 31)
-                    inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a>';
-                  else if (ajaxobj[i].pay_status == 30)
-                    inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
-                  else if (ajaxobj[i].pay_status > 31)
-                    inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
-
-                  inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+ajaxobj[i]._id+'" class="btn btn-info btn-xs"><i class="fa fa-eye"></i> 查看详情 </a>';
-                  inner_html += '</td>';
-                  inner_html += '<td class=" ">';
-                    inner_html += '<a href="/vendors/{{ vendor_id }}/orders-me-other?club_id=' + ajaxobj[i].distributor_id + '">'+ajaxobj[i].distributor_name+'</a>';
-                  inner_html += '</td>';
-
-
-                  inner_html += '</tr>';
-
-                $('#tbody').append(inner_html);
-                // member_num += 1;
-              };
-            if(total_page>5){
-                for (var k=1;k<=5;k++){
-                  var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
-                  $(".pageBox").append(inner_html);
-                };
-              }else if(total_page<=5){
-                for (var k=1;k<=total_page;k++){
-                  var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
-                  $(".pageBox").append(inner_html);
-                };
-              }
-              $("#num1").addClass("on");
-            }
-            });
-          };
 
           function gotoPage(pageNum) {
             $.ajax({
@@ -315,6 +209,7 @@
                   currentPage = pageNum;
               var ajaxobj = data.data;
                   total_page = data.total_pgae;//总页
+                  $("#total_page").html(total_page);
               $('#tbody').html("");
 
               for (var i in ajaxobj) {
@@ -353,10 +248,11 @@
                   inner_html += '<td class=" ">';
                     inner_html += ajaxobj[i].amount+'元<br />';
                   inner_html += '</td>';
-
-                  inner_html += '<td class=" ">';
-                    inner_html += ajaxobj[i].actual_payment + '元';
-                  inner_html += '</td>';
+                  if (ajaxobj[i].pay_status == 30){
+                    inner_html += '<td>'+ajaxobj[i].actual_payment+'元</td>';
+                  }else{
+                    inner_html += '<td>--</td>';
+                  }
 
                   inner_html += '<td class=" ">';
                     inner_html += ajaxobj[i].create_time;
@@ -371,8 +267,6 @@
                   else if (ajaxobj[i].pay_status == 31)
                     inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a>';
                   else if (ajaxobj[i].pay_status == 30)
-                    inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
-                  else if (ajaxobj[i].pay_status > 31)
                     inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
 
                   inner_html += '</td>';
@@ -413,7 +307,7 @@
           };
 
           $(function(){
-            query();
+            gotoPage("1");
             $(document).on('click','.pageBox > button',function(){
               var num = $(this).text();
               gotoPage(num);

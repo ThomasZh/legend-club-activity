@@ -11,11 +11,10 @@
   <title>骑无止境</title>
 
   <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="{{ static_url('weui/lib/weui.css') }}">
   <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
-
   <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
-
   <!-- Custom styling plus plugins -->
   <link href="{{ static_url('css/custom.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
@@ -106,7 +105,7 @@
                       <label class="control-label col-md-3 col-sm-3 col-xs-12" for="comment">当前积分 <span class="required">*</span>
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
-                        <input type="number" id="bonus" name="bonus" value="{{ profile['remaining_points'] }}"
+                        <input type="number" id="points" name="points" value="{{ profile['remaining_points'] }}"
                           class="form-control col-md-7 col-xs-12">
                       </div>
                     </div>
@@ -114,7 +113,7 @@
                       <label class="control-label col-md-3 col-sm-3 col-xs-12" for="comment">历史累计积分 <span class="required">*</span>
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
-                        <input type="number" id="history_bonus" name="history_bonus" value="{{ profile['accumulated_points'] }}"
+                        <input type="number" id="history_bonus" name="history_bonus" value="{{ profile['accumulated_points'] }}" readonly="readonly"
                           class="form-control col-md-7 col-xs-12">
                       </div>
                     </div>
@@ -130,7 +129,7 @@
                       <label class="control-label col-md-3 col-sm-3 col-xs-12" for="comment">历史累计里程(km) <span class="required">*</span>
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
-                        <input type="number" id="distance" name="distance" value="{{ profile['mileage'] }}"
+                        <input type="number" id="mileage" name="mileage" value="{{ profile['mileage'] }}"
                           class="form-control col-md-7 col-xs-12">
                       </div>
                     </div>
@@ -138,7 +137,7 @@
                       <label class="control-label col-md-3 col-sm-3 col-xs-12" for="comment">等级(0-10) <span class="required">*</span>
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
-                        <input type="number" id="rank" name="rank" value="{{ profile['_rank'] }}"
+                        <input type="number" id="star" name="star" value="{{ profile['star'] }}"
                           class="form-control col-md-7 col-xs-12">
                       </div>
                     </div>
@@ -146,8 +145,7 @@
                     <div class="ln_solid"></div>
                     <div class="form-group">
                       <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                        <button type="button" class="btn btn-danger">升级为领队</button>
-                        <button type="button" class="btn btn-primary" onclick="history.go(-1);">重置</button>
+                        <button type="button" class="btn btn-danger" id="rank_btn">升级为领队</button>
                         <button type="submit" class="btn btn-success">提交</button>
                       </div>
                     </div>
@@ -229,10 +227,13 @@
                     <thead>
                       <tr>
                         <th style="width: 1%">#</th>
-                        <th style="width: 20%">活动名称</th>
+                        <th style="width: 13%">活动名称</th>
                         <th>奖励积分</th>
-                        <th style="width: 20%">报名人数</th>
-                        <th style="width: 20%">报名日期</th>
+                        <th style="width: 13%">报名人数</th>
+                        <th style="width: 13%">下单金额</th>
+                        <th style="width: 13%">支付金额</th>
+                        <th style="width: 13%">支付状态</th>
+                        <th style="width: 13%">报名日期</th>
                         <th>#操作</th>
                       </tr>
                     </thead>
@@ -283,21 +284,19 @@
                         <th style="width: 20%">日期</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      <input type="hidden" value="{{ i=1 }}"></input>
-                      {% for task in tasks %}
-                      <tr>
-                        <td scope="row">{{ i }}</td>
-                        <td>{{task['title']}}</td>
-                        <td>{{task['category']}}</td>
-                        <td>{{task['create_time']}}</td>
-                        <td></td>
-                      </tr>
-                      <input type="hidden" value="{{ i=i+1 }}"></input>
-                      {% end %}
+                    <tbody id="point_tbody">
                     </tbody>
                   </table>
                   <!-- end project list -->
+                  <div class="clearfix"></div>
+                  <div class="col-md-5 col-sm-12 col-xs-12 center-margin">
+                    <button class="btn btn-success" type="button" id="point_prev">上一页</button>
+                    <span class="point_pageBox"></span>
+
+                    <button class="btn btn-success" type="button" id="point_next">下一页</button>
+                    共<span id="point_total_page" style="padding:0 5px;"></span>页
+
+                  </div>
 
                 </div>
               </div>
@@ -315,16 +314,7 @@
     </div>
 
   </div>
-
-  <div id="custom_notifications" class="custom-notifications dsp_none">
-    <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
-    </ul>
-    <div class="clearfix"></div>
-    <div id="notif-group" class="tabbed_notifications"></div>
-  </div>
-
   <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
-
   <!-- bootstrap progress js -->
   <script src="{{ static_url('admin/js/progressbar/bootstrap-progressbar.min.js') }}"></script>
   <!-- icheck -->
@@ -333,161 +323,189 @@
   <script src="{{ static_url('admin/js/custom.js') }}"></script>
   <!-- pace -->
   <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
-
+  <script src="{{ static_url('weui/js/weui.js') }}"></script>
   <!-- daterangepicker -->
   <script type="text/javascript" src="{{ static_url('admin/js/moment/moment.min.js') }}"></script>
   <script type="text/javascript" src="{{ static_url('admin/js/datepicker/daterangepicker.js') }}"></script>
 
-  <!-- daterangepicker -->
-  <script type="text/javascript" src="{{ static_url('admin/js/moment.min.js') }}"></script>
-  <script type="text/javascript" src="{{ static_url('admin/js/datepicker/daterangepicker.js') }}"></script>
-  <!-- moris js -->
-  <script src="{{ static_url('admin/js/moris/raphael-min.js') }}"></script>
-  <script src="{{ static_url('admin/js/moris/morris.js') }}"></script>
-
   <script>
 
-          var preAllow = true;   // when ajax not completed, cannot do the next request
-          var limit = 8;//每页显示数
-          var currentPage = 0;//当前页
-          var total_page = 0;//总页数
-          function query(pageNum) {
-            $.ajax({
-              type: "GET",
-              url: "/bf/api/vendors/{{ vendor_id }}/customers/{{ account_id }}/orders?page=1&limit="+limit,
-              headers: {
-                "Authorization": "Bearer {{ access_token }}"
-              },
-              dataType: "json",
-              contentType: 'application/json',
-              success: function(data, status, xhr) {
-                  console.log(data);
-                  currentPage = 1;
-              var ajaxobj = data.data;
-                  total_page = data.total_pgae;//总页
-                  $("#total_page").html(total_page);
-              // num = ajaxobj.length;
-              for (var i in ajaxobj) {
-                var inner_html = '<tr><td>#</td>';
-                inner_html += '<td>';
-                inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/'+ajaxobj[i].item_id+'/detail/step1">'+ajaxobj[i].item_name+'</a>';
-                inner_html += '</td>';
-                inner_html += '<td>'+ajaxobj[i].bonus_points+'</td>';
-                inner_html += '<td>'+ajaxobj[i].quantity+'</td>';
-                inner_html += '<td>'+ajaxobj[i].create_time+'</td>';
-                inner_html += '<td>';
-                inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+ajaxobj[i]._id+'" class="btn btn-info btn-xs">';
-                inner_html += '<i class="fa fa-eye"></i> 订单 </a>';
-                inner_html += '</td>';
-                inner_html += '</tr>';
+      var limit = 8;//每页显示数
+      var currentPage;//当前页
+      var point_currentPage;//当前页
+      var total_page;//总页数
 
-                $('#tbody').append(inner_html);
-                // member_num += 1;
-              };
-            if(total_page>5){
-                for (var k=1;k<=5;k++){
-                  var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
-                  $(".pageBox").append(inner_html);
-                };
-              }else if(total_page<=5){
-                for (var k=1;k<=total_page;k++){
-                  var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
-                  $(".pageBox").append(inner_html);
-                };
-              }
-              $("#num1").addClass("on");
+      function gotoPage(pageNum) {
+        currentPage = pageNum;
+        $.ajax({
+          type: "GET",
+          url: "/bf/api/vendors/{{ vendor_id }}/customers/{{ account_id }}/orders?page="+pageNum+"&limit="+limit,
+          headers: {"Authorization": "Bearer {{ access_token }}"},
+          dataType: "json",
+          contentType: 'application/json',
+          success: function(data, status, xhr) {
+              // console.log(data);
+          var ajaxobj = data.data;
+              total_page = data.total_pgae;//总页
+              $("#total_page").html(total_page);
+          $('#tbody').html("");
+          for (var i in ajaxobj) {
+            var inner_html = '<tr><td>#</td>';
+            inner_html += '<td>';
+            inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/'+ajaxobj[i].item_id+'/detail/step1">'+ajaxobj[i].item_name+'</a>';
+            inner_html += '</td>';
+            inner_html += '<td>'+ajaxobj[i].bonus_points+'</td>';
+            inner_html += '<td>'+ajaxobj[i].quantity+'</td>';
+            inner_html += '<td>'+ajaxobj[i].amount+'元</td>';
+            if (ajaxobj[i].pay_status == 30){
+              inner_html += '<td>'+ajaxobj[i].actual_payment+'元</td>';
+            }else{
+              inner_html += '<td>--</td>';
             }
-            });
+            inner_html += '<td class=" ">';
+
+            if (ajaxobj[i].pay_status <= 20)
+              inner_html += '<a href="#" class="btn btn-warning btn-xs"> 待付款 </a>';
+            else if(ajaxobj[i].pay_status == 21)
+              inner_html += '<a href="#" class="btn btn-danger btn-xs"> 下单失败 </a>';
+            else if (ajaxobj[i].pay_status == 31)
+              inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a>';
+            else if (ajaxobj[i].pay_status == 30)
+              inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
+
+            inner_html += '</td>';
+            inner_html += '<td>'+ajaxobj[i].create_time+'</td>';
+            inner_html += '<td>';
+            inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+ajaxobj[i]._id+'" class="btn btn-info btn-xs">';
+            inner_html += '<i class="fa fa-eye"></i> 订单 </a>';
+            inner_html += '</td>';
+            inner_html += '</tr>';
+
+            $('#tbody').append(inner_html);
           };
 
-          function gotoPage(pageNum) {
-            $.ajax({
-              type: "GET",
-              url: "/bf/api/vendors/{{ vendor_id }}/customers/{{ account_id }}/orders?page="+pageNum+"&limit="+limit,
-              headers: {
-                "Authorization": "Bearer {{ access_token }}"
-              },
-              dataType: "json",
-              contentType: 'application/json',
-              success: function(data, status, xhr) {
-                  // console.log(data);
-                  currentPage = pageNum;
-              var ajaxobj = data.data;
-                  total_page = data.total_pgae;//总页
-              $('#tbody').html("");
+            pageNext = parseInt((currentPage-1)/5) + 1;
+            start = (pageNext-1)*5+1;
+            end = pageNext*5;
+            if(end > total_page){
+              end = total_page;
+            }
+            $(".pageBox").html("");
+            for (var k=start;k<=end;k++){
+              var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
+              $(".pageBox").append(inner_html);
+            };
+             $("#num"+currentPage).addClass("on").siblings().removeClass("on");
+          }
+        });
+      };
 
-              for (var i in ajaxobj) {
-                var inner_html = '<tr><td>#</td>';
-                inner_html += '<td>';
-                inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/'+ajaxobj[i].activity_id+'/detail/step1">'+ajaxobj[i].activity_title+'</a>';
-                inner_html += '<br/>';
-                inner_html += '<small>'+ajaxobj[i].activity_begin_time+'</small>';
-                inner_html += '</td>';
-                inner_html += '<td>'+ajaxobj[i].activity_distance+'</td>';
-                inner_html += '<td>'+ajaxobj[i].applicant_num+'</td>';
-                inner_html += '<td>'+ajaxobj[i].create_time+'</td>';
-                inner_html += '<td>';
-                if (ajaxobj[i].cret_id != null) {
-                  inner_html += '  <a href="/vendors/{{ vendor_id }}/crets/'+ajaxobj[i].cret_id+'" class="btn btn-primary btn-xs">';
-                  inner_html += '  <i class="fa fa-eye"></i> 证书 </a>';
-                }
-                inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+ajaxobj[i]._id+'" class="btn btn-info btn-xs">';
-                inner_html += '<i class="fa fa-eye"></i> 订单 </a>';
-                inner_html += '</td>';
-                inner_html += '</tr>';
+      function query(pageNum) {
+        point_currentPage = pageNum;
+        $.ajax({
+          type: "GET",
+          url: "/bf/api/vendors/{{ vendor_id }}/customers/{{ account_id }}/points?page="+pageNum+"&limit="+limit,
+          headers: {"Authorization": "Bearer {{ access_token }}"},
+          dataType: "json",
+          contentType: 'application/json',
+          success: function(data, status, xhr) {
+              console.log(data);
+          var ajaxobj = data.data;
+              total_page = data.total_pgae;//总页
+              $("#point_total_page").html(total_page);
+          $('#point_tbody').html("");
+          for (var i in ajaxobj) {
+            var inner_html = '<tr><td>#</td>';
+            inner_html += '<td>';
+            inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/'+ajaxobj[i].item_id+'/detail/step1">'+ajaxobj[i].item_name+'</a>';
+            inner_html += '</td>';
+            if(ajaxobj[i].points > 0){
+              inner_html += '<td>积分   +'+ajaxobj[i].points+'</td>';
+            }else{
+              inner_html += '<td>积分 '+ajaxobj[i].points+'</td>';
+            }
 
-                $('#tbody').append(inner_html);
-                // member_num += 1;
-              };
+            inner_html += '<td>'+ajaxobj[i].create_time+'</td>';
+            inner_html += '</tr>';
 
-              pageNext = parseInt((currentPage-1)/5) + 1;
-
-                start = (pageNext-1)*5+1;
-                end = pageNext*5;
-                if(end > total_page){
-                  end = total_page;
-                }
-
-                $(".pageBox").html("");
-                for (var k=start;k<=end;k++){
-                  var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
-
-                  $(".pageBox").append(inner_html);
-                };
-                 $("#num"+currentPage).addClass("on").siblings().removeClass("on");
-
-              }
-            });
-
+            $('#point_tbody').append(inner_html);
           };
 
-          $(function(){
-            query();
-            $(document).on('click','.pageBox > button',function(){
+            pageNext = parseInt((point_currentPage-1)/5) + 1;
+            start = (pageNext-1)*5+1;
+            end = pageNext*5;
+            if(end > total_page){
+              end = total_page;
+            }
+            $(".point_pageBox").html("");
+            for (var k=start;k<=end;k++){
+              var inner_html = '<button class="btn btn-info" type="button" id="point_num'+k+'">'+k+'</button>';
+              $(".point_pageBox").append(inner_html);
+            };
+             $("#point_num"+point_currentPage).addClass("on").siblings().removeClass("on");
+          }
+        });
+      };
+
+      $(function(){
+          gotoPage("1");
+          query("1");
+          $(document).on('click','.pageBox > button',function(){
               var num = $(this).text();
               gotoPage(num);
-              //  $(this).addClass("current").siblings().removeClass("current");
-            })
-
-            $("#prev").on("click",function(){
-                if(currentPage<=1){
-
-                }else{
-                    gotoPage(--currentPage);
-                    // $("#num"+currentPage).addClass("current").siblings().removeClass("current");
-                }
-            });
-
-            $("#next").on("click",function(){
-                if(currentPage>=total_page){
-
-                }else{
-                    gotoPage(++currentPage);
-                    // $("#num"+currentPage).addClass("current").siblings().removeClass("current");
-                }
-            })
           });
-  </script>
+          $("#prev").on("click",function(){
+              if(currentPage<=1){
+              }else{
+                    gotoPage(--currentPage);
+              }
+          });
+          $("#next").on("click",function(){
+              if(currentPage>=total_page){
+
+              }else{
+                    gotoPage(++currentPage);
+              }
+          });
+
+          $(document).on('click','.point_pageBox > button',function(){
+              var num = $(this).text();
+              query(num);
+          });
+          $("#point_prev").on("click",function(){
+              if(point_currentPage<=1){
+              }else{
+                    query(--point_currentPage);
+              }
+          });
+          $("#point_next").on("click",function(){
+              if(point_currentPage>=total_page){
+
+              }else{
+                    query(++point_currentPage);
+              }
+          });
+          $("#rank_btn").on("click",function(){
+            var data = {"_rank":"100"};
+            var json = JSON.stringify(data);
+            $.ajax({
+              type: "PUT",
+              url: "http://7x24hs.com/api/clubs/{{ vendor_id }}/users/{{ account_id }}",
+              data: json,
+              headers: {"Authorization":"Bearer {{ access_token }}"},
+              contentType: 'application/json',
+              success:function(data){
+                var data = JSON.parse(data);
+                if(data.err_code == 200){
+                  weui.Loading.success();
+                }
+              },
+              error:function(){
+              }
+            });
+          })
+      });
+</script>
 
 </body>
 
