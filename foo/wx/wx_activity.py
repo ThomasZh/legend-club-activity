@@ -534,6 +534,7 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
         amount = 0
         actual_payment = 0
         quantity = int(_applicant_num)
+        logging.info("got quantity %r", quantity)
 
         _activity = activity_dao.activity_dao().query(activity_id)
         _bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
@@ -552,9 +553,10 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
                     _base_fee = {"_id":_base_fee_id, "name":template['name'], "fee":template['fee']}
                     _base_fees.append(_base_fee)
                     activity_amount = template['fee']
-                    amount = amount + template['fee']
+                    amount = amount + int(template['fee']) * quantity
                     actual_payment = actual_payment + int(template['fee']) * quantity
                     break;
+        logging.info("got actual_payment %r", actual_payment)
 
         # 附加服务项编号数组
         # *** 接受json数组用这个 ***
@@ -569,9 +571,10 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
                 if _ext_fee_id == template['_id']:
                     _ext_fee = {"_id":_ext_fee_id, "name":template['name'], "fee":template['fee']}
                     _ext_fees.append(_ext_fee)
-                    amount = amount + template['fee']
+                    amount = amount + int(template['fee']) * quantity
                     actual_payment = actual_payment + int(template['fee']) * quantity
                     break;
+        logging.info("got actual_payment %r", actual_payment)
 
         # 保险选项,数组
         _insurance_ids = self.get_body_argument("insurances", [])
@@ -583,9 +586,10 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
                 if _insurance_id == _insurance_template['_id']:
                     _insurance = {"_id":_insurance_id, "name":_insurance_template['title'], "fee":_insurance_template['amount']}
                     _insurances.append(_insurance)
-                    amount = amount + _insurance['fee']
+                    amount = amount + int(_insurance['fee']) * quantity
                     actual_payment = actual_payment + int(_insurance['fee']) * quantity
                     break;
+        logging.info("got actual_payment %r", actual_payment)
 
         #代金券选项,数组
         _vouchers_ids = self.get_body_argument("vouchers", [])
@@ -596,7 +600,8 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
             _voucher = voucher_dao.voucher_dao().query_not_safe(_vouchers_id)
             _json = {'_id':_vouchers_id, 'fee':_voucher['amount']}
             _vouchers.append(_json)
-            actual_payment = actual_payment - int(_json['fee'])
+            actual_payment = actual_payment - int(_json['fee']) * quantity
+        logging.info("got actual_payment %r", actual_payment)
 
         # 积分选项,数组
         _bonus = 0
@@ -610,6 +615,7 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
         logging.info("got _bonus %r", _bonus)
         points = _bonus
         actual_payment = actual_payment + points
+        logging.info("got actual_payment %r", actual_payment)
 
         _order_id = str(uuid.uuid1()).replace('-', '')
         _status = ORDER_STATUS_BF_INIT
@@ -654,7 +660,7 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
         wx_notify_domain = wx_app_info['wx_notify_domain']
 
         _timestamp = (int)(time.time())
-        if _total_amount != 0:
+        if actual_payment != 0:
             # wechat 统一下单
             # _openid = self.get_secure_cookie("wx_openid")
             # logging.info("got _openid %r", _openid)
@@ -718,6 +724,10 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
             _order_return['timestamp'] = _timestamp
             _order_return['app_id'] = wx_app_id
 
+            # wx统一下单记录保存
+            _order_return['_id'] = _order_return['prepay_id']
+            self.create_symbol_object(_order_return)
+
             # 微信统一下单返回成功
             order_unified = None
             if(_order_return['return_msg'] == 'OK'):
@@ -743,7 +753,7 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
                     vendor_id=vendor_id,
                     return_msg=response.body, order_return=_order_return,
                     activity=_activity, order_index=order_index)
-        else: #_total_amount == 0:
+        else: #actual_payment == 0:
             # FIXME, 将服务模板转为字符串，客户端要用
             _servTmpls = _activity['ext_fee_template']
             _activity['json_serv_tmpls'] = tornado.escape.json_encode(_servTmpls);
@@ -758,7 +768,18 @@ class WxActivityApplyStep2Handler(AuthorizationHandler):
             # 如使用积分抵扣，则将积分减去
             if order_index['points_used'] < 0:
                 # 修改个人积分信息
-                self.points_increase(vendor_id, order_index['account_id'], order_index['points_used'])
+                bonus_points = {
+                    'club_id':vendor_id,
+                    'account_id':_account_id,
+                    '_type': 'buy_activity',
+                    'item_type': 'activity',
+                    'item_id': activity_id,
+                    'item_name': _activity['title'],
+                    'points': points,
+                    'order_id': order_index['_id']
+                }
+                self.create_points(bonus_points)
+                # self.points_decrease(vendor_id, order_index['account_id'], order_index['points_used'])
 
             # 如使用代金券抵扣，则将代金券减去
             for _voucher in _vouchers:
@@ -902,6 +923,9 @@ class WxOrderNotifyHandler(BaseHandler):
         _xml = self.request.body
         logging.info("got return_body %r", _xml)
         _pay_return = parseWxPayReturn(_xml)
+        # wx支付结果记录保存
+        _pay_return['_id'] = _pay_return['transaction_id']
+        self.create_symbol_object(_pay_return)
 
         logging.info("got result_code %r", _pay_return['result_code'])
         logging.info("got total_fee %r", _pay_return['total_fee'])
@@ -934,7 +958,18 @@ class WxOrderNotifyHandler(BaseHandler):
                 _bonus = order['bonus']
                 if _bonus < 0:
                     # 修改个人积分信息
-                    self.points_increase(vendor_id, order_index['account_id'], bonus)
+                    bonus_points = {
+                        'club_id':vendor_id,
+                        'account_id':order_index['account_id'],
+                        '_type': 'buy_activity',
+                        'item_type': order_index['item_type'],
+                        'item_id': order_index['item_id'],
+                        'item_name': order_index['item_name'],
+                        'points': _bonus,
+                        'order_id': order_index['_id']
+                    }
+                    self.create_points(bonus_points)
+                    # self.points_increase(vendor_id, order_index['account_id'], bonus)
 
                 # 如使用代金券抵扣，则将代金券减去
                 _vouchers = order['vouchers']

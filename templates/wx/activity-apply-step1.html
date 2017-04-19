@@ -107,7 +107,6 @@
             积分
           </p>
         </div>
-
     {% else %}
         <div class="ui-whitespace maring-top-10">
           <p class="ui-txt-info font-normal ">
@@ -124,7 +123,6 @@
         </div>
         <div class="ui-form ui-border-t overflow-hidden bonuscfg">
         </div>
-
     {% end %}
 
     <div class="ui-whitespace maring-top-10">
@@ -259,12 +257,12 @@
       var innerHTML = '';
         innerHTML += '<div class="ui-form-item ui-form-item-checkbox ui-border-b">';
         innerHTML += '  <label class="ui-checkbox" >';
-        innerHTML += '    <input type="checkbox" name="bonus" value="'+item['bonus']+'"';
-        innerHTML += '      data-fee="'+item['bonus']+'">';
+        innerHTML += '    <input type="checkbox" name="bonus" value="'+item['remaining_points']+'"';
+        innerHTML += '      data-fee="'+item['remaining_points']+'">';
         innerHTML += '  </label>';
         innerHTML += '  <p class="near-full-width">';
         innerHTML += '    可用积分抵';
-        innerHTML += '    <span id="bonus_label" class="flt-right">-'+item['bonus']+'元</span>';
+        innerHTML += '    <span id="bonus_label" class="flt-right">-'+item['remaining_points']+'元</span>';
         innerHTML += '  </p>';
         innerHTML += '</div>';
       $('.bonuscfg').html(innerHTML);
@@ -374,11 +372,12 @@
       });
 
       // 当前积分
-      var bonus = parseInt( customerProfile['bonus'] * 100 );
+      var bonus = parseInt( customerProfile['remaining_points'] );
       if (bonus_checked) {
         if (total_fees < bonus) {
-          var use_bonus = total_fees / 100;
+          var use_bonus = total_fees;
           total_fees = 0;
+          use_bonus = use_bonus / 100;
 
           var innerHTML = '';
           innerHTML += '<div class="ui-form-item ui-form-item-checkbox ui-border-b">';
@@ -394,7 +393,8 @@
           $('.bonuscfg').html(innerHTML);
         } else {
           total_fees = total_fees - bonus;
-          var use_bonus = bonus / 100;
+          var use_bonus = bonus;
+          use_bonus = use_bonus / 100;
 
           var innerHTML = '';
           innerHTML += '<div class="ui-form-item ui-form-item-checkbox ui-border-b">';
@@ -410,7 +410,8 @@
           $('.bonuscfg').html(innerHTML);
         }
       } else {
-        var use_bonus = bonus / 100;
+        var use_bonus = bonus;
+        use_bonus = use_bonus / 100;
 
         var innerHTML = '';
          innerHTML += '<div class="ui-form-item ui-form-item-checkbox ui-border-b">';

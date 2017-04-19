@@ -54,7 +54,7 @@
   <div class="white-bg padding-top-10 padding-bottom-10 margin-bottom-10 overflow-hidden">
     <div class="ui-whitespace font-normal">
       <p class="ui-txt-default higher">参加人数：<span class="applicant_num flt-right">0</span></p>
-      <p class="ui-txt-default higher">费用：<span class="flt-right">{{order_index['activity_amount']}}元/人</span></p>
+      <p class="ui-txt-default higher">基础费用：<span class="flt-right">{{order_index['activity_amount']}}元/人</span></p>
       <div class="ui-txt-default higher">附加服务：</div>
       <div class="ui-txt-info ui-txt-justify extserv-items"></div>
       <div class="ui-txt-default higher">保险：</div>
@@ -72,11 +72,11 @@
     <!-- ui-flex ui-flex-align-center: 垂直居中 -->
     <div class="ui-col ui-col-2 ui-flex ui-flex-align-center ui-flex-pack-center">
       合计:￥
-      <span class="total_fees">0</span>
+      <span class="total_fees">{{ order_index['actual_payment'] }}</span>
     </div>
     <!-- ui-flex ui-flex-align-center ui-flex-pack-center: 垂直加水平居中 -->
     <div class="ui-col ui-flex ui-flex-align-center ui-flex-pack-center green mock-green-btn">
-      {% if order_index['amount'] == 0 %}
+      {% if order_index['actual_payment'] == 0 %}
         <a id="wexin-pay-btn" onclick="callpay();" class="ui-txt-white pay-btn full-width">填写报名</a>
       {% else %}
         <a id="wexin-pay-btn" onclick="callpay();" class="ui-txt-white pay-btn full-width">微信支付</a>
@@ -126,7 +126,7 @@
   	}
 
   	function callpay() {
-      if ({{ order_index['amount'] }} == 0) {
+      if ({{ order_index['actual_payment'] }} == 0) {
         location.href = "/bf/wx/vendors/{{ vendor_id }}/activitys/{{activity['_id']}}/apply/step3?order_id={{order_index['_id']}}";
       } else {
   		  if (typeof WeixinJSBridge == "undefined"){
@@ -183,7 +183,7 @@
       // 人数
       $('.applicant_num').html(order.quantity+'人');
       // 总金额
-      $('.total_fees').html(order.amount);
+      $('.total_fees').html(order.actual_payment);
       // 购买的附加服务
       var ext_fees = order['ext_fees'];
       for(var i in ext_fees){

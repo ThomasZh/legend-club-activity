@@ -136,10 +136,25 @@ class ApiActivityShareXHR(BaseHandler):
         _account_id = self.get_argument("account_id", "")
         logging.info("got _account_id %r", _account_id)
 
-        _bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
-        bonus_points = int(_bonus_template['activity_shared'])
-        # 修改个人积分信息
-        self.points_increase(vendor_id, _account_id, bonus_points)
+        # 一个活动分享，只能获取一次积分奖励
+        points_logs = self.get_points_log(_account_id, activity_id, "share_activity")
+        if len(points_logs) == 0:
+            _activity = activity_dao.activity_dao().query(activity_id)
+            _bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
+            points = int(_bonus_template['activity_shared'])
+            # 修改个人积分信息
+            bonus_points = {
+                'club_id':vendor_id,
+                'account_id':_account_id,
+                '_type': 'share_activity',
+                'item_type': 'activity',
+                'item_id': activity_id,
+                'item_name': _activity['title'],
+                'points': points,
+                'order_id': DEFAULT_USER_ID
+            }
+            self.create_points(bonus_points)
+            # self.points_increase(vendor_id, _account_id, bonus_points)
 
         _json = {'rs':'success'}
         logging.info("got result code>>>>>>>>>>>>>>>>>>> %r", _json)
