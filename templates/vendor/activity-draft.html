@@ -99,7 +99,7 @@
                     {% for activity in activitys %}
                       <div class="col-md-3 col-xs-12 widget widget_tally_box">
                         <div class="x_panel ui-ribbon-container fixed_height_360">
-                          {% if activity['hidden'] %}
+                          {% if activity['private_status'] %}
                           <div class="ui-ribbon-wrapper">
                             <div class="ui-ribbon">
                               隐藏
@@ -107,14 +107,13 @@
                           </div>
                           {% end %}
                           <div class="x_title">
-                            <h2>{{activity['category']}}</h2>
                             <div class="clearfix"></div>
                           </div>
                           <div class="x_content">
                             <div class="thumbnail">
                               <div class="image view view-first">
                                 <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step1">
-                                  <img style="width: 100%; display: block;" src="{{activity['bk_img_url']}}" alt="image" />
+                                  <img style="width: 100%; display: block;" src="{{activity['img']}}" alt="image" />
                                 </a>
                               </div>
                             </div>

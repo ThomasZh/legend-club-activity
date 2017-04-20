@@ -30,18 +30,6 @@ import markdown
 import re
 
 
-class WxMpVerifyHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.finish('rZAV6WH7J2WhqAIs')
-        return
-
-
-class WxMpVerify2Handler(tornado.web.RequestHandler):
-    def get(self):
-        self.finish('UwBwsF7uHi57Xd6e')
-        return
-
-
 class singleton(object):
     _singleton = None;
     def __new__(cls):
@@ -138,6 +126,30 @@ def time_span(ts):
 
 
 class BaseHandler(tornado.web.RequestHandler):
+
+    def get_activity(self, activity_id):
+        headers = {"Authorization":"Bearer "+DEFAULT_USER_ID}
+
+        url = API_DOMAIN + "/api/activities/"+activity_id
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got get_activity response.body=[%r]", response.body)
+        data = json_decode(response.body)
+        return data['rs']
+
+
+    def get_activities(self, club_id, _status, page, limit):
+        headers = {"Authorization":"Bearer "+DEFAULT_USER_ID}
+
+        params = {"filter":"club", "club_id":club_id, "_status":_status, "page":page, "limit":limit}
+        url = url_concat(API_DOMAIN + "/api/activities", params)
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got get_activities response.body=[%r]", response.body)
+        data = json_decode(response.body)
+        rs = data['rs']
+        return rs['data']
+
 
     def get_points_log(self, _account_id, activity_id, _filter):
         headers = {"Authorization":"Bearer "+DEFAULT_USER_ID}

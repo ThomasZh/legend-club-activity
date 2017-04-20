@@ -12,37 +12,22 @@ from foo.auth import auth_email
 from foo.auth import auth_phone
 from vendor import vendor_category
 from vendor import vendor_activity
-from vendor import blog
 from vendor import vendor_order
 from vendor import vendor_customer
 from vendor import vendor_voucher
 from vendor import vendor_setup
 from vendor import trip_router
-from wx import wx_activity
-from wx import wx_personal_center
-from wx import wx_wrap
-from wx import xml_parser
 from api import api_category
 from api import api_activity
 from api import api_blog
 from api import api_setup
 from api import api_customer_profile
 from api import api_order
-from foo.portal import eshop
 
 
 def map():
 
     config = [
-
-        (r'/webapp', getattr(eshop, 'EshopHomeHandler')),
-        (r'/webapp/eshop', getattr(eshop, 'EshopHomeHandler')),
-        (r'/webapp/eshop/clubs/([a-z0-9]*)', getattr(eshop, 'EshopIndexHandler')),
-        (r'/webapp/eshop/clubs/([a-z0-9]*)/articles/([a-z0-9]*)', getattr(eshop, 'EshopArticleHandler')),
-        (r'/webapp/eshop/clubs/([a-z0-9]*)/articles/([a-z0-9]*)/add-comment', getattr(eshop, 'EshopArticleAddCommentHandler')),
-        (r'/webapp/eshop/clubs/([a-z0-9]*)/products/([a-z0-9]*)', getattr(eshop, 'EshopProductHandler')),
-        (r'/webapp/eshop/clubs/([a-z0-9]*)/products/([a-z0-9]*)/place-order', getattr(eshop, 'EshopProductPlaceOrderHandler')),
-        (r'/webapp/eshop/clubs/([a-z0-9]*)/products/([a-z0-9]*)/place-order-success', getattr(eshop, 'EshopProductPlaceOrderSuccessHandler')),
 
         # authenticated
         (r'/ops/auth/email/login', getattr(auth_email, 'AuthEmailLoginHandler')),
@@ -105,28 +90,6 @@ def map():
         (r'/vendors/([a-z0-9]*)/activitys/league/recruit', getattr(vendor_activity, 'VendorActivityLeagueRecruitHandler')),
         (r'/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/demo', getattr(vendor_activity, 'VendorActivityLeagueDemoHandler')),
 
-        # blog
-        # 这四个没用
-        (r"/vendors/([a-z0-9]*)/blog/my-articles", getattr(blog, 'MyArticlesHandler')),
-        (r"/vendors/([a-z0-9]*)/blog/my-article", getattr(blog, 'MyArticleHandler')),
-        (r"/vendors/([a-z0-9]*)/blog/add-article", getattr(blog, 'AddArticleHandler')),
-        (r"/vendors/([a-z0-9]*)/blog/edit-article", getattr(blog, 'EditArticleHandler')),
-
-        # 重写下面9个即可
-        (r"/vendors/([a-z0-9]*)/blog/add-paragraph", getattr(blog, 'AddParagraphHandler')),
-        (r"/vendors/([a-z0-9]*)/blog/add-paragraph-raw", getattr(blog, 'AddParagraphRawHandler')),
-        (r"/vendors/([a-z0-9]*)/blog/add-paragraph-img", getattr(blog, 'AddParagraphImgHandler')),
-        (r"/vendors/([a-z0-9]*)/blog/add-paragraph/after", getattr(blog, 'AddParagraphAfterHandler')),
-        (r"/vendors/([a-z0-9]*)/blog/add-paragraph-raw/after", getattr(blog, 'AddParagraphRawAfterHandler')),
-        (r"/vendors/([a-z0-9]*)/blog/add-paragraph-img/after", getattr(blog, 'AddParagraphImgAfterHandler')),
-        (r"/vendors/([a-z0-9]*)/blog/edit-paragraph", getattr(blog, 'EditParagraphHandler')),
-        (r"/vendors/([a-z0-9]*)/blog/edit-paragraph-raw", getattr(blog, 'EditParagraphRawHandler')),
-        (r"/vendors/([a-z0-9]*)/blog/edit-paragraph-img", getattr(blog, 'EditParagraphImgHandler')),
-
-        # 这三个可通用
-        (r"/vendors/([a-z0-9]*)/blog/paragraph/up", getattr(blog, 'UpParagraphHandler')),
-        (r"/vendors/([a-z0-9]*)/blog/paragraph/down", getattr(blog, 'DownParagraphHandler')),
-        (r"/vendors/([a-z0-9]*)/blog/paragraph/del", getattr(blog, 'DelParagraphHandler')),
 
         # 我自己的全部订单，含分销
         (r"/vendors/([a-z0-9]*)/orders-me-all", getattr(vendor_order, 'VendorOrdersMeAllHandler')),
@@ -224,58 +187,6 @@ def map():
         (r"/bf/api/vendors/([a-z0-9]*)/customers/([a-z0-9]*)/orders", getattr(api_customer_profile, 'ApiCustomerOrdersXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/customers/([a-z0-9]*)/points", getattr(api_customer_profile, 'ApiCustomerPointsXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/customer-profile/customers", getattr(api_customer_profile, 'ApiCustomerListXHR')),
-
-        # 推荐活动列表
-        (r"/bf/wx/vendors/([a-z0-9]*)/activitys/recommend", getattr(wx_activity, 'WxRecommendActivityHandler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)_([a-z0-9]*)", getattr(wx_activity, 'WxRecommendActivityInfoHandler')),
-
-        # bike-forever wexin activity
-        (r"/bf/wx/vendors/([a-z0-9]*)/activitys", getattr(wx_activity, 'WxActivityListHandler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)", getattr(wx_activity, 'WxActivityInfoHandler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/qrcode", getattr(wx_activity, 'WxActivityQrcodeHandler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)_([a-z0-9]*)/apply/step0", getattr(wx_activity, 'WxActivityApplyStep0Handler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)_([a-z0-9]*)/apply/step01", getattr(wx_activity, 'WxActivityApplyStep01Handler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)_([a-z0-9]*)/apply/step1", getattr(wx_activity, 'WxActivityApplyStep1Handler')),
-        (r"/bf/wxpay", getattr(wx_activity, 'WxActivityApplyStep2Handler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/apply/step3", getattr(wx_activity, 'WxActivityApplyStep3Handler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/hha", getattr(wx_activity, 'WxHhaHandler')),
-
-        # 开放线路市场
-        (r"/bf/wx/vendors/([a-z0-9]*)/triprouters", getattr(wx_activity, 'WxTriprouterMarketHandler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/triprouters/([a-z0-9]*)", getattr(wx_activity, 'WxTriprouterInfoHandler')),
-
-        # 由俱乐部分享出的有偿代金券
-        (r"/bf/wx/vendors/([a-z0-9]*)/vouchers/([a-z0-9]*)", getattr(wx_activity, 'WxVoucherShareHandler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/vouchers/([a-z0-9]*)/buy/step0", getattr(wx_activity, 'WxVoucherBuyStep0Handler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/vouchers/([a-z0-9]*)/buy/step1", getattr(wx_activity, 'WxVoucherBuyStep1Handler')),
-        (r"/bf/voucher-pay", getattr(wx_activity, 'WxVoucherBuyStep2Handler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/vouchers/([a-z0-9]*)/buy/step3", getattr(wx_activity, 'WxVoucherBuyStep3Handler')),
-
-        # bike-forever wexin order
-        # 微信支付结果通用通知
-        # 该链接是通过【统一下单API】中提交的参数notify_url设置，如果链接无法访问，商户将无法接收到微信通知。
-        # 通知url必须为直接可访问的url，不能携带参数。示例：notify_url：“https://pay.weixin.qq.com/wxpay/pay.action”
-        (r"/bf/wx/orders/notify", getattr(wx_activity, 'WxOrderNotifyHandler')),
-        (r"/bf/wx/voucher-orders/notify", getattr(wx_activity, 'WxVoucherOrderNotifyHandler')),
-        (r"/bf/wx/orders/wait", getattr(wx_activity, 'WxOrderWaitHandler')),
-
-        # bike-forever wexin personal-center
-        (r"/bf/wx/vendors/([a-z0-9]*)/pc0", getattr(wx_personal_center, 'WxPersonalCenter0Handler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/pc1", getattr(wx_personal_center, 'WxPersonalCenter1Handler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/pc", getattr(wx_personal_center, 'WxPersonalCenterHandler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/pc/orders", getattr(wx_personal_center, 'WxPcOrderListHandler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/pc/orders/([a-z0-9]*)", getattr(wx_personal_center, 'WxPcOrderInfoHandler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/pc/orders/([a-z0-9]*)/applys", getattr(wx_personal_center, 'WxPcOrderApplyListHandler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/pc/orders/([a-z0-9]*)/evaluate", getattr(wx_personal_center, 'WxPcOrderEvaluateHandler')),
-        (r"/bf/wxrepay", getattr(wx_personal_center, 'WxPcOrderRepayHandler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/pc/vouchers", getattr(wx_personal_center, 'WxPcVoucherListHandler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/pc/bonus", getattr(wx_personal_center, 'WxPcBonusListHandler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/pc/certs", getattr(wx_personal_center, 'WxPcCertListHandler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/pc/certs/([a-z0-9]*)", getattr(wx_personal_center, 'WxPcCertInfoHandler')),
-        (r"/bf/wx/vendors/([a-z0-9]*)/pc/tasks", getattr(wx_personal_center, 'WxPcTaskListHandler')),
-
-        (r"/MP_verify_rZAV6WH7J2WhqAIs.txt", getattr(comm, 'WxMpVerifyHandler')),
-        (r"/MP_verify_UwBwsF7uHi57Xd6e.txt", getattr(comm, 'WxMpVerify2Handler')),
 
         # comm
         ('.*', getattr(comm, 'PageNotFoundHandler'))
