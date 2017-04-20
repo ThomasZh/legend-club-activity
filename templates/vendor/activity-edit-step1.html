@@ -237,6 +237,13 @@
                       <label class="control-label col-md-3 col-sm-3 col-xs-12">分类</label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
                         <select class="form-control" id="category" name="category">
+{% for category in categorys %}
+  {% if category['_id'] == activity['category_id'] %}
+                              <option value="{{category['_id']}}" selected="selected">{{category['title']}}</option>
+  {% else %}
+                              <option value="{{category['_id']}}">{{category['title']}}</option>
+  {% end %}
+{% end %}
                         </select>
                       </div>
                     </div>
@@ -258,12 +265,12 @@
                       <label class="control-label col-md-3 col-sm-3 col-xs-12">隐藏(在微信端不可见)</label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
                         <div id="hidden" class="btn-group" data-toggle="buttons">
-{% if activity['hidden'] %}
+{% if activity['private_status'] %}
                             <input type="radio" name="hidden" value="true" checked=""> &nbsp; 是 &nbsp;
 {% else %}
                             <input type="radio" name="hidden" value="true"> &nbsp; 是 &nbsp;
 {% end %}
-{% if activity['hidden'] %}
+{% if activity['private_status'] %}
                             <input type="radio" name="hidden" value="false"> 否
 {% else %}
                             <input type="radio" name="hidden" value="false" checked=""> 否

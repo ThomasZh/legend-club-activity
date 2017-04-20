@@ -555,14 +555,16 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
             "title":_title,
             "subtitle":_distance,
             "img":_bk_img_url,
+            "category_id":_category,
             "begin_time":_begin_time, "end_time":_end_time, "apply_end_time":_apply_end_time,
             "mileage":_distance,
             "amount":0,
-            "hidden":hidden,
+            "private_status":hidden,
             "cash_only":cash_only,
             "strength":_strength, "scenery":_scenery, "road_info":_road_info, "kickoff":_kickoff,
             "ext_fee_template":[], "base_fee_template":[],
             "member_min":_member_min, "member_max":_member_max,
+            "notes":''
         }
         headers = {"Authorization":"Bearer "+access_token}
         url = API_DOMAIN + "/api/activities"
