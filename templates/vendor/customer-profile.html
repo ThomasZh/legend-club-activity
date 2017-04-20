@@ -227,14 +227,13 @@
                     <thead>
                       <tr>
                         <th style="width: 1%">#</th>
-                        <th style="width: 13%">活动名称</th>
-                        <th>奖励积分</th>
-                        <th style="width: 13%">报名人数</th>
-                        <th style="width: 13%">下单金额</th>
-                        <th style="width: 13%">支付金额</th>
-                        <th style="width: 13%">支付状态</th>
-                        <th style="width: 13%">报名日期</th>
-                        <th>#操作</th>
+                        <th style="width: 16%">活动名称</th>
+                        <th style="width: 16%">报名人数</th>
+                        <th style="width: 16%">下单金额</th>
+                        <th style="width: 16%">支付金额</th>
+                        <th style="width: 16%">支付状态</th>
+                        <th style="width: 16%">报名日期</th>
+                        <th>操作</th>
                       </tr>
                     </thead>
                     <tbody id="tbody">
@@ -279,7 +278,8 @@
                     <thead>
                       <tr>
                         <th style="width: 1%">#</th>
-                        <th style="width: 20%">来源/用途</th>
+                        <th style="width: 20%">来源</th>
+                        <th style="width: 20%">用途</th>
                         <th>积分变化</th>
                         <th style="width: 20%">日期</th>
                       </tr>
@@ -354,7 +354,6 @@
             inner_html += '<td>';
             inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/'+ajaxobj[i].item_id+'/detail/step1">'+ajaxobj[i].item_name+'</a>';
             inner_html += '</td>';
-            inner_html += '<td>'+ajaxobj[i].bonus_points+'</td>';
             inner_html += '<td>'+ajaxobj[i].quantity+'</td>';
             inner_html += '<td>'+ajaxobj[i].amount+'元</td>';
             if (ajaxobj[i].pay_status == 30){
@@ -404,7 +403,7 @@
         point_currentPage = pageNum;
         $.ajax({
           type: "GET",
-          url: "/bf/api/vendors/{{ vendor_id }}/customers/{{ account_id }}/points?page="+pageNum+"&limit="+limit,
+          url: "/bf/api/vendors/{{ vendor_id }}/customers/{{ account_id }}/points?bonus_type=bonus&page="+pageNum+"&limit="+limit,
           headers: {"Authorization": "Bearer {{ access_token }}"},
           dataType: "json",
           contentType: 'application/json',
@@ -417,12 +416,18 @@
           for (var i in ajaxobj) {
             var inner_html = '<tr><td>#</td>';
             inner_html += '<td>';
-            inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/'+ajaxobj[i].item_id+'/detail/step1">'+ajaxobj[i].item_name+'</a>';
+            if(ajaxobj[i].order_id != "00000000000000000000000000000000"){
+                inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+ajaxobj[i].order_id+'">'+ajaxobj[i].item_name+'</a>';
+            }
+            else{
+                inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/'+ajaxobj[i].item_id+'/detail/step1">'+ajaxobj[i].item_name+'</a>';
+            }
             inner_html += '</td>';
+            inner_html += '<td>'+ajaxobj[i].action+'</td>';
             if(ajaxobj[i].points > 0){
-              inner_html += '<td>积分   +'+ajaxobj[i].points+'</td>';
+              inner_html += '<td>   +'+ajaxobj[i].points+'</td>';
             }else{
-              inner_html += '<td>积分 '+ajaxobj[i].points+'</td>';
+              inner_html += '<td> '+ajaxobj[i].points+'</td>';
             }
 
             inner_html += '<td>'+ajaxobj[i].create_time+'</td>';
@@ -503,7 +508,7 @@
               error:function(){
               }
             });
-          })
+          });
       });
 </script>
 

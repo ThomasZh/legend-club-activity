@@ -215,12 +215,14 @@ class VendorCustomerProfileHandler(AuthorizationHandler):
         logging.info("got points %r", points)
         _history_bonus = self.get_argument("history_bonus", "")
         logging.info("got _history_bonus %r", _history_bonus)
+        vouchers = self.get_argument("vouchers", "")
+        logging.info("got vouchers %r", vouchers)
         mileage = self.get_argument("mileage", "")
         logging.info("got mileage %r", mileage)
         star = self.get_argument("star", "")
         logging.info("got star %r", star)
 
-        json = {'_rank':0, 'star':star, 'points':points,'crets':0, 'mileage':mileage}
+        json = {'_rank':0, 'star':star, 'points':points,'vouchers':vouchers, 'mileage':mileage}
 
         url = "http://7x24hs.com/api/clubs/"+vendor_id+"/users/"+account_id
         http_client = HTTPClient()
