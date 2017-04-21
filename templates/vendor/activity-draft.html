@@ -11,29 +11,14 @@
   <title>骑无止境 ｜ 草稿箱</title>
 
   <!-- Bootstrap core CSS -->
-
+  <link rel="stylesheet" href="{{ static_url('weui/lib/weui.css') }}">
   <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
-
   <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
-
   <!-- Custom styling plus plugins -->
-  <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
+  <link href="{{ static_url('css/custom.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
-
-
   <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
-
-  <!--[if lt IE 9]>
-        <script src="../assets/js/ie8-responsive-file-warning.js"></script>
-        <![endif]-->
-
-  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-  <!--[if lt IE 9]>
-          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-        <![endif]-->
-
 </head>
 
 
@@ -92,46 +77,15 @@
                   </ul>
                   <div class="clearfix"></div>
                 </div>
-                <div class="x_content">
-                  <div class="row">
+                <div class="x_content" id="x_Box">
+                </div>
+                <div class="clearfix"></div>
+                <div class="col-md-5 col-sm-12 col-xs-12 center-margin">
+                  <button class="btn btn-success" type="button" id="prev">上一页</button>
+                  <span class="pageBox"></span>
 
-                    <p>必须发布，用户才能见到</p>
-                    {% for activity in activitys %}
-                      <div class="col-md-3 col-xs-12 widget widget_tally_box">
-                        <div class="x_panel ui-ribbon-container fixed_height_360">
-                          {% if activity['private_status'] %}
-                          <div class="ui-ribbon-wrapper">
-                            <div class="ui-ribbon">
-                              隐藏
-                            </div>
-                          </div>
-                          {% end %}
-                          <div class="x_title">
-                            <div class="clearfix"></div>
-                          </div>
-                          <div class="x_content">
-                            <div class="thumbnail">
-                              <div class="image view view-first">
-                                <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step1">
-                                  <img style="width: 100%; display: block;" src="{{activity['img']}}" alt="image" />
-                                </a>
-                              </div>
-                            </div>
-                            <p class="title_lock">{{activity['title']}}</p>
-                            <p>{{activity['begin_time']}}</p>
-                            <div class="divider"></div>
-                            <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/action/publish" class="btn btn-success btn-xs">
-                              <i class="fa fa-pencil"></i> 发布 </a>
-                            <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/action/delete" class="btn btn-danger btn-xs">
-                              <i class="fa fa-trash-o"></i> 删除 </a>
-                            <!-- <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/action/clone" class="btn btn-primary btn-xs">
-                              <i class="fa fa-copy"></i> 复制 </a> -->
-                          </div>
-                        </div>
-                      </div>
-                    {% end %}
-
-                  </div>
+                  <button class="btn btn-success" type="button" id="next">下一页</button>
+                  共<span id="total_page" style="padding:0 5px;"></span>页
                 </div>
               </div>
             </div>
@@ -148,31 +102,170 @@
 
   </div>
 
-  <div id="custom_notifications" class="custom-notifications dsp_none">
-    <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
-    </ul>
-    <div class="clearfix"></div>
-    <div id="notif-group" class="tabbed_notifications"></div>
-  </div>
-
   <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
-
   <!-- bootstrap progress js -->
   <script src="{{ static_url('admin/js/progressbar/bootstrap-progressbar.min.js') }}"></script>
   <!-- icheck -->
   <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
-
   <script src="{{ static_url('admin/js/custom.js') }}"></script>
   <!-- pace -->
   <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
-
+  <script src="{{ static_url('weui/js/weui.js') }}"></script>
   <!-- daterangepicker -->
   <script type="text/javascript" src="{{ static_url('admin/js/moment/moment.min.js') }}"></script>
   <script type="text/javascript" src="{{ static_url('admin/js/datepicker/daterangepicker.js') }}"></script>
 
-  <!-- form validation -->
-  <script src="{{ static_url('admin/js/validator/validator.js') }}"></script>
+  <script>
+  function confirms(id,fun,mess){
+    weui.confirm(mess,"提示信息",function(r){
+      if(r == true){
+        fun(id);
+      }else{
+      }
+    })
 
+  };
+  function publish(id){
+    console.log(id);
+
+    $.ajax({
+      type: "POST",
+      url: "http://7x24hs.com/api/activities/"+id+"/publish",
+      dataType: "json",
+      headers: {"Authorization":"Bearer {{access_token}}"},
+      contentType: 'application/json',
+      success: function(data, status, xhr) {
+          weui.Loading.success();
+          location.href = "/vendors/{{vendor_id}}/activitys/recruit";
+      },
+      error: function(XMLHttpRequest, textStatus, errorThrown) {
+        console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+        $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+      },
+      complete: function(XMLHttpRequest, textStatus) {
+        this; // 调用本次AJAX请求时传递的options参数
+      }
+    });
+  };
+
+  function dele(id){
+    console.log(id);
+
+    $.ajax({
+      type: "DELETE",
+      url: "http://7x24hs.com/api/activities/"+id,
+      dataType: "json",
+      headers: {"Authorization":"Bearer {{access_token}}"},
+      contentType: 'application/json',
+      success: function(data, status, xhr) {
+        weui.Loading.success();
+        location.href = "/vendors/{{vendor_id}}/activitys/draft";
+      },
+      error: function(XMLHttpRequest, textStatus, errorThrown) {
+        console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+          $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+      },
+      complete: function(XMLHttpRequest, textStatus) {
+        this; // 调用本次AJAX请求时传递的options参数
+      }
+    });
+  }
+  </script>
+
+  <script>
+          function getLocalTime(nS) { //时间戳转换
+             return new Date(parseInt(nS) * 1000).toLocaleString().replace(/:\d{1,2}$/,' ');
+          };
+
+          var limit = 8;//每页显示数
+          var currentPage = 0;//当前页
+          var total_page = 0;//总页数
+
+          function gotoPage(pageNum) {
+            $.get("http://7x24hs.com/api/activities?filter=club&club_id={{ vendor_id }}&_status=10&page="+pageNum+"&limit="+limit+"",function(data,status){
+                  console.log(data);
+                  data_obj = JSON.parse(data);
+                  data = data_obj.rs;
+                  currentPage = pageNum;
+              var pageData = data.data;
+                  total_page = data.total_pgae;//总页
+                  $("#total_page").html(total_page);
+              $('#x_Box').html("");
+
+              for (var i in pageData) {
+                var inner_html = '<div class="col-md-3 col-xs-12 widget widget_tally_box">';
+                inner_html += '<div class="x_panel ui-ribbon-container fixed_height_360">';
+                if (pageData[i].private == 1){
+                   inner_html += '<div class="ui-ribbon-wrapper"><div class="ui-ribbon">私有</div></div>';
+                }
+                inner_html += '<div class="x_content">';
+                inner_html += '<div class="thumbnail">';
+                inner_html += '<div class="image view view-first">';
+                inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/'+pageData[i]._id+'/detail/step1">';
+                inner_html += '<img style="width: 100%; display: block;" src="'+pageData[i].img+'" alt="image" />';
+                inner_html += '</a></div></div>';
+                inner_html += '<p>'+pageData[i].title+'</p>';
+                inner_html += '<p>'+getLocalTime(pageData[i].create_time)+'</p>';
+                inner_html += '<div class="divider"></div>'
+                inner_html += '<p>';
+                inner_html += '<a onclick="confirms(\''+pageData[i]._id+'\',dele,\'确定删除该活动吗？\')" class="btn ap_del btn-danger btn-xs">';
+                inner_html += '<i class="fa fa-trash-o"></i> 删除 </a>';
+                inner_html += '<a onclick="confirms(\''+pageData[i]._id+'\',publish,\'确定发布该活动吗？\')" class="btn ap_del btn-success btn-xs">';
+                inner_html += '<i class="fa fa-check-circle"></i> 发布 </a>';
+                inner_html += '</p></div></div></div>';
+
+                $('#x_Box').append(inner_html);
+                // member_num += 1;
+              };
+
+              pageNext = parseInt((currentPage-1)/5) + 1;
+
+                start = (pageNext-1)*5+1;
+                end = pageNext*5;
+                if(end > total_page){
+                  end = total_page;
+                }
+
+                $(".pageBox").html("");
+                for (var k=start;k<=end;k++){
+                  var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
+
+                  $(".pageBox").append(inner_html);
+                };
+                 $("#num"+currentPage).addClass("on").siblings().removeClass("on");
+
+
+            });
+
+          };
+
+          $(function(){
+            gotoPage("1");
+            $(document).on('click','.pageBox > button',function(){
+              var num = $(this).text();
+              gotoPage(num);
+              //  $(this).addClass("current").siblings().removeClass("current");
+            })
+
+            $("#prev").on("click",function(){
+                if(currentPage<=1){
+
+                }else{
+                    gotoPage(--currentPage);
+                    // $("#num"+currentPage).addClass("current").siblings().removeClass("current");
+                }
+            });
+
+            $("#next").on("click",function(){
+                if(currentPage>=total_page){
+
+                }else{
+                    gotoPage(++currentPage);
+                    // $("#num"+currentPage).addClass("current").siblings().removeClass("current");
+                }
+            })
+          });
+  </script>
 </body>
 
 </html>

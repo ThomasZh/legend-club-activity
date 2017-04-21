@@ -51,7 +51,6 @@ from dao import cret_dao
 
 
 from global_const import ACTIVITY_STATUS_DRAFT
-from global_const import ACTIVITY_STATUS_POP
 from global_const import ACTIVITY_STATUS_DOING
 from global_const import ACTIVITY_STATUS_RECRUIT
 from global_const import ACTIVITY_STATUS_COMPLETED

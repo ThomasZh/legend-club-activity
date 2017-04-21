@@ -3831,6 +3831,7 @@ ul.project_files li a i {
   height: 88px;
   top: -3px;
   right: -3px;
+  z-index: 1;
 }
 .ui-ribbon-container.ui-ribbon-primary .ui-ribbon {
   background-color: #5b90bf;

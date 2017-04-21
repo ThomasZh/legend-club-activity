@@ -18,12 +18,9 @@
   <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
 
   <!-- Custom styling plus plugins -->
-  <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
+  <link href="{{ static_url('css/custom.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
-
-
   <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
-
   <!-- fileinput -->
   <link rel="stylesheet" href="{{ static_url("css/fileinput.min.css")}}">
 
@@ -32,17 +29,6 @@
 	<script src="{{ static_url("js/spark-md5.min.js")}}"></script>
 	<script src="{{ static_url("js/async.js")}}"></script>
 	<script src="{{ static_url("js/upyun-mu.js")}}"></script>
-
-  <!--[if lt IE 9]>
-        <script src="../assets/js/ie8-responsive-file-warning.js"></script>
-        <![endif]-->
-
-  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-  <!--[if lt IE 9]>
-          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-        <![endif]-->
-
 </head>
 
 
@@ -230,7 +216,7 @@
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
                         <input type="file" id="file" name="file" class="form-control col-md-7 col-xs-12">
-                        <input id="bk_img_url" name="bk_img_url" type="hidden" value="{{activity['img']}}"/>
+                        <input id="img" name="img" type="hidden" value="{{activity['img']}}"/>
                       </div>
                     </div>
                     <div class="form-group">
@@ -252,7 +238,7 @@
                       <div class="col-md-6 col-sm-6 col-xs-12">
                         <select class="form-control" id="triprouter" name="triprouter">
 {% for triprouter in triprouters %}
-  {% if activity.has_key('triprouter') and triprouter['_id'] == activity['triprouter'] %}
+  {% if activity.has_key('triprouter_id') and triprouter['_id'] == activity['triprouter_id'] %}
                               <option value="{{triprouter['_id']}}" selected="selected">{{triprouter['title']}}</option>
   {% else %}
                               <option value="{{triprouter['_id']}}">{{triprouter['title']}}</option>
@@ -265,25 +251,37 @@
                       <label class="control-label col-md-3 col-sm-3 col-xs-12">隐藏(在微信端不可见)</label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
                         <div id="hidden" class="btn-group" data-toggle="buttons">
-{% if activity['private_status'] %}
-                            <input type="radio" name="hidden" value="true" checked=""> &nbsp; 是 &nbsp;
+{% if activity['private'] == "1" %}
+                            <input type="radio" name="private" value="1" checked="checked"> &nbsp; 是 &nbsp;
+                            <input type="radio" name="private" value="0"> &nbsp; 否 &nbsp;
 {% else %}
-                            <input type="radio" name="hidden" value="true"> &nbsp; 是 &nbsp;
-{% end %}
-{% if activity['private_status'] %}
-                            <input type="radio" name="hidden" value="false"> 否
-{% else %}
-                            <input type="radio" name="hidden" value="false" checked=""> 否
+                            <input type="radio" name="private" value="1"> &nbsp; 是 &nbsp;
+                            <input type="radio" name="private" value="0" checked="checked"> &nbsp; 否 &nbsp;
+
 {% end %}
                         </div>
                       </div>
                     </div>
+                    <div class="form-group">
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12"> 不可使用积分、优惠券</label>
+                      <div class="col-md-6 col-sm-6 col-xs-12">
+                        <div id="cash_only" class="btn-group" data-toggle="buttons">
+          {% if activity['cash_only'] == "1" %}
+                          <input type="radio" name="cash_only" value="1" checked=""> &nbsp; 是 &nbsp;</input>
+                          <input type="radio" name="cash_only" value="0"> &nbsp; 否 &nbsp; </input>
+          {% else %}
+                          <input type="radio" name="cash_only" value="1"> &nbsp; 是 &nbsp;</input>
+                          <input type="radio" name="cash_only" value="0" checked=""> &nbsp; 否 &nbsp; </input>
+          {% end %}
+                        </div>
+                      </div>
+                    </div>
                     <div class="item form-group">
-                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="location">地理位置 <span class="required">*</span>
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="subtitle">描述 <span class="required">*</span>
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
-                        <input type="text" id="location" name="location"
-                          value="{{activity['subtitle']}}" required="required" class="form-control col-md-7 col-xs-12">
+                        <input type="text" id="subtitle" name="subtitle"
+                          value="{{ activity['subtitle'] }}" required="required" class="form-control col-md-7 col-xs-12">
                       </div>
                     </div>
                     <div class="form-group">
@@ -319,10 +317,10 @@
 
                     <div class="ln_solid"></div>
                     <div class="form-group">
-                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="distance">骑行里程(km) <span class="required">*</span>
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="mileage">骑行里程(km) <span class="required">*</span>
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
-                        <input type="number" data-validate-minmax="1,1000" id="distance" name="distance" required="required"
+                        <input type="number" data-validate-minmax="1,1000" id="mileage" name="mileage" required="required"
                           class="form-control col-md-7 col-xs-12" value="{{activity['mileage']}}">
                       </div>
                     </div>
@@ -444,7 +442,7 @@
     function uploadHandle() {
       file = document.getElementById('file').files[0];
       var imgUrl = uploadUpyun(file);
-      document.getElementById("bk_img_url").value = imgUrl;
+      document.getElementById("img").value = imgUrl;
     }
 
     document.addEventListener('uploaded',function(e) {

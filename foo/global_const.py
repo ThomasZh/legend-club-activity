@@ -61,13 +61,12 @@ DEFAULT_USER_ID = "00000000000000000000000000000000"
 DEFAULT_USER_AVATAR = "http://tripc2c-person-face.b0.upaiyun.com/default/user.png"
 DEFAULT_USER_NICKNAME = "匿名"
 
-# status: 10=Draft, 20=Recruit
+
 ACTIVITY_STATUS_CANCELED = 5          # 已取消
 ACTIVITY_STATUS_DRAFT = 10            # 草稿箱
 ACTIVITY_STATUS_RECRUIT = 20          # 招募中
 ACTIVITY_STATUS_DOING = 30            # 活动中
 ACTIVITY_STATUS_COMPLETED = 40        # 已完成
-ACTIVITY_STATUS_POP = 50              # 热门
 
 
 # order status

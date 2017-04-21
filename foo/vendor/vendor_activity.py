@@ -61,18 +61,14 @@ class VendorActivityDraftHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
-
-        _status = ACTIVITY_STATUS_DRAFT
-        activitys = self.get_activities(vendor_id, _status, 1, 20)
-
 
         # before = time.time();
         # activitys = activity_dao.activity_dao().query_pagination_by_status(
         #         vendor_id, ACTIVITY_STATUS_DRAFT, before, PAGE_SIZE_LIMIT)
-        for activity in activitys:
-            activity['begin_time'] = timestamp_date(float(activity['begin_time'])) # timestamp -> %m/%d/%Y
+
             # for category in categorys:
             #     if category['_id'] == activity['category']:
             #         activity['category'] = category['title']
@@ -80,10 +76,10 @@ class VendorActivityDraftHandler(AuthorizationHandler):
 
         counter = self.get_counter(vendor_id)
         self.render('vendor/activity-draft.html',
+                access_token=access_token,
                 vendor_id=vendor_id,
                 ops=ops,
-                counter=counter,
-                activitys=activitys)
+                counter=counter)
 
 
 # /vendors/<string:vendor_id>/activitys/pop
@@ -93,6 +89,7 @@ class VendorActivityPopHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         before = time.time();
@@ -108,6 +105,7 @@ class VendorActivityPopHandler(AuthorizationHandler):
         counter = self.get_counter(vendor_id)
         self.render('vendor/activity-pop.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
                 ops=ops,
                 counter=counter,
                 activitys=activitys)
@@ -120,6 +118,7 @@ class VendorActivityDoingHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         before = time.time();
@@ -135,6 +134,7 @@ class VendorActivityDoingHandler(AuthorizationHandler):
         counter = self.get_counter(vendor_id)
         self.render('vendor/activity-doing.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
                 ops=ops,
                 counter=counter,
                 activitys=activitys)
@@ -147,6 +147,7 @@ class VendorActivityRecruitHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         before = time.time();
@@ -162,6 +163,7 @@ class VendorActivityRecruitHandler(AuthorizationHandler):
         counter = self.get_counter(vendor_id)
         self.render('vendor/activity-recruit.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
                 ops=ops,
                 counter=counter,
                 activitys=activitys)
@@ -173,6 +175,7 @@ class VendorActivityRecruitNotHiddenHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         before = time.time();
@@ -196,6 +199,7 @@ class VendorActivityRecruitNotHiddenHandler(AuthorizationHandler):
         counter = self.get_counter(vendor_id)
         self.render('vendor/activity-recruit-nothidden.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
                 ops=ops,
                 counter=counter,
                 activitys=activitys)
@@ -266,6 +270,7 @@ class VendorActivityLeagueShareHandler(AuthorizationHandler):
         counter = self.get_counter(vendor_id)
         self.render('vendor/activity-league-share.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
                 ops=ops,
                 counter=counter,
                 activitys=activitys)
@@ -278,6 +283,7 @@ class VendorActivityShareSetHandler(AuthorizationHandler):
         logging.info("got activity_id %r in uri", activity_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         # 设置别人开放的活动为自己所用
         activity = activity_dao.activity_dao().query(activity_id)
@@ -358,6 +364,7 @@ class VendorActivityLeagueRecruitHandler(AuthorizationHandler):
         counter = self.get_counter(vendor_id)
         self.render('vendor/activity-recruit-all.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
                 ops=ops,
                 counter=counter,
                 activitys=activitys)
@@ -412,12 +419,13 @@ class VendorActivityLeagueDemoHandler(AuthorizationHandler):
 
         article = self.get_article(_activity['_id'])
         if not article:
-            article = {'_id':_activity['_id'], 'title':_activity['title'], 'subtitle':_activity['location'], 'img':_activity['bk_img_url'],'paragraphs':''}
+            article = {'_id':_activity['_id'], 'title':_activity['title'], 'subtitle':_activity['subtitle'], 'img':_activity['bk_img_url'],'paragraphs':''}
             self.create_article(article)
 
         counter = self.get_counter(vendor_id)
         self.render('vendor/activity-demo.html',
                     vendor_id=vendor_id,
+                    access_token=access_token,
                     ops=ops,
                     counter=counter,
                     bonus_template=_bonus_template,
@@ -432,6 +440,7 @@ class VendorActivityCanceledHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         before = time.time();
@@ -447,6 +456,7 @@ class VendorActivityCanceledHandler(AuthorizationHandler):
         counter = self.get_counter(vendor_id)
         self.render('vendor/activity-canceled.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
                 ops=ops,
                 counter=counter,
                 activitys=activitys)
@@ -459,6 +469,7 @@ class VendorActivityCompletedHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         before = 0
@@ -474,6 +485,7 @@ class VendorActivityCompletedHandler(AuthorizationHandler):
         counter = self.get_counter(vendor_id)
         self.render('vendor/activity-completed.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
                 ops=ops,
                 counter=counter,
                 activitys=activitys)
@@ -486,12 +498,14 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         triprouters = trip_router_dao.trip_router_dao().query_by_vendor(vendor_id)
         counter = self.get_counter(vendor_id)
         self.render('vendor/activity-create-step1.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
                 ops=ops,
                 counter=counter,
                 triprouters=triprouters,
@@ -508,28 +522,20 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
         _category = self.get_argument("category", "")
         _triprouter = self.get_argument("triprouter","")
 
-        hidden = self.get_argument("hidden", "")
-        logging.info("got hidden %r", hidden)
-        if hidden == 'true':
-            hidden = True
-        else:
-            hidden = False
+        private = self.get_argument("private", "")
+        logging.info("got private %r", private)
 
         cash_only = self.get_argument("cash_only", "")
         logging.info("got cash_only %r", cash_only)
-        if cash_only == 'true':
-            cash_only = True
-        else:
-            cash_only = False
 
-        location = self.get_argument("location", "")
+        subtitle = self.get_argument("subtitle", "")
         _begin_time = self.get_argument("begin_time", "")
         _begin_time = float(date_timestamp(_begin_time)) # %m/%d/%Y -> timestamp
         _end_time = self.get_argument("end_time", "")
         _end_time = float(date_timestamp(_end_time)) # %m/%d/%Y -> timestamp
         _apply_end_time = self.get_argument("apply_end_time", "")
         _apply_end_time = float(date_timestamp(_apply_end_time)) # %m/%d/%Y -> timestamp
-        _distance = self.get_argument("distance", "")
+        mileage = self.get_argument("mileage", "")
         _strength = self.get_argument("strength", "")
         _scenery = self.get_argument("scenery", "")
         _road_info = self.get_argument("road_info", "")
@@ -541,11 +547,11 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
         # _activity_id = str(uuid.uuid1()).replace('-', '')
         # json = {"_id":_activity_id, "vendor_id":vendor_id,
         #         "status":ACTIVITY_STATUS_DRAFT, "popular":False,
-        #         "hidden":hidden, "cash_only":cash_only,
+        #         "private":private, "cash_only":cash_only,
         #         "create_time":_timestamp, "last_update_time":_timestamp,
-        #         "title":_title, "bk_img_url":_bk_img_url, "category":_category, "triprouter":_triprouter, "location":location,
+        #         "title":_title, "bk_img_url":_bk_img_url, "category":_category, "triprouter":_triprouter, "subtitle":subtitle,
         #         "begin_time":_begin_time, "end_time":_end_time, "apply_end_time":_apply_end_time,
-        #         "distance":_distance, "strength":_strength, "scenery":_scenery, "road_info":_road_info, "kickoff":_kickoff,
+        #         "mileage":mileage, "strength":_strength, "scenery":_scenery, "road_info":_road_info, "kickoff":_kickoff,
         #         "ext_fee_template":[], "base_fee_template":[],
         #         "member_min":_member_min, "member_max":_member_max, "notes":'' }
         # activity_dao.activity_dao().create(json)
@@ -553,13 +559,14 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
         activity = {
             "club_id":vendor_id,
             "title":_title,
-            "subtitle":_distance,
+            "subtitle":subtitle,
             "img":_bk_img_url,
             "category_id":_category,
+            "triprouter_id":_triprouter,
             "begin_time":_begin_time, "end_time":_end_time, "apply_end_time":_apply_end_time,
-            "mileage":_distance,
+            "mileage":mileage,
             "amount":0,
-            "private_status":hidden,
+            "private":private,
             "cash_only":cash_only,
             "strength":_strength, "scenery":_scenery, "road_info":_road_info, "kickoff":_kickoff,
             "ext_fee_template":[], "base_fee_template":[],
@@ -576,7 +583,7 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
         rs = data['rs']
         _activity_id = rs["_id"]
 
-        article = {'_id':_activity_id, 'title':_title, 'subtitle':location, 'img':_bk_img_url,'paragraphs':''}
+        article = {'_id':_activity_id, 'title':_title, 'subtitle':subtitle, 'img':_bk_img_url,'paragraphs':''}
         self.create_article(article)
 
         wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
@@ -628,10 +635,12 @@ class VendorActivityCreateStep2Handler(AuthorizationHandler):
         logging.info("got activity_id %r in uri", activity_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         counter = self.get_counter(vendor_id)
         self.render('vendor/activity-create-step2.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
                 ops=ops,
                 counter=counter,
                 activity_id=activity_id)
@@ -645,7 +654,7 @@ class VendorActivityCreateStep2Handler(AuthorizationHandler):
         ops = self.get_ops_info()
 
         slope_length = self.get_argument("slope_length", "")
-        distance = self.get_argument("distance", "")
+        distance = self.get_argument("mileage", "")
         hours = self.get_argument("hours", "")
         height = self.get_argument("height", "")
         speed = self.get_argument("speed", "")
@@ -655,7 +664,7 @@ class VendorActivityCreateStep2Handler(AuthorizationHandler):
         _timestamp = time.time()
         json = {"_id":activity_id,
                 "last_update_time":_timestamp,
-                "slope_length":slope_length, "distance":distance, "hours":hours, "height":height, "speed":speed,
+                "slope_length":slope_length, "mileage":mileage, "hours":hours, "height":height, "speed":speed,
                 "road_map_url":road_map_url, "contour_map_url":contour_map_url}
         cret_template_dao.cret_template_dao().update(json);
 
@@ -674,10 +683,12 @@ class VendorActivityCreateStep3Handler(AuthorizationHandler):
         logging.info("got activity_id %r in uri", activity_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         counter = self.get_counter(vendor_id)
         self.render('vendor/activity-create-step3.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
                 ops=ops,
                 counter=counter,
                 activity_id=activity_id)
@@ -709,6 +720,7 @@ class VendorActivityDetailStep1Handler(AuthorizationHandler):
         logging.info("got activity_id %r in uri", activity_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         activity = self.get_activity(activity_id)
         # _activity = activity_dao.activity_dao().query(activity_id)
@@ -734,6 +746,7 @@ class VendorActivityDetailStep1Handler(AuthorizationHandler):
         activity_counter = self.get_counter(activity_id)
         self.render('vendor/activity-edit-step1.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
                 ops=ops,
                 activity_id=activity_id,
                 counter=counter, activity_counter=activity_counter,
@@ -749,25 +762,24 @@ class VendorActivityDetailStep1Handler(AuthorizationHandler):
         logging.info("got activity_id %r in uri", activity_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         _title = self.get_argument("title", "")
-        _bk_img_url = self.get_argument("bk_img_url", "")
+        img = self.get_argument("img", "")
         _category = self.get_argument("category", "")
         _triprouter = self.get_argument("triprouter","")
-        hidden = self.get_argument("hidden", "")
-        logging.info("got hidden %r", hidden)
-        if hidden == 'true':
-            hidden = True
-        else:
-            hidden = False
-        location = self.get_argument("location", "")
+        private = self.get_argument("private", "")
+        logging.info("got private %r", private)
+        cash_only = self.get_argument("cash_only", "")
+        logging.info("got cash_only %r", cash_only)
+        subtitle = self.get_argument("subtitle", "")
         _begin_time = self.get_argument("begin_time", "")
         _begin_time = float(date_timestamp(_begin_time)) # %m/%d/%Y -> timestamp
         _end_time = self.get_argument("end_time", "")
         _end_time = float(date_timestamp(_end_time)) # %m/%d/%Y -> timestamp
         _apply_end_time = self.get_argument("apply_end_time", "")
         _apply_end_time = float(date_timestamp(_apply_end_time)) # %m/%d/%Y -> timestamp
-        _distance = self.get_argument("distance", "")
+        mileage = self.get_argument("mileage", "")
         _strength = self.get_argument("strength", "")
         _scenery = self.get_argument("scenery", "")
         _road_info = self.get_argument("road_info", "")
@@ -776,15 +788,38 @@ class VendorActivityDetailStep1Handler(AuthorizationHandler):
         _member_max = self.get_argument("member_max", "")
         logging.info("got _title %r", _title)
 
-        _timestamp = time.time()
-        json = {"_id":activity_id,
-                "last_update_time":_timestamp,
-                "hidden":hidden,
-                "title":_title, "bk_img_url":_bk_img_url, "category":_category, "triprouter":_triprouter ,"location":location,
-                "begin_time":_begin_time, "end_time":_end_time, "apply_end_time":_apply_end_time,
-                "distance":_distance, "strength":_strength, "scenery":_scenery, "road_info":_road_info, "kickoff":_kickoff,
-                "member_min":_member_min, "member_max":_member_max}
-        activity_dao.activity_dao().update(json);
+        # _timestamp = time.time()
+        # json = {"_id":activity_id,
+        #         "last_update_time":_timestamp,
+        #         "private":private,
+        #         "title":_title, "bk_img_url":_bk_img_url, "category":_category, "triprouter":_triprouter ,"subtitle":subtitle,
+        #         "begin_time":_begin_time, "end_time":_end_time, "apply_end_time":_apply_end_time,
+        #         "mileage":mileage, "strength":_strength, "scenery":_scenery, "road_info":_road_info, "kickoff":_kickoff,
+        #         "member_min":_member_min, "member_max":_member_max}
+        # activity_dao.activity_dao().update(json);
+
+        activity = {
+            "title":_title,
+            "subtitle":subtitle,
+            "img":img,
+            "category_id":_category,
+            "triprouter_id":_triprouter,
+            "begin_time":_begin_time, "end_time":_end_time, "apply_end_time":_apply_end_time,
+            "mileage":mileage,
+            "amount":0,
+            "private":private,
+            "cash_only":cash_only,
+            "strength":_strength, "scenery":_scenery, "road_info":_road_info, "kickoff":_kickoff,
+            "ext_fee_template":[], "base_fee_template":[],
+            "member_min":_member_min, "member_max":_member_max,
+            "notes":''
+        }
+        headers = {"Authorization":"Bearer "+access_token}
+        url = API_DOMAIN + "/api/activities/"+ activity_id
+        _json = json_encode(activity)
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="PUT", headers=headers, body=_json)
+        logging.info("update activity response.body=[%r]", response.body)
 
         self.redirect('/vendors/' + vendor_id + '/activitys/' + activity_id + '/detail/step1')
 
@@ -796,6 +831,7 @@ class VendorActivityDetailStep2Handler(AuthorizationHandler):
         logging.info("got activity_id %r in uri", activity_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         activity = self.get_activity(activity_id)
         # activity = activity_dao.activity_dao().query(activity_id)
@@ -817,6 +853,7 @@ class VendorActivityDetailStep2Handler(AuthorizationHandler):
         activity_counter = self.get_counter(activity_id)
         self.render('vendor/activity-edit-step2.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
                 ops=ops,
                 wx_notify_domain=wx_notify_domain,
                 activity_id=activity_id,
@@ -852,6 +889,7 @@ class VendorActivityDetailStep3Handler(AuthorizationHandler):
         logging.info("got activity_id %r in uri", activity_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         activity = self.get_activity(activity_id)
         # activity = activity_dao.activity_dao().query(activity_id)
@@ -865,6 +903,7 @@ class VendorActivityDetailStep3Handler(AuthorizationHandler):
         activity_counter = self.get_counter(activity_id)
         self.render('vendor/activity-edit-step3.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
                 ops=ops,
                 activity_id=activity_id,
                 counter=counter, activity_counter=activity_counter,
@@ -881,7 +920,7 @@ class VendorActivityDetailStep3Handler(AuthorizationHandler):
 
         template_id = self.get_argument("template_id", "")
         logging.info("got template_id %r", template_id)
-        distance = self.get_argument("distance", "")
+        mileage = self.get_argument("mileage", "")
         hours = self.get_argument("hours", "")
         height = self.get_argument("height", "")
         speed = self.get_argument("speed", "")
@@ -893,7 +932,7 @@ class VendorActivityDetailStep3Handler(AuthorizationHandler):
         _timestamp = time.time()
         json = {"_id":template_id,
                 "last_update_time":_timestamp,
-                "distance":distance, "hours":hours, "height":height,
+                "mileage":mileage, "hours":hours, "height":height,
                 "speed":speed, "road_map_url":road_map_url, "contour_map_url":contour_map_url}
         cret_template_dao.cret_template_dao().update(json);
 
@@ -907,6 +946,7 @@ class VendorActivityDetailStep4Handler(AuthorizationHandler):
         logging.info("got activity_id %r in uri", activity_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         activity = self.get_activity(activity_id)
         # activity = activity_dao.activity_dao().query(activity_id)
@@ -920,6 +960,7 @@ class VendorActivityDetailStep4Handler(AuthorizationHandler):
         activity_counter = self.get_counter(activity_id)
         self.render('vendor/activity-edit-step4.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
                 ops=ops,
                 activity_id=activity_id,
                 counter=counter, activity_counter=activity_counter,
@@ -967,8 +1008,8 @@ class VendorActivityDetailStep5Handler(AuthorizationHandler):
         activity_counter = self.get_counter(activity_id)
         self.render('vendor/activity-edit-step5.html',
                 vendor_id=vendor_id,
-                ops=ops,
                 access_token=access_token,
+                ops=ops,
                 activity_id=activity_id,
                 counter=counter, activity_counter=activity_counter,
                 activity=activity, categorys=categorys,
@@ -1015,6 +1056,7 @@ class VendorActivityDetailStep6Handler(AuthorizationHandler):
         activity_counter = self.get_counter(activity_id)
         self.render('vendor/activity-edit-step6.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
                 ops=ops,
                 activity_id=activity_id,
                 counter=counter, activity_counter=activity_counter,
@@ -1042,13 +1084,14 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
 
         article = self.get_article(activity_id)
         if not article:
-            article = {'_id':activity_id, 'title':activity['title'], 'subtitle':activity['location'], 'img':activity['bk_img_url'],'paragraphs':''}
+            article = {'_id':activity_id, 'title':activity['title'], 'subtitle':activity['subtitle'], 'img':activity['bk_img_url'],'paragraphs':''}
             self.create_article(article)
 
         counter = self.get_counter(vendor_id)
         activity_counter = self.get_counter(activity_id)
         self.render('vendor/activity-edit-step7.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
                 ops=ops,
                 travel_id=activity_id,
                 counter=counter, activity_counter=activity_counter,
@@ -1065,7 +1108,7 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
         access_token = self.get_secure_cookie("access_token")
         ops = self.get_ops_info()
 
-        _activity = self.get_activity(activity_id)
+        activity = self.get_activity(activity_id)
         # activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         applys = apply_dao.apply_dao().query_by_activity(activity_id)
@@ -1078,7 +1121,7 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
         content = self.get_argument("content","")
         logging.info("got content %r", content)
 
-        article = {'_id':activity_id ,'title':activity['title'], 'subtitle':activity['location'], 'img':activity['bk_img_url'],'paragraphs':content}
+        article = {'_id':activity_id ,'title':activity['title'], 'subtitle':activity['subtitle'], 'img':activity['img'],'paragraphs':content}
         self.update_article(article)
 
         self.redirect('/vendors/' + vendor_id + '/activitys/' + activity_id + '/detail/step7')
@@ -1091,6 +1134,7 @@ class VendorActivityDetailStep8Handler(AuthorizationHandler):
         logging.info("got activity_id %r in uri", activity_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         activity = self.get_activity(activity_id)
         # activity = activity_dao.activity_dao().query(activity_id)
@@ -1109,6 +1153,7 @@ class VendorActivityDetailStep8Handler(AuthorizationHandler):
         activity_counter = self.get_counter(activity_id)
         self.render('vendor/activity-edit-step8.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
                 ops=ops,
                 counter=counter, activity_counter=activity_counter,
                 activity=activity, categorys=categorys,
@@ -1121,6 +1166,7 @@ class VendorActivityDetailStep8Handler(AuthorizationHandler):
         logging.info("got activity_id %r in uri", activity_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         # 生成基本服务
         base_serv_names = self.get_arguments("base_serv_name")
@@ -1150,8 +1196,15 @@ class VendorActivityDetailStep8Handler(AuthorizationHandler):
             ext_fee_template.append(ext_json)
             ext_num = ext_num + 1
 
-        json = {"_id":activity_id, "ext_fee_template":ext_fee_template, "base_fee_template":base_fee_template}
-        activity_dao.activity_dao().update(json);
+        json = {"ext_fee_template":ext_fee_template, "base_fee_template":base_fee_template}
+        # activity_dao.activity_dao().update(json);
+
+        headers = {"Authorization":"Bearer "+access_token}
+        url = API_DOMAIN + "/api/activities/"+ activity_id
+        _json = json_encode(json)
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="PUT", headers=headers, body=_json)
+        logging.info("update fee response.body=[%r]", response.body)
 
         self.redirect('/vendors/' + vendor_id + '/activitys/' + activity_id + '/detail/step8')
 
@@ -1163,6 +1216,7 @@ class VendorActivityDetailStep9Handler(AuthorizationHandler):
         logging.info("got activity_id %r in uri", activity_id)
 
         ops = self.get_ops_info()
+        access_token = self.get_access_token()
 
         activity = self.get_activity(activity_id)
         # activity = activity_dao.activity_dao().query(activity_id)
@@ -1176,6 +1230,7 @@ class VendorActivityDetailStep9Handler(AuthorizationHandler):
         activity_counter = self.get_counter(activity_id)
         self.render('vendor/activity-edit-step9.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
                 ops=ops,
                 counter=counter, activity_counter=activity_counter,
                 activity=activity, categorys=categorys,
@@ -1381,7 +1436,7 @@ class VendorActivityActionCloneHandler(AuthorizationHandler):
                 "bk_img_url":activity['bk_img_url'],
                 "category":activity['category'],
                 "triprouter":activity['triprouter'],
-                "location":activity['location'],
+                "subtitle":activity['subtitle'],
                 "hidden":False,"cash_only":False,
                 "begin_time":timestamp, "end_time":timestamp, "apply_end_time":timestamp,
                 "distance":activity['distance'],
@@ -1415,7 +1470,7 @@ class VendorActivityActionCloneHandler(AuthorizationHandler):
             article = data['rs']
             _paragraphs = article['paragraphs']
             # 再创建一个新的article
-            article = {'title':activity['title'], 'subtitle':activity['location'], 'img':activity['bk_img_url'],'paragraphs':_paragraphs}
+            article = {'title':activity['title'], 'subtitle':activity['subtitle'], 'img':activity['bk_img_url'],'paragraphs':_paragraphs}
             _json = json_encode(article)
             headers = {"Authorization":"Bearer "+access_token}
             url = API_DOMAIN + "/api/articles"

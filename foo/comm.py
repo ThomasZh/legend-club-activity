@@ -138,19 +138,6 @@ class BaseHandler(tornado.web.RequestHandler):
         return data['rs']
 
 
-    def get_activities(self, club_id, _status, page, limit):
-        headers = {"Authorization":"Bearer "+DEFAULT_USER_ID}
-
-        params = {"filter":"club", "club_id":club_id, "_status":_status, "page":page, "limit":limit}
-        url = url_concat(API_DOMAIN + "/api/activities", params)
-        http_client = HTTPClient()
-        response = http_client.fetch(url, method="GET", headers=headers)
-        logging.info("got get_activities response.body=[%r]", response.body)
-        data = json_decode(response.body)
-        rs = data['rs']
-        return rs['data']
-
-
     def get_points_log(self, _account_id, activity_id, _filter):
         headers = {"Authorization":"Bearer "+DEFAULT_USER_ID}
 
