@@ -654,7 +654,7 @@ class VendorActivityCreateStep2Handler(AuthorizationHandler):
         ops = self.get_ops_info()
 
         slope_length = self.get_argument("slope_length", "")
-        distance = self.get_argument("mileage", "")
+        mileage = self.get_argument("mileage", "")
         hours = self.get_argument("hours", "")
         height = self.get_argument("height", "")
         speed = self.get_argument("speed", "")
@@ -666,6 +666,7 @@ class VendorActivityCreateStep2Handler(AuthorizationHandler):
                 "last_update_time":_timestamp,
                 "slope_length":slope_length, "mileage":mileage, "hours":hours, "height":height, "speed":speed,
                 "road_map_url":road_map_url, "contour_map_url":contour_map_url}
+
         cret_template_dao.cret_template_dao().update(json);
 
         counter = self.get_counter(vendor_id)
@@ -924,6 +925,7 @@ class VendorActivityDetailStep3Handler(AuthorizationHandler):
         hours = self.get_argument("hours", "")
         height = self.get_argument("height", "")
         speed = self.get_argument("speed", "")
+        slope_length = self.get_argument("slope_length", "")
         road_map_url = self.get_argument("road_map_url", "")
         contour_map_url = self.get_argument("contour_map_url", "")
         logging.info("got road_map_url %r", road_map_url)
@@ -933,7 +935,7 @@ class VendorActivityDetailStep3Handler(AuthorizationHandler):
         json = {"_id":template_id,
                 "last_update_time":_timestamp,
                 "mileage":mileage, "hours":hours, "height":height,
-                "speed":speed, "road_map_url":road_map_url, "contour_map_url":contour_map_url}
+                "speed":speed, "slope_length":slope_length, "road_map_url":road_map_url, "contour_map_url":contour_map_url}
         cret_template_dao.cret_template_dao().update(json);
 
         self.redirect('/vendors/' + vendor_id + '/activitys/' + activity_id + '/detail/step3')
@@ -1027,6 +1029,7 @@ class VendorActivityDetailStep6Handler(AuthorizationHandler):
         access_token = self.get_access_token()
 
         activity = self.get_activity(activity_id)
+        logging.info("got activity>>>> %r", activity)
         # activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         cret_template = cret_template_dao.cret_template_dao().query(activity_id)
@@ -1170,7 +1173,9 @@ class VendorActivityDetailStep8Handler(AuthorizationHandler):
 
         # 生成基本服务
         base_serv_names = self.get_arguments("base_serv_name")
+        logging.info("got base_serv_names %r",base_serv_names)
         base_serv_fees = self.get_arguments("base_serv_fee")
+        logging.info("got base_serv_fees %r",base_serv_fees)
         base_fee_template = []
         base_num = 0
         for base_name in base_serv_names:

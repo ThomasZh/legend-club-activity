@@ -249,7 +249,10 @@ class ApiActivityExportXHR(AuthorizationHandler):
         _unicode = 'utf8'
         _file = xlwt.Workbook(encoding=_unicode) # Workbook
 
-        activity = activity_dao.activity_dao().query(activity_id)
+        # activity = activity_dao.activity_dao().query(activity_id)
+        activity = self.get_activity(activity_id)
+        logging.info("got activity %r in uri", activity)
+
         for base_fee in activity['base_fee_template']:
             _table = _file.add_sheet(base_fee['name'])        # new sheet
 

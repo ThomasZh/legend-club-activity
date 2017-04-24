@@ -33,16 +33,6 @@
 	<script src="{{ static_url("js/async.js")}}"></script>
 	<script src="{{ static_url("js/upyun-mu.js")}}"></script>
 
-  <!--[if lt IE 9]>
-        <script src="../assets/js/ie8-responsive-file-warning.js"></script>
-        <![endif]-->
-
-  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-  <!--[if lt IE 9]>
-          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-        <![endif]-->
-
 </head>
 
 
@@ -109,7 +99,7 @@
               <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step3">
               <span class="count_top"><i class="fa fa-info-circle"></i> 活动信息</span>
               {% if cret_template %}
-              <div class="count green">{{cret_template['distance']}}<small>km</small></div>
+              <div class="count green">{{cret_template['mileage']}}<small>km</small></div>
               {% else %}
               <div class="count green">0<small>km</small></div>
               {% end %}
@@ -227,11 +217,11 @@
                       </div>
                     </div>
                     <div class="form-group">
-                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="distance">骑行数据（里程KM） <span class="required">*</span>
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="mileage">骑行数据（里程KM） <span class="required">*</span>
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
-                        <input type="number" id="distance" name="distance" required="required"
-                          value="{{cret_template['distance']}}"
+                        <input type="number" id="mileage" name="mileage" required="required"
+                          value="{{cret_template['mileage']}}"
                           class="form-control col-md-7 col-xs-12">
                       </div>
                     </div>

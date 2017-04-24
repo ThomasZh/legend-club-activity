@@ -98,7 +98,7 @@
               <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step3">
               <span class="count_top"><i class="fa fa-info-circle"></i> 活动信息</span>
               {% if cret_template %}
-              <div class="count">{{cret_template['distance']}}<small>km</small></div>
+              <div class="count">{{cret_template['mileage']}}<small>km</small></div>
               {% else %}
               <div class="count">0<small>km</small></div>
               {% end %}
@@ -181,49 +181,48 @@
         <div class="">
           <div class="page-title">
             <div class="title_left">
-              <h3>活动 <small> 报名</small></h3>
+              <h3>活动 <small> 会员报名详情</small></h3>
+            </div>
+            <div class="x_title" style="border-bottom:none;">
+              <ul class="nav navbar-right panel_toolbox">
+                <li>
+                  <a id="createExcel"
+                    class="btn btn-success btn-xs">
+                    <i class="fa fa-file-excel-o"></i> 创建Excel </a>
+                  <!--
+                  <a id="createExcel" href="/vendor/apply/export/excel?id={{activity['_id']}}"
+                    class="btn btn-success btn-xs">
+                    <i class="fa fa-file-excel-o"></i> 创建Excel </a>
+                  -->
+                </li>
+                <li>
+                  <a id="downloadExcel" href="#"
+                    class="btn btn-success btn-xs" disabled="true">
+                    <i class="fa fa-download"></i> 下载Excel </a>
+                  <!--
+                  <a id="downloadExcel" href="/static/report/{{activity['_id']}}.xls"
+                    class="btn btn-success btn-xs" disabled="true">
+                    <i class="fa fa-download"></i> 下载Excel </a>
+                  -->
+                </li>
+                <!-- <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                </li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                </li> -->
+              </ul>
+              <div class="clearfix"></div>
             </div>
           </div>
           <div class="clearfix"></div>
 
           <div class="row">
             <div class="col-md-12 col-sm-12 col-xs-12">
+              {% for act_base_fee in activity['base_fee_template']%}
               <div class="x_panel">
-                <div class="x_title">
-                  <h2>会员报名详情</h2>
-                  <ul class="nav navbar-right panel_toolbox">
-                    <li>
-                      <a id="createExcel"
-                        class="btn btn-success btn-xs">
-                        <i class="fa fa-file-excel-o"></i> 创建Excel </a>
-                      <!--
-                      <a id="createExcel" href="/vendor/apply/export/excel?id={{activity['_id']}}"
-                        class="btn btn-success btn-xs">
-                        <i class="fa fa-file-excel-o"></i> 创建Excel </a>
-                      -->
-                    </li>
-                    <li>
-                      <a id="downloadExcel" href="#"
-                        class="btn btn-success btn-xs" disabled="true">
-                        <i class="fa fa-download"></i> 下载Excel </a>
-                      <!--
-                      <a id="downloadExcel" href="/static/report/{{activity['_id']}}.xls"
-                        class="btn btn-success btn-xs" disabled="true">
-                        <i class="fa fa-download"></i> 下载Excel </a>
-                      -->
-                    </li>
-                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                    </li>
-                    <li><a class="close-link"><i class="fa fa-close"></i></a>
-                    </li>
-                  </ul>
-                  <div class="clearfix"></div>
-                </div>
-                {% for act_base_fee in activity['base_fee_template']%}
+
                 <div class="x_content">
 
                   <p>{{act_base_fee['name']}}</p>
-
                   <!-- start project list -->
                   <table class="table table-striped projects">
                     <thead>
@@ -284,9 +283,10 @@
 
                 </div>
               </div>
+              {% end %}
             </div>
           </div>
-          {% end %}
+
         </div>
 
         <!-- footer content -->
