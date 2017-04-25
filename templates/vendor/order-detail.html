@@ -168,25 +168,9 @@
                         </td>
                         {% elif order_index['pay_status'] == 30 %}
                         <td>
-                          <a href="#" class="btn btn-info btn-xs"> 待报名 </a>
+                          <a href="#" class="btn btn-success btn-xs"> 支付成功 </a>
                         </td>
-                        {% elif order_index['pay_status'] == 50 %}
-                        <td>
-                          <a href="#" class="btn btn-info btn-xs"> 待骑行 </a>
-                        </td>
-                        {% elif order_index['pay_status'] == 60 %}
-                        <td>
-                          <a href="#" class="btn btn-info btn-xs"> 待评价 </a>
-                        </td>
-                        {% elif order_index['pay_status'] == 70 %}
-                        <td>
-                          <a href="#" class="btn btn-success btn-xs"> 活动完成 </a>
-                        </td>
-                        {% elif order_index['pay_status'] == 10 %}
-                        <td>
-                          <a href="#" class="btn btn-danger btn-xs"> 初始化成功 </a>
-                        </td>
-                        {% else%}
+                        {% else %}
                         <td>
                           <a href="#" class="btn btn-success btn-xs"> {{ order_index['pay_status'] }} </a>
                         </td>

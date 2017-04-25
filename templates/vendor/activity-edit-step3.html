@@ -11,19 +11,13 @@
   <title>骑无止境</title>
 
   <!-- Bootstrap core CSS -->
-
   <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
-
   <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
-
   <!-- Custom styling plus plugins -->
   <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
-
-
   <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
-
   <!-- fileinput -->
   <link rel="stylesheet" href="{{ static_url("css/fileinput.min.css")}}">
 
@@ -303,13 +297,6 @@
 
   </div>
 
-  <div id="custom_notifications" class="custom-notifications dsp_none">
-    <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
-    </ul>
-    <div class="clearfix"></div>
-    <div id="notif-group" class="tabbed_notifications"></div>
-  </div>
-
   <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
 
   <!-- bootstrap progress js -->
@@ -329,51 +316,51 @@
   <script src="{{ static_url('admin/js/validator/validator.js') }}"></script>
 
   <script>
-  function uuid() {
-    var s = [];
-    var hexDigits = "0123456789abcdef";
-    for (var i = 0; i < 36; i++) {
-      s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+
+    function uuid() {
+      var s = [];
+      var hexDigits = "0123456789abcdef";
+      for (var i = 0; i < 36; i++) {
+        s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+      }
+      s[14] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
+      s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
+      s[8] = s[13] = s[18] = s[23] = "-";
+
+      var uuid = s.join("");
+      return uuid;
     }
-    s[14] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
-    s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
-    s[8] = s[13] = s[18] = s[23] = "-";
 
-    var uuid = s.join("");
-    return uuid;
-  }
+    function uploadUpyun(file, elementId) {
+      console.log(file.name);
+      var ext = '.' + file.name.split('.').pop();
+      // console.log(ext);
 
-  function uploadUpyun(file, elementId) {
-    console.log(file.name);
-    var ext = '.' + file.name.split('.').pop();
-    // console.log(ext);
+      var config = {
+        // 空间名称
+        bucket : 'tripc2c-club-title',
+        // 上传请求过期时间
+        expiration : parseInt((new Date().getTime() + 3600000) / 1000),
+        // 尽量不要使用直接传表单 API 的方式，以防泄露造成安全隐患
+        form_api_secret : 'CRKAOsKHGbbCnU+yztBxUT0bYR0='
+      };
 
-    var config = {
-      // 空间名称
-      bucket : 'tripc2c-club-title',
-      // 上传请求过期时间
-      expiration : parseInt((new Date().getTime() + 3600000) / 1000),
-      // 尽量不要使用直接传表单 API 的方式，以防泄露造成安全隐患
-      form_api_secret : 'CRKAOsKHGbbCnU+yztBxUT0bYR0='
+      var instance = new Sand(config);
+      var options = {
+        'notify_url' : 'http://upyun.com'
+      };
+      instance.setOptions(options);
+      instance.setElementId(elementId);
+      var d = new Date();
+      var month = d.getMonth() + 1;
+      var filename = '/activity/' + d.getFullYear() + '/' + month + '/' + d.getDate() + '/' + uuid() + ext;
+      console.log(filename);
+      instance.upload(filename);
+
+      return 'https://tripc2c-club-title.b0.upaiyun.com' + filename;
     };
-
-    var instance = new Sand(config);
-    var options = {
-      'notify_url' : 'http://upyun.com'
-    };
-    instance.setOptions(options);
-    instance.setElementId(elementId);
-    var d = new Date();
-    var month = d.getMonth() + 1;
-    var filename = '/activity/' + d.getFullYear() + '/' + month + '/' + d.getDate() + '/' + uuid() + ext;
-    console.log(filename);
-    instance.upload(filename);
-
-    return 'https://tripc2c-club-title.b0.upaiyun.com' + filename;
-  }
 
     // with plugin options
-    var fileElement = document.getElementById("file");
     $("#file").fileinput({
       'showCaption': false,
       'showUpload': false,
@@ -381,8 +368,8 @@
       'initialPreview':
         ['<img src="{{cret_template['road_map_url']}}" class="file-preview-image" alt="Old picture" title="Old picture">']
     });
+    var fileElement = document.getElementById("file");
     fileElement.addEventListener("change",uploadHandle,false);
-
     function uploadHandle() {
       var file = document.getElementById('file').files[0];
       var imgUrl = uploadUpyun(file);
@@ -391,7 +378,6 @@
     }
 
     // with plugin options
-    var fileElement2 = document.getElementById("file2");
     $("#file2").fileinput({
       'showCaption': false,
       'showUpload': false,
@@ -399,8 +385,8 @@
       'initialPreview':
         ['<img src="{{cret_template['contour_map_url']}}" class="file-preview-image" alt="Old picture" title="Old picture">'],
     });
+    var fileElement2 = document.getElementById("file2");
     fileElement2.addEventListener("change",uploadHandle2,false);
-
     function uploadHandle2() {
       var file2 = document.getElementById('file2').files[0];
       var imgUrl2 = uploadUpyun(file2,'file2');

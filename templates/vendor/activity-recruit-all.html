@@ -8,34 +8,21 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>骑无止境 ｜ 招募中</title>
+  <title>骑无止境 ｜ 我分销的活动列表</title>
 
   <!-- Bootstrap core CSS -->
-
+  <link rel="stylesheet" href="{{ static_url('weui/css/weui.min.css') }}">
+  <link rel="stylesheet" href="{{ static_url('weui/css/jquery-weui.min.css') }}">
   <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
-
   <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
 
   <!-- Custom styling plus plugins -->
-  <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
+  <link href="{{ static_url('css/custom.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
-
-
   <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
 
-  <!--[if lt IE 9]>
-        <script src="../assets/js/ie8-responsive-file-warning.js"></script>
-        <![endif]-->
-
-  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-  <!--[if lt IE 9]>
-          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-        <![endif]-->
-
 </head>
-
 
 <body class="nav-md">
 
@@ -75,7 +62,7 @@
         <div class="">
           <div class="page-title">
             <div class="title_left">
-              <h3> 活动 <small> 招募中</small> </h3>
+              <h3> 联盟 <small> 我分销的活动</small> </h3>
             </div>
           </div>
           <div class="clearfix"></div>
@@ -84,7 +71,7 @@
             <div class="col-md-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>招募中(我自己的所有活动和分享别人的活动)</h2>
+                  <h2>招募中（不显示隐藏活动）</h2>
                   <ul class="nav navbar-right panel_toolbox">
                     <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                     </li>
@@ -93,46 +80,15 @@
                   </ul>
                   <div class="clearfix"></div>
                 </div>
-                <div class="x_content">
+                <div class="x_content" id="x_Box">
+                </div>
+                <div class="clearfix"></div>
+                <div class="col-md-5 col-sm-12 col-xs-12 center-margin">
+                  <button class="btn btn-success" type="button" id="prev">上一页</button>
+                  <span class="pageBox"></span>
 
-                  <div class="row">
-                    {% for activity in activitys %}
-                      <div class="col-md-3 col-xs-12 widget widget_tally_box">
-                        <div class="x_panel ui-ribbon-container fixed_height_360">
-                          {% if activity['share'] %}
-                          <div class="ui-ribbon-wrapper">
-                            <div class="ui-ribbon">
-                              共享
-                            </div>
-                          </div>
-                          {% end %}
-                          <div class="x_title">
-                            <h2>{{activity['club']}}</h2>
-                            <div class="clearfix"></div>
-                          </div>
-                          <div class="x_content">
-                            <div class="thumbnail">
-                              <div class="image view view-first">
-                                {% if activity['share'] %}
-                                    <a href="/vendors/{{ vendor_id }}/activitys/{{activity['activity']}}/demo">
-                                      <img style="width: 100%; display: block;" src="{{activity['bk_img_url']}}" alt="image" />
-                                    </a>
-                                {% else %}
-                                    <a href="/vendors/{{ vendor_id }}/activitys/{{activity['_id']}}/detail/step1">
-                                      <img style="width: 100%; display: block;" src="{{activity['bk_img_url']}}" alt="image" />
-                                    </a>
-                                {% end %}
-                              </div>
-                            </div>
-                            <p class="title_lock">{{activity['title']}}</p>
-                            <p>{{activity['begin_time']}}</p>
-                            <!-- <div class="divider"></div> -->
-                          </div>
-                        </div>
-                      </div>
-                    {% end %}
-
-                  </div>
+                  <button class="btn btn-success" type="button" id="next">下一页</button>
+                  共<span id="total_page" style="padding:0 5px;"></span>页
                 </div>
               </div>
             </div>
@@ -148,31 +104,141 @@
     </div>
 
   </div>
-
-  <div id="custom_notifications" class="custom-notifications dsp_none">
-    <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
-    </ul>
-    <div class="clearfix"></div>
-    <div id="notif-group" class="tabbed_notifications"></div>
-  </div>
-
   <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
-
   <!-- bootstrap progress js -->
   <script src="{{ static_url('admin/js/progressbar/bootstrap-progressbar.min.js') }}"></script>
   <!-- icheck -->
   <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
-
   <script src="{{ static_url('admin/js/custom.js') }}"></script>
   <!-- pace -->
   <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
-
+  <script src="{{ static_url('weui/js/jquery-weui.min.js') }}"></script>
   <!-- daterangepicker -->
   <script type="text/javascript" src="{{ static_url('admin/js/moment/moment.min.js') }}"></script>
   <script type="text/javascript" src="{{ static_url('admin/js/datepicker/daterangepicker.js') }}"></script>
+  <script>
 
-  <!-- form validation -->
-  <script src="{{ static_url('admin/js/validator/validator.js') }}"></script>
+      function confirms(id,fun,mess){
+        $.confirm(mess,"提示信息",function(){fun(id)},function(){})
+      };
+      function a_close(id){
+        console.log(id);
+        $.ajax({
+          type: "DELETE",
+          url: "http://7x24hs.com/api/distributors/{{ vendor_id }}/items/"+id+"/takeon",
+          dataType: "json",
+          headers: {"Authorization":"Bearer {{access_token}}"},
+          contentType: 'application/json',
+          success: function(data, status, xhr) {
+              location.href = "/vendors/{{vendor_id}}/activitys/league/share";
+          },
+          error: function(XMLHttpRequest, textStatus, errorThrown) {
+            console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+            $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+          },
+          complete: function(XMLHttpRequest, textStatus) {
+            this; // 调用本次AJAX请求时传递的options参数
+          }
+        });
+      };
+
+      function getLocalTime(nS) { //时间戳转换
+             return new Date(parseInt(nS) * 1000).toLocaleString().replace(/:\d{1,2}$/,' ');
+          };
+
+          var limit = 8;//每页显示数
+          var currentPage = 0;//当前页
+          var total_page = 0;//总页数
+
+      function gotoPage(pageNum) {
+        $.ajax({
+          type: "GET",
+          url: "http://7x24hs.com/api/distributors/{{ vendor_id }}/items?_status=20&private=0&page="+pageNum+"&limit="+limit,
+          headers: {
+            "Authorization": "Bearer {{ access_token }}"
+          },
+          contentType: 'application/json',
+          success: function(data, status, xhr) {
+                console.log(data);
+                data_obj = JSON.parse(data);
+                data = data_obj.rs;
+                currentPage = pageNum;
+            var pageData = data.data;
+                total_page = data.total_page;//总页
+                $("#total_page").html(total_page);
+            $('#x_Box').html("");
+
+            for (var i in pageData) {
+              var inner_html = '<div class="col-md-3 col-xs-12 widget widget_tally_box">';
+              inner_html += '<div class="x_panel ui-ribbon-container fixed_height_360">';
+              inner_html += '<div class="x_content">';
+              inner_html += '<div class="thumbnail">';
+              inner_html += '<div class="image view view-first">';
+              inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/'+pageData[i]._id+'/detail/step1">';
+              inner_html += '<img style="width: 100%; display: block;" src="'+pageData[i].img+'" alt="image" />';
+              inner_html += '</a></div></div>';
+              inner_html += '<p>'+pageData[i].title+'</p>';
+              inner_html += '<p>回扣率: '+pageData[i].discount_rate+'％</p>';
+              inner_html += '<p>'+getLocalTime(pageData[i].begin_time)+'</p>';
+              inner_html += '<div class="divider"></div>'
+              inner_html += '<p>';
+              if(pageData[i].resale == 1){
+                inner_html += '<a onclick="confirms(\''+pageData[i]._id+'\',a_close,\'确定不再分销该活动吗？\')" class="btn ap_del btn-danger btn-xs">';
+                inner_html += '<i class="fa fa-trash-o"></i> 取消分销 </a>';
+              }
+              inner_html += '</p></div></div></div>';
+
+              $('#x_Box').append(inner_html);
+              // member_num += 1;
+            };
+
+              pageNext = parseInt((currentPage-1)/5) + 1;
+              start = (pageNext-1)*5+1;
+              end = pageNext*5;
+              if(end > total_page){
+                end = total_page;
+              }
+
+              $(".pageBox").html("");
+              for (var k=start;k<=end;k++){
+                var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
+
+                $(".pageBox").append(inner_html);
+              };
+               $("#num"+currentPage).addClass("on").siblings().removeClass("on");
+
+            }
+          })
+
+        };
+
+          $(function(){
+            gotoPage("1");
+            $(document).on('click','.pageBox > button',function(){
+              var num = $(this).text();
+              gotoPage(num);
+              //  $(this).addClass("current").siblings().removeClass("current");
+            })
+
+            $("#prev").on("click",function(){
+                if(currentPage<=1){
+
+                }else{
+                    gotoPage(--currentPage);
+                    // $("#num"+currentPage).addClass("current").siblings().removeClass("current");
+                }
+            });
+
+            $("#next").on("click",function(){
+                if(currentPage>=total_page){
+
+                }else{
+                    gotoPage(++currentPage);
+                    // $("#num"+currentPage).addClass("current").siblings().removeClass("current");
+                }
+            })
+          });
+  </script>
 
 </body>
 

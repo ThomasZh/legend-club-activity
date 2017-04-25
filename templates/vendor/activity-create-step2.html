@@ -11,21 +11,21 @@
   <title>骑无止境</title>
 
   <!-- Bootstrap core CSS -->
-
   <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
-
   <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
-
   <!-- Custom styling plus plugins -->
   <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
-
-
   <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
-
   <!-- fileinput -->
   <link rel="stylesheet" href="{{ static_url("css/fileinput.min.css")}}">
+
+  <!-- fileinput -->
+  <script src="{{ static_url("js/fileinput.min.js")}}"></script>
+	<script src="{{ static_url("js/spark-md5.min.js")}}"></script>
+	<script src="{{ static_url("js/async.js")}}"></script>
+	<script src="{{ static_url("js/upyun-mu.js")}}"></script>
 
 
 </head>
@@ -104,10 +104,10 @@
                       </div>
                     </div>
                     <div class="item form-group">
-                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="distance">骑行数据（里程km） <span class="required">*</span>
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="mileage">骑行数据（里程km） <span class="required">*</span>
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
-                        <input type="number" id="distance" name="distance" required="required" class="form-control col-md-7 col-xs-12">
+                        <input type="number" id="mileage" name="mileage" required="required" class="form-control col-md-7 col-xs-12">
                       </div>
                     </div>
                     <div class="item form-group">
@@ -201,13 +201,51 @@
   <!-- form validation -->
   <script src="{{ static_url('admin/js/validator/validator.js') }}"></script>
 
-  <!-- fileinput -->
-  <script src="{{ static_url("js/fileinput.min.js")}}"></script>
-	<script src="{{ static_url("js/spark-md5.min.js")}}"></script>
-	<script src="{{ static_url("js/async.js")}}"></script>
-	<script src="{{ static_url("js/upyun-mu.js")}}"></script>
-
   <script>
+
+    function uuid() {
+      var s = [];
+      var hexDigits = "0123456789abcdef";
+      for (var i = 0; i < 36; i++) {
+        s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+      }
+      s[14] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
+      s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
+      s[8] = s[13] = s[18] = s[23] = "-";
+
+      var uuid = s.join("");
+      return uuid;
+    }
+
+    function uploadUpyun(file, elementId) {
+      console.log(file.name);
+      var ext = '.' + file.name.split('.').pop();
+      // console.log(ext);
+
+      var config = {
+        // 空间名称
+        bucket : 'tripc2c-club-title',
+        // 上传请求过期时间
+        expiration : parseInt((new Date().getTime() + 3600000) / 1000),
+        // 尽量不要使用直接传表单 API 的方式，以防泄露造成安全隐患
+        form_api_secret : 'CRKAOsKHGbbCnU+yztBxUT0bYR0='
+      };
+
+      var instance = new Sand(config);
+      var options = {
+        'notify_url' : 'http://upyun.com'
+      };
+      instance.setOptions(options);
+      instance.setElementId(elementId);
+      var d = new Date();
+      var month = d.getMonth() + 1;
+      var filename = '/activity/' + d.getFullYear() + '/' + month + '/' + d.getDate() + '/' + uuid() + ext;
+      console.log(filename);
+      instance.upload(filename);
+
+      return 'https://tripc2c-club-title.b0.upaiyun.com' + filename;
+    };
+
     // with plugin options
 		$("#file").fileinput({
 			'showCaption': false,
@@ -233,7 +271,7 @@
     element2.addEventListener("change",uploadHandle2,false);
     function uploadHandle2() {
       var file_el = document.getElementById('file2').files[0];
-      var imgUrl = uploadUpyun(file_el);
+      var imgUrl = uploadUpyun(file_el,'file2');
       document.getElementById("contour_map_url").value = imgUrl;
     }
 
@@ -241,47 +279,6 @@
 			 //alert('uploaded');
 		});
 
-    function uuid() {
-      var s = [];
-      var hexDigits = "0123456789abcdef";
-      for (var i = 0; i < 36; i++) {
-        s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
-      }
-      s[14] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
-      s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
-      s[8] = s[13] = s[18] = s[23] = "-";
-
-      var uuid = s.join("");
-      return uuid;
-    }
-
-    function uploadUpyun(file) {
-      var ext = '.' + file.name.split('.').pop();
-      console.log(ext);
-
-      var config = {
-        // 空间名称
-        bucket : 'tripc2c-club-title',
-        // 上传请求过期时间
-        expiration : parseInt((new Date().getTime() + 3600000) / 1000),
-        // 尽量不要使用直接传表单 API 的方式，以防泄露造成安全隐患
-        form_api_secret : 'CRKAOsKHGbbCnU+yztBxUT0bYR0='
-      };
-
-      var instance = new Sand(config);
-      var options = {
-        'notify_url' : 'http://upyun.com'
-      };
-      instance.setOptions(options);
-
-      var d = new Date();
-      var month = d.getMonth() + 1;
-      var filename = '/activity/' + d.getFullYear() + '/' + month + '/' + d.getDate() + '/' + uuid() + ext;
-      console.log(filename);
-      instance.upload(filename);
-
-      return 'https://tripc2c-club-title.b0.upaiyun.com' + filename;
-    }
 
     // initialize the validator function
     validator.message['date'] = 'not a real date';

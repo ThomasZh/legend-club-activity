@@ -249,7 +249,7 @@ class ApiCustomerProfileHistoryActivityXHR(tornado.web.RequestHandler):
             order['create_time'] = timestamp_datetime(order['create_time'])
             logging.info("got activity_title %r", order['activity_title'])
             order['activity_begin_time'] = timestamp_datetime(_activity['begin_time'])
-            order['activity_distance'] = _activity['distance']
+            order['activity_distance'] = _activity['mileage']
             order['activity_status'] = _activity['status']
 
             order_fees = []

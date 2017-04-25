@@ -162,10 +162,13 @@
                 inner_html += '</div></div>';
                 inner_html += '<div class="col-xs-12 bottom text-center">';
                 inner_html += '<div class="col-xs-12 col-sm-6 emphasis">';
-                inner_html += '<p class="">L'+ajaxobj[i]._rank+'</p></div>';
+                inner_html += '<p class="">L'+ajaxobj[i].star+'</p></div>';
                 inner_html += '<div class="col-xs-12 col-sm-6 emphasis">';
-                inner_html += '<button type="button" class="btn btn-success btn-xs">';
-                inner_html += '<i class="fa fa-tags"> 领队 会员 非会员 </i> </button>';
+                if(ajaxobj[i]._rank == "100"){
+                  inner_html += '<button type="button" class="btn btn-danger btn-xs"><i class="fa fa-tags"> 领队 </i> </button>';
+                }else{
+                  inner_html += '<button type="button" class="btn btn-success btn-xs"><i class="fa fa-tags"> 会员 </i> </button>';
+                }
                 inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ajaxobj[i].account_id+'" type="button" class="btn btn-primary btn-xs" >';
                 inner_html += '<i class="fa fa-user"></i> 查看详情 </a>';
                 inner_html += '</div></div></div></div>';

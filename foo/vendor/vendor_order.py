@@ -223,6 +223,7 @@ class VendorOrderInfoHandler(AuthorizationHandler):
         order['amount'] = float(order['amount']) / 100
         order['points_used'] = float(order['points_used']) / 100
         order_index['actual_payment'] = float(order_index['actual_payment']) / 100
+        order_index['amount'] = float(order_index['amount']) / 100
 
         params = {"filter":"order", "order_id":order_id, "page":1, "limit":20}
         url = url_concat(API_DOMAIN + "/api/applies", params)

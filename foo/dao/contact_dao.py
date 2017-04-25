@@ -53,7 +53,7 @@ class contact_dao(singleton):
 
     def query_by_account(self, vendor_id, account_id):
         cursor = self.__contact_collection.find({
-                "vendor_id":vendor_id,
+                "club_id":vendor_id,
                 "account_id":account_id})
         array = []
         for i in cursor:
@@ -63,7 +63,7 @@ class contact_dao(singleton):
 
     def query_contact(self, vendor_id, account_id, name):
         cursor = self.__contact_collection.find({
-                "vendor_id":vendor_id,
+                "club_id":vendor_id,
                 "account_id":account_id,
                 "name":name})
         data = None

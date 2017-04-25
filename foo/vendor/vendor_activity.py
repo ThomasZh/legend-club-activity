@@ -243,37 +243,38 @@ class VendorActivityLeagueShareHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
 
         ops = self.get_ops_info()
+        logging.info("got ops %r in uri", ops)
         access_token = self.get_access_token()
+        logging.info("got access_token %r in uri", access_token)
 
         # activitys = activity_dao.activity_dao().query_by_open()
-        activitys = activity_dao.activity_dao().query_by_open_status_notme(ACTIVITY_STATUS_RECRUIT,vendor_id)
-        activitys_share = activity_share_dao.activity_share_dao().query_by_vendor(vendor_id)
-
-        # 加share属性，区别一个自己是否已经分享了别人开放的这个活动
-        for activity in activitys:
-            # 取俱乐部名称
-            club_id = activity['vendor_id']
-            club = get_club_info(access_token,club_id)
-            if club:
-                activity['club'] = club['name']
-            else:
-                activity['club'] = ""
-            activity['share'] = False
-
-            activity['begin_time'] = timestamp_date(float(activity['begin_time'])) # timestamp -> %m/%d/%Y
-
-            for activity_share in activitys_share:
-                if(activity['_id']==activity_share['activity']):
-                    activity['share'] = True
-                    break
+        # activitys = activity_dao.activity_dao().query_by_open_status_notme(ACTIVITY_STATUS_RECRUIT,vendor_id)
+        # activitys_share = activity_share_dao.activity_share_dao().query_by_vendor(vendor_id)
+        #
+        # # 加share属性，区别一个自己是否已经分享了别人开放的这个活动
+        # for activity in activitys:
+        #     # 取俱乐部名称
+        #     club_id = activity['vendor_id']
+        #     club = get_club_info(access_token,club_id)
+        #     if club:
+        #         activity['club'] = club['name']
+        #     else:
+        #         activity['club'] = ""
+        #     activity['share'] = False
+        #
+        #     activity['begin_time'] = timestamp_date(float(activity['begin_time'])) # timestamp -> %m/%d/%Y
+        #
+        #     for activity_share in activitys_share:
+        #         if(activity['_id']==activity_share['activity']):
+        #             activity['share'] = True
+        #             break
 
         counter = self.get_counter(vendor_id)
         self.render('vendor/activity-league-share.html',
                 vendor_id=vendor_id,
                 access_token=access_token,
                 ops=ops,
-                counter=counter,
-                activitys=activitys)
+                counter=counter)
 
 
 class VendorActivityShareSetHandler(AuthorizationHandler):
@@ -313,7 +314,7 @@ class VendorActivityShareCancelHandler(AuthorizationHandler):
         self.redirect('/vendors/' + vendor_id + '/activitys/league/share')
 
 
-# 我会员所见所有活动
+# 我分销的活动
 class VendorActivityLeagueRecruitHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
@@ -322,52 +323,51 @@ class VendorActivityLeagueRecruitHandler(AuthorizationHandler):
         ops = self.get_ops_info()
         access_token = self.get_access_token()
 
-        categorys = category_dao.category_dao().query_by_vendor(vendor_id)
-
-        # 查询自己在招募中的活动
-        activitys_me = activity_dao.activity_dao().query_by_vendor_status(vendor_id,ACTIVITY_STATUS_RECRUIT)
-        activitys_share = activity_share_dao.activity_share_dao().query_by_vendor(vendor_id)
-
-        # 处理一下自己活动
-        for activity in activitys_me:
-            # club = club_dao.club_dao().query(activity['vendor_id'])
-            activity['share'] = False
-            activity['begin_time'] = timestamp_date(float(activity['begin_time'])) # timestamp -> %m/%d/%Y
-            activity['club'] = ops['club_name']
-
-        # 分享的活动中如果不是在招募中了就删除掉
-        for share in activitys_share:
-            _id = share['activity']
-            act = activity_dao.activity_dao().query(_id)
-            # 分享了别人俱乐部招募中的活动
-            if act['status'] != ACTIVITY_STATUS_RECRUIT:
-                logging.info("===========%r",act['status'])
-                # activitys_share.remove(share)
-                activity_share_dao.activity_share_dao().delete(share['_id'])
-
-        # 重新查询分享了的活动
-        activitys_share_new = activity_share_dao.activity_share_dao().query_by_vendor(vendor_id)
-        for share in activitys_share_new:
-            _id = share['activity']
-            act = activity_dao.activity_dao().query(_id)
-            share['begin_time'] = timestamp_date(float(act['begin_time'])) # timestamp -> %m/%d/%Y
-            # 取俱乐部名称
-            club_id = share['club']
-            club = get_club_info(access_token,club_id)
-            if club:
-                share['club'] = club['name']
-            else:
-                share['club'] = ""
-
-        activitys = activitys_me + activitys_share_new
+        # categorys = category_dao.category_dao().query_by_vendor(vendor_id)
+        #
+        # # 查询自己在招募中的活动
+        # activitys_me = activity_dao.activity_dao().query_by_vendor_status(vendor_id,ACTIVITY_STATUS_RECRUIT)
+        # activitys_share = activity_share_dao.activity_share_dao().query_by_vendor(vendor_id)
+        #
+        # # 处理一下自己活动
+        # for activity in activitys_me:
+        #     # club = club_dao.club_dao().query(activity['vendor_id'])
+        #     activity['share'] = False
+        #     activity['begin_time'] = timestamp_date(float(activity['begin_time'])) # timestamp -> %m/%d/%Y
+        #     activity['club'] = ops['club_name']
+        #
+        # # 分享的活动中如果不是在招募中了就删除掉
+        # for share in activitys_share:
+        #     _id = share['activity']
+        #     act = activity_dao.activity_dao().query(_id)
+        #     # 分享了别人俱乐部招募中的活动
+        #     if act['status'] != ACTIVITY_STATUS_RECRUIT:
+        #         logging.info("===========%r",act['status'])
+        #         # activitys_share.remove(share)
+        #         activity_share_dao.activity_share_dao().delete(share['_id'])
+        #
+        # # 重新查询分享了的活动
+        # activitys_share_new = activity_share_dao.activity_share_dao().query_by_vendor(vendor_id)
+        # for share in activitys_share_new:
+        #     _id = share['activity']
+        #     act = activity_dao.activity_dao().query(_id)
+        #     share['begin_time'] = timestamp_date(float(act['begin_time'])) # timestamp -> %m/%d/%Y
+        #     # 取俱乐部名称
+        #     club_id = share['club']
+        #     club = get_club_info(access_token,club_id)
+        #     if club:
+        #         share['club'] = club['name']
+        #     else:
+        #         share['club'] = ""
+        #
+        # activitys = activitys_me + activitys_share_new
 
         counter = self.get_counter(vendor_id)
         self.render('vendor/activity-recruit-all.html',
                 vendor_id=vendor_id,
                 access_token=access_token,
                 ops=ops,
-                counter=counter,
-                activitys=activitys)
+                counter=counter)
 
 
 #查看别人分享活动的招募帖 VendorActivityLeagueDemoHandler
@@ -610,7 +610,7 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
         # create cretificate
         json = {"_id":_activity_id,
                 "create_time":_timestamp, "last_update_time":_timestamp,
-                "distance":0, "hours":0, "height":0, "slope_length":0, "speed":0,
+                "mileage":0, "hours":0, "height":0, "slope_length":0, "speed":0,
                 "road_map_url":"", "contour_map_url":""}
         cret_template_dao.cret_template_dao().create(json)
 
@@ -733,6 +733,7 @@ class VendorActivityDetailStep1Handler(AuthorizationHandler):
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         cret_template = cret_template_dao.cret_template_dao().query(activity_id)
         bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
+
         try:
             bonus_template['activity_shared']
         except:
@@ -741,6 +742,14 @@ class VendorActivityDetailStep1Handler(AuthorizationHandler):
             bonus_template['cret_shared']
         except:
             bonus_template['cret_shared'] = 0
+        try:
+            cret_template['mileage']
+        except:
+            cret_template['mileage'] = 0
+        try:
+            activity['private']
+        except:
+            activity['private'] = 0
         bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
 
         counter = self.get_counter(vendor_id)
@@ -896,6 +905,7 @@ class VendorActivityDetailStep3Handler(AuthorizationHandler):
         # activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         cret_template = cret_template_dao.cret_template_dao().query(activity_id)
+        logging.info("got cret_template %r in uri", cret_template)
         bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
         bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
@@ -1391,7 +1401,7 @@ class VendorActivityActionCompleteHandler(AuthorizationHandler):
                 json = {"_id":_cret_id, "vendor_id":vendor_id,
                         "create_time":_timestamp, "review":False,
                         "activity_id":activity_id, "account_id":order['account_id'], "vendor_id":vendor_id,
-                        "distance":_cert_template['distance'],
+                        "mileage":_cert_template['mileage'],
                         "hours":_cert_template['hours'], "height":_cert_template['height'],
                         "speed":_cert_template['speed'], "road_map_url":_cert_template['road_map_url'],
                         "contour_map_url":_cert_template['contour_map_url']}
@@ -1444,7 +1454,7 @@ class VendorActivityActionCloneHandler(AuthorizationHandler):
                 "subtitle":activity['subtitle'],
                 "hidden":False,"cash_only":False,
                 "begin_time":timestamp, "end_time":timestamp, "apply_end_time":timestamp,
-                "distance":activity['distance'],
+                "mileage":activity['mileage'],
                 "strength":activity['strength'],
                 "scenery":activity['scenery'],
                 "road_info":activity['road_info'],
@@ -1493,7 +1503,7 @@ class VendorActivityActionCloneHandler(AuthorizationHandler):
 
         _json = {"_id":new_activity_id,
                 "create_time":timestamp, "last_update_time":timestamp,
-                "distance":cret_template['distance'],
+                "mileage":cret_template['mileage'],
                 "hours":cret_template['hours'],
                 "height":cret_template['height'],
                 "slope_length":cret_template['slope_length'],
