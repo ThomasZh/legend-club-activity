@@ -170,7 +170,7 @@
 
       function gotoPage(pageNum) {
           $.get("http://7x24hs.com/api/activities?filter=club&club_id={{ vendor_id }}&_status=30&page="+pageNum+"&limit="+limit+"",function(data,status){
-                console.log(data);
+                // console.log(data);
                 data_obj = JSON.parse(data);
                 data = data_obj.rs;
                 currentPage = pageNum;

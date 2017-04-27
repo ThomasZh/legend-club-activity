@@ -331,9 +331,10 @@
   <script>
 
       var limit = 8;//每页显示数
-      var currentPage;//当前页
-      var point_currentPage;//当前页
-      var total_page;//总页数
+      var currentPage;//订单当前页
+      var point_currentPage;//积分当前页
+      var total_page;//订单总页数
+      var point_total_page;//积分总页数
 
       function gotoPage(pageNum) {
         currentPage = pageNum;
@@ -408,10 +409,10 @@
           dataType: "json",
           contentType: 'application/json',
           success: function(data, status, xhr) {
-              console.log(data);
+              // console.log(data);
           var ajaxobj = data.data;
-              total_page = data.total_page;//总页
-              $("#point_total_page").html(total_page);
+              point_total_page = data.total_page;//总页
+              $("#point_total_page").html(point_total_page);
           $('#point_tbody').html("");
           for (var i in ajaxobj) {
             var inner_html = '<tr><td>#</td>';
@@ -439,8 +440,8 @@
             pageNext = parseInt((point_currentPage-1)/5) + 1;
             start = (pageNext-1)*5+1;
             end = pageNext*5;
-            if(end > total_page){
-              end = total_page;
+            if(end > point_total_page){
+              end = point_total_page;
             }
             $(".point_pageBox").html("");
             for (var k=start;k<=end;k++){
@@ -467,7 +468,6 @@
           });
           $("#next").on("click",function(){
               if(currentPage>=total_page){
-
               }else{
                     gotoPage(++currentPage);
               }
@@ -484,7 +484,7 @@
               }
           });
           $("#point_next").on("click",function(){
-              if(point_currentPage>=total_page){
+              if(point_currentPage>=point_total_page){
 
               }else{
                     query(++point_currentPage);
