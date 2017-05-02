@@ -202,6 +202,7 @@ class VendorOrderInfoHandler(AuthorizationHandler):
         order_index = self.get_order_index(order_id)
         logging.info("got order_index %r in uri", order_index)
         order_index['create_time'] = timestamp_datetime(order_index['create_time'])
+        order_index['booking_time'] = timestamp_datetime(order_index['booking_time'])
         order = self.get_symbol_object(order_id)
 
         for base_fee in order['base_fees']:

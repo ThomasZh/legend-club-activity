@@ -81,6 +81,7 @@ class ApiOrdersXHR(AuthorizationHandler):
         for order in orders:
             # 下单时间，timestamp -> %m月%d 星期%w
             order['create_time'] = timestamp_datetime(float(order['create_time']))
+            order['booking_time'] = timestamp_datetime(float(order['booking_time']))
             # 合计金额
             order['amount'] = float(order['amount']) / 100
             order['actual_payment'] = float(order['actual_payment']) / 100
@@ -115,6 +116,7 @@ class ApiActivityOrdersXHR(AuthorizationHandler):
         for order in orders:
             # 下单时间，timestamp -> %m月%d 星期%w
             order['create_time'] = timestamp_datetime(float(order['create_time']))
+            order['booking_time'] = timestamp_datetime(float(order['booking_time']))
             # 合计金额
             order['amount'] = float(order['amount']) / 100
             order['actual_payment'] = float(order['actual_payment']) / 100

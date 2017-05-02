@@ -125,7 +125,8 @@
                         <th>会员</th>
                         <th>下单金额</th>
                         <th>支付金额</th>
-                        <th>日期</th>
+                        <th>下单时间</th>
+                        <th>交付日期</th>
                         <th>状态</th>
                         <th class=" no-link last">
                           <span class="nobr">操作</span>
@@ -255,6 +256,10 @@
 
                   inner_html += '<td class=" ">';
                     inner_html += pageData[i].create_time;
+                  inner_html += '</td>';
+
+                  inner_html += '<td class=" ">';
+                    inner_html += pageData[i].booking_time;
                   inner_html += '</td>';
 
                   inner_html += '<td class=" ">';

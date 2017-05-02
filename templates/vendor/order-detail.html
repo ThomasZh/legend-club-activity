@@ -98,7 +98,8 @@
                         <th>购买数量</th>
                         <th>购买详情</th>
                         <th>支付总额</th>
-                        <th>日期</th>
+                        <th>下单时间</th>
+                        <th>交付日期</th>
                         <th>状态</th>
                       </tr>
                     </thead>
@@ -154,6 +155,7 @@
                           {% end %}
                         </td>
                         <td class=" ">{{ order_index['create_time'] }}</td>
+                        <td class=" ">{{ order_index['booking_time'] }}</td>
                         {% if order_index['pay_status'] == 20 %}
                         <td>
                           <a href="#" class="btn btn-warning btn-xs"> 待付款 </a>
