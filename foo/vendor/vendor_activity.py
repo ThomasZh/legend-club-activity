@@ -34,6 +34,7 @@ from tornado.httpclient import HTTPClient
 from tornado.httputil import url_concat
 
 from comm import *
+from global_const import *
 
 from dao import budge_num_dao
 from dao import category_dao
@@ -50,8 +51,6 @@ from dao import trip_router_dao
 from dao import evaluation_dao
 from dao import activity_share_dao
 from dao import vendor_wx_dao
-
-from global_const import *
 
 
 # /vendors/<string:vendor_id>/activitys/draft
@@ -79,6 +78,7 @@ class VendorActivityDraftHandler(AuthorizationHandler):
                 access_token=access_token,
                 vendor_id=vendor_id,
                 ops=ops,
+                API_DOMAIN=API_DOMAIN,
                 counter=counter)
 
 
@@ -107,6 +107,7 @@ class VendorActivityPopHandler(AuthorizationHandler):
                 vendor_id=vendor_id,
                 access_token=access_token,
                 ops=ops,
+                API_DOMAIN=API_DOMAIN,
                 counter=counter,
                 activitys=activitys)
 
@@ -136,6 +137,7 @@ class VendorActivityDoingHandler(AuthorizationHandler):
                 vendor_id=vendor_id,
                 access_token=access_token,
                 ops=ops,
+                API_DOMAIN=API_DOMAIN,
                 counter=counter,
                 activitys=activitys)
 
@@ -165,6 +167,7 @@ class VendorActivityRecruitHandler(AuthorizationHandler):
                 vendor_id=vendor_id,
                 access_token=access_token,
                 ops=ops,
+                API_DOMAIN=API_DOMAIN,
                 counter=counter,
                 activitys=activitys)
 
@@ -201,6 +204,7 @@ class VendorActivityRecruitNotHiddenHandler(AuthorizationHandler):
                 vendor_id=vendor_id,
                 access_token=access_token,
                 ops=ops,
+                API_DOMAIN=API_DOMAIN,
                 counter=counter,
                 activitys=activitys)
 
@@ -274,6 +278,7 @@ class VendorActivityLeagueShareHandler(AuthorizationHandler):
                 vendor_id=vendor_id,
                 access_token=access_token,
                 ops=ops,
+                API_DOMAIN=API_DOMAIN,
                 counter=counter)
 
 
@@ -367,6 +372,7 @@ class VendorActivityLeagueRecruitHandler(AuthorizationHandler):
                 vendor_id=vendor_id,
                 access_token=access_token,
                 ops=ops,
+                API_DOMAIN=API_DOMAIN,
                 counter=counter)
 
 
@@ -427,6 +433,7 @@ class VendorActivityLeagueDemoHandler(AuthorizationHandler):
                     vendor_id=vendor_id,
                     access_token=access_token,
                     ops=ops,
+                    API_DOMAIN=API_DOMAIN,
                     counter=counter,
                     bonus_template=_bonus_template,
                     article=article,
@@ -458,6 +465,7 @@ class VendorActivityCanceledHandler(AuthorizationHandler):
                 vendor_id=vendor_id,
                 access_token=access_token,
                 ops=ops,
+                API_DOMAIN=API_DOMAIN,
                 counter=counter,
                 activitys=activitys)
 
@@ -487,6 +495,7 @@ class VendorActivityCompletedHandler(AuthorizationHandler):
                 vendor_id=vendor_id,
                 access_token=access_token,
                 ops=ops,
+                API_DOMAIN=API_DOMAIN,
                 counter=counter,
                 activitys=activitys)
 

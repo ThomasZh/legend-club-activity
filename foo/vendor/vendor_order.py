@@ -63,6 +63,7 @@ class VendorOrdersMeAllHandler(AuthorizationHandler):
         self.render('vendor/orders-me-all.html',
                 vendor_id=vendor_id,
                 ops=ops,
+                API_DOMAIN=API_DOMAIN,
                 access_token=access_token,
                 counter=counter)
 
@@ -79,6 +80,7 @@ class VendorOrdersMeNoneHandler(AuthorizationHandler):
         self.render('vendor/orders-me-none.html',
                 vendor_id=vendor_id,
                 ops=ops,
+                API_DOMAIN=API_DOMAIN,
                 access_token=access_token,
                 counter=counter)
 
@@ -97,6 +99,7 @@ class VendorOrdersMeOtherHandler(AuthorizationHandler):
                 vendor_id=vendor_id,
                 club_id=club_id,
                 ops=ops,
+                API_DOMAIN=API_DOMAIN,
                 access_token=access_token,
                 counter=counter)
 
@@ -113,6 +116,7 @@ class VendorOrdersMeOthersHandler(AuthorizationHandler):
         self.render('vendor/orders-me-others.html',
                 vendor_id=vendor_id,
                 ops=ops,
+                API_DOMAIN=API_DOMAIN,
                 access_token=access_token,
                 counter=counter)
 
@@ -131,6 +135,7 @@ class VendorOrdersOtherMeHandler(AuthorizationHandler):
                 vendor_id=vendor_id,
                 club_id=club_id,
                 ops=ops,
+                API_DOMAIN=API_DOMAIN,
                 access_token=access_token,
                 counter=counter)
 
@@ -147,6 +152,7 @@ class VendorOrdersOthersMeHandler(AuthorizationHandler):
         self.render('vendor/orders-others-me.html',
                 vendor_id=vendor_id,
                 ops=ops,
+                API_DOMAIN=API_DOMAIN,
                 access_token=access_token,
                 counter=counter)
 
@@ -162,6 +168,7 @@ class VendorApplyListHandler(AuthorizationHandler):
         self.render('vendor/applys.html',
                 vendor_id=vendor_id,
                 ops=ops,
+                API_DOMAIN=API_DOMAIN,
                 access_token=access_token,
                 counter=counter)
 
@@ -185,6 +192,7 @@ class VendorVoucherOrderListHandler(AuthorizationHandler):
         self.render('vendor/voucher-orders.html',
                 vendor_id=vendor_id,
                 ops=ops,
+                API_DOMAIN=API_DOMAIN,
                 access_token=access_token,
                 counter=counter,
                 voucher_orders= _array)

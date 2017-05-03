@@ -132,7 +132,7 @@
 
         $.ajax({
           type: "DELETE",
-          url: "http://7x24hs.com/api/activities/"+id+"/popular",
+          url: "{{ API_DOMAIN }}/api/activities/"+id+"/popular",
           dataType: "json",
           headers: {"Authorization":"Bearer {{access_token}}"},
           contentType: 'application/json',
@@ -159,7 +159,7 @@
           var total_page = 0;//总页数
 
       function gotoPage(pageNum) {
-          $.get("http://7x24hs.com/api/activities?filter=club&club_id={{ vendor_id }}&_status=20&popular=1&page="+pageNum+"&limit="+limit+"",function(data,status){
+          $.get("{{ API_DOMAIN }}/api/activities?filter=club&club_id={{ vendor_id }}&_status=20&popular=1&page="+pageNum+"&limit="+limit+"",function(data,status){
                 // console.log(data);
                 data_obj = JSON.parse(data);
                 data = data_obj.rs;

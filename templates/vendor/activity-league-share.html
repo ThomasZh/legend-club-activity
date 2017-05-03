@@ -126,7 +126,7 @@
 
         $.ajax({
           type: "DELETE",
-          url: "http://7x24hs.com/api/distributors/{{ vendor_id }}/items/"+id+"/takeon",
+          url: "{{ API_DOMAIN }}/api/distributors/{{ vendor_id }}/items/"+id+"/takeon",
           dataType: "json",
           headers: {"Authorization":"Bearer {{access_token}}"},
           contentType: 'application/json',
@@ -152,7 +152,7 @@
         console.log(_json);
         $.ajax({
           type: "POST",
-          url: "http://7x24hs.com/api/distributors/{{ vendor_id }}/items/"+id+"/takeon",
+          url: "{{ API_DOMAIN }}/api/distributors/{{ vendor_id }}/items/"+id+"/takeon",
           dataType: "json",
           data: _json,
           headers: {"Authorization":"Bearer {{ access_token }}"},
@@ -181,7 +181,7 @@
       function gotoPage(pageNum) {
         $.ajax({
           type: "GET",
-          url: "http://7x24hs.com/api/leagues/{{ ops['league_id'] }}/items?_status=20&private=0&page="+pageNum+"&limit="+limit,
+          url: "{{ API_DOMAIN }}/api/leagues/{{ ops['league_id'] }}/items?_status=20&private=0&page="+pageNum+"&limit="+limit,
           headers: {
             "Authorization": "Bearer {{ access_token }}"
           },
