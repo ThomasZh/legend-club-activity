@@ -280,7 +280,9 @@
                         <th style="width: 1%">#</th>
                         <th style="width: 20%">来源</th>
                         <th style="width: 20%">用途</th>
+                        <th>积分(操作前)</th>
                         <th>积分变化</th>
+                        <th>积分(操作后)</th>
                         <th style="width: 20%">日期</th>
                       </tr>
                     </thead>
@@ -425,11 +427,14 @@
             }
             inner_html += '</td>';
             inner_html += '<td>'+ajaxobj[i].action+'</td>';
+
+            inner_html += '<td> '+ajaxobj[i].balance_before+'</td>';
             if(ajaxobj[i].points > 0){
               inner_html += '<td>   +'+ajaxobj[i].points+'</td>';
             }else{
               inner_html += '<td> '+ajaxobj[i].points+'</td>';
             }
+            inner_html += '<td> '+ajaxobj[i].balance_after+'</td>';
 
             inner_html += '<td>'+ajaxobj[i].create_time+'</td>';
             inner_html += '</tr>';
