@@ -216,6 +216,8 @@ class VendorOrderInfoHandler(AuthorizationHandler):
         for base_fee in order['base_fees']:
             # 价格转换成元
             order['activity_amount'] = float(base_fee['fee']) / 100
+        if not order.has_key('activity_amount'):
+            order['activity_amount'] = 0
 
         for _voucher in order['vouchers']:
             # 价格转换成元

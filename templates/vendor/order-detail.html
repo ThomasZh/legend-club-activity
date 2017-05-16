@@ -134,8 +134,8 @@
                           <a href="/vendors/{{ vendor_id }}/customers/{{ order_index['account_id'] }}">{{ order_index['nickname'] }}</a>
                           <br />
                         </td>
-                        <td>{{order['quantity']}}</td>
-                        <td>活动费用: {{order['activity_amount']}}元<br />
+                        <td>{{ order['quantity'] }}</td>
+                        <td>活动费用: {{ order['activity_amount'] }}元<br />
                           {% for fee in order['ext_fees'] %}
                             {{ fee['name'] }}: {{ fee['fee'] }}元<br />
                           {% end %}

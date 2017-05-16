@@ -825,11 +825,11 @@ class VendorActivityDetailStep1Handler(AuthorizationHandler):
             "triprouter_id":_triprouter,
             "begin_time":_begin_time, "end_time":_end_time, "apply_end_time":_apply_end_time,
             "mileage":mileage,
-            "amount":0,
+            # "amount":0,
             "private":private,
             "cash_only":cash_only,
             "strength":_strength, "scenery":_scenery, "road_info":_road_info, "kickoff":_kickoff,
-            "ext_fee_template":[], "base_fee_template":[],
+            # "ext_fee_template":[], "base_fee_template":[],
             "member_min":_member_min, "member_max":_member_max,
             "notes":''
         }
