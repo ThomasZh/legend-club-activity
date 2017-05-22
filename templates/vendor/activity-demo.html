@@ -18,9 +18,9 @@ body {
 }
 </style>
 
-<body ontouchstart class="padding-bottom-70">
+<body ontouchstart class="padding-bottom-70" style="margin:auto;">
   <div class="banner">
-    <img src="{{activity['bk_img_url']}}" />
+    <img src="{{activity['img']}}" />
     {% set phases = {'0':'招募中','1':'已成行','2':'已满员','3':'已结束'} %}
     {% set themes = {'0':'green','1':'orange','2':'red','3':'gray'} %}
     <div class="bookmarks {{themes[activity['phase']]}}">{{phases[activity['phase']]}}</div>
@@ -53,7 +53,7 @@ body {
 			    <div class="ui-col ui-col-2">
 						<ul >
 							<li>
-								<span >骑行里程：{{activity['distance']}}公里</span>
+								<span >骑行里程：{{activity['mileage']}}公里</span>
 							</li>
 							<li>
 								<span >强度：{{activity['strength']}}</span>

@@ -277,7 +277,8 @@ class VendorSupplierBalanceHandler(AuthorizationHandler):
                 access_token=access_token,
                 vendor_id=vendor_id,
                 ops=ops,
-                counter=counter)
+                counter=counter,
+                api_domain = API_DOMAIN)
 
 
 class VendorResellerBalanceHandler(AuthorizationHandler):
@@ -293,4 +294,43 @@ class VendorResellerBalanceHandler(AuthorizationHandler):
                 access_token=access_token,
                 vendor_id=vendor_id,
                 ops=ops,
-                counter=counter)
+                counter=counter,
+                api_domain = API_DOMAIN)
+
+
+class VendorSupplierBalanceDetailsHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id, account_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+        logging.info("got account_id %r in uri", account_id)
+
+        ops = self.get_ops_info()
+        access_token = self.get_access_token()
+
+        counter = self.get_counter(vendor_id)
+        self.render('vendor/supplier-balance-details.html',
+                access_token=access_token,
+                vendor_id=vendor_id,
+                account_id=account_id,
+                ops=ops,
+                counter=counter,
+                api_domain = API_DOMAIN)
+
+
+class VendorResellerBalanceDetailsHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id, org_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+        logging.info("got org_id %r in uri", org_id)
+
+        ops = self.get_ops_info()
+        access_token = self.get_access_token()
+
+        counter = self.get_counter(vendor_id)
+        self.render('vendor/reseller-balance-details.html',
+                access_token=access_token,
+                vendor_id=vendor_id,
+                org_id=org_id,
+                ops=ops,
+                counter=counter,
+                api_domain = API_DOMAIN)

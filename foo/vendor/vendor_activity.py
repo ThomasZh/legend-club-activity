@@ -384,7 +384,9 @@ class VendorActivityLeagueDemoHandler(AuthorizationHandler):
 
         ops = self.get_ops_info()
         access_token = self.get_access_token()
-        _activity = activity_dao.activity_dao().query(activity_id)
+        # _activity = activity_dao.activity_dao().query(activity_id)
+        _activity = self.get_activity(activity_id)
+        logging.info("got _activity %r", _activity)
         # 按报名状况查询每个活动的当前状态：
         # 0: 报名中, 1: 已成行, 2: 已满员, 3: 已结束
         #
@@ -425,7 +427,7 @@ class VendorActivityLeagueDemoHandler(AuthorizationHandler):
 
         article = self.get_article(_activity['_id'])
         if not article:
-            article = {'_id':_activity['_id'], 'title':_activity['title'], 'subtitle':_activity['subtitle'], 'img':_activity['bk_img_url'],'paragraphs':''}
+            article = {'_id':_activity['_id'], 'title':_activity['title'], 'subtitle':_activity['subtitle'], 'img':_activity['img'],'paragraphs':''}
             self.create_article(article)
 
         counter = self.get_counter(vendor_id)

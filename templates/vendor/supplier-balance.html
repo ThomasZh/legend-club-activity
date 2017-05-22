@@ -81,7 +81,7 @@
                 </div>
                 <div class="x_content">
 
-                  <p>我的分销商积分详情</p>
+                  <p>我的分销商积分列表</p>
 
                   <!-- start project list -->
                   <table class="table table-striped projects">
@@ -89,7 +89,8 @@
                       <tr>
                         <th style="width: 1%">#</th>
                         <th style="width: 16%">分销商名称</th>
-                        <th style="width: 16%">积分</th>
+                        <th style="width: 16%">剩余积分</th>
+                        <th style="width: 16%">累计积分</th>
                         <th>操作</th>
                       </tr>
                     </thead>
@@ -149,25 +150,26 @@
         currentPage = pageNum;
         $.ajax({
           type: "GET",
-          url: "/bf/api/vendors/{{ vendor_id }}/customers/orders?page="+pageNum+"&limit="+limit,
+          url: "{{ api_domain }}/api/points/clubs/{{ vendor_id }}/distributors?page="+pageNum+"&limit="+limit,
           headers: {"Authorization": "Bearer {{ access_token }}"},
           dataType: "json",
           contentType: 'application/json',
           success: function(data, status, xhr) {
-              // console.log(data);
-          var ajaxobj = data.data;
-              total_page = data.total_page;//总页
+              // console.log(data.rs);
+          var ajaxobj = data.rs.data;
+              total_page = data.rs.total_page;//总页
               $("#total_page").html(total_page);
           $('#tbody').html("");
           for (var i in ajaxobj) {
             var inner_html = '<tr><td>#</td>';
+            inner_html += '<td>'+ajaxobj[i].account_name + '</td>';
+            inner_html += '<td>'+ajaxobj[i].remaining_points+'</td>';
+            inner_html += '<td>'+ajaxobj[i].accumulated_points+'</td>';
             inner_html += '<td>';
-            inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/'+ajaxobj[i].item_id+'/detail/step1">'+ajaxobj[i].item_name+'</a>';
-            inner_html += '</td>';
-            inner_html += '<td>'+ajaxobj[i].quantity+'</td>';
-            inner_html += '<td>';
-            inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+ajaxobj[i]._id+'" class="btn btn-info btn-xs">';
-            inner_html += '<i class="fa fa-eye"></i> 订单 </a>';
+            inner_html += '<a href="/vendors/{{ vendor_id }}/supplier-details/'+ajaxobj[i].account_id + '" class="btn btn-info btn-xs">';
+            inner_html += '<i class="fa fa-eye"></i> 查看详情 </a><br/>';
+            inner_html += '<a href="#" class="btn btn-warning btn-xs">';
+            inner_html += '<i class="fa fa-eye"></i> 申请提现 </a>';
             inner_html += '</td>';
             inner_html += '</tr>';
 
@@ -192,7 +194,6 @@
 
       $(function(){
           gotoPage("1");
-          query("1");
           $(document).on('click','.pageBox > button',function(){
               var num = $(this).text();
               gotoPage(num);

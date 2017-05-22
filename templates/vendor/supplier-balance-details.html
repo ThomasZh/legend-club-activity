@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>骑无止境 -- 我是分销商</title>
+  <title>骑无止境 -- 我是供销商积分详情</title>
 
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="{{ static_url('weui/lib/weui.css') }}">
@@ -61,7 +61,7 @@
         <div class="">
           <div class="page-title">
             <div class="title_left">
-              <h3>我是分销商</h3>
+              <h3>我是供应商</h3>
             </div>
           </div>
           <div class="clearfix"></div>
@@ -70,7 +70,7 @@
             <div class="col-md-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>我在各供应商下的积分</h2>
+                  <h2>我的分销商积分消费记录</h2>
                   <ul class="nav navbar-right panel_toolbox">
                     <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                     </li>
@@ -81,21 +81,23 @@
                 </div>
                 <div class="x_content">
 
-                  <p>我在各供应商下的积分详情</p>
+                  <p>包含获得与使用的积分详情</p>
 
                   <!-- start project list -->
                   <table class="table table-striped projects">
                     <thead>
                       <tr>
                         <th style="width: 1%">#</th>
-                        <th style="width: 16%">供应商名称</th>
-                        <th style="width: 16%">剩余积分</th>
-                        <th style="width: 16%">累计积分</th>
+                        <th style="width: 20%">来源</th>
+                        <th style="width: 20%">用途</th>
+                        <th>积分(操作前)</th>
+                        <th>积分变化</th>
+                        <th>积分(操作后)</th>
+                        <th style="width: 20%">日期</th>
                         <th>操作</th>
                       </tr>
                     </thead>
                     <tbody id="tbody">
-
                     </tbody>
                   </table>
                   <!-- end project list -->
@@ -110,7 +112,6 @@
                   </div>
 
                 </div>
-
               </div>
             </div>
 
@@ -142,6 +143,10 @@
 
   <script>
 
+      function getLocalTime(nS) { //时间戳转换
+         return new Date(parseInt(nS) * 1000).toLocaleString().replace(/:\d{1,2}$/,' ');
+      };
+
       var limit = 8;//每页显示数
       var currentPage;//订单当前页
       var total_page;//订单总页数
@@ -150,26 +155,32 @@
         currentPage = pageNum;
         $.ajax({
           type: "GET",
-          url: "{{ api_domain }}/api/points/clubs/{{ vendor_id }}/suppliers?page="+pageNum+"&limit="+limit,
+          url: "{{ api_domain }}/api/points?filter=distributor&club_id={{ vendor_id }}&distributor_id={{ account_id }}&page="+pageNum+"&limit="+limit,
           headers: {"Authorization": "Bearer {{ access_token }}"},
           dataType: "json",
           contentType: 'application/json',
           success: function(data, status, xhr) {
-              //  console.log(data.rs);
+              // console.log(data.rs);
           var ajaxobj = data.rs.data;
               total_page = data.rs.total_page;//总页
               $("#total_page").html(total_page);
           $('#tbody').html("");
           for (var i in ajaxobj) {
             var inner_html = '<tr><td>#</td>';
-            inner_html += '<td>'+ajaxobj[i].org_name + '</td>';
-            inner_html += '<td>'+ajaxobj[i].remaining_points+'</td>';
-            inner_html += '<td>'+ajaxobj[i].accumulated_points+'</td>';
+            inner_html += '<td>'+ajaxobj[i].item_name+'</td>';
+            inner_html += '<td>'+ajaxobj[i].action+'</td>';
+            inner_html += '<td> '+ajaxobj[i].balance_before+'</td>';
+            if(ajaxobj[i].points > 0){
+              inner_html += '<td>   +'+ajaxobj[i].points+'</td>';
+            }else{
+              inner_html += '<td> '+ajaxobj[i].points+'</td>';
+            }
+            inner_html += '<td> '+ajaxobj[i].balance_after+'</td>';
+            inner_html += '<td>'+getLocalTime(ajaxobj[i].create_time)+'</td>';
             inner_html += '<td>';
-            inner_html += '<a href="/vendors/{{ vendor_id }}/reseller-details/'+ajaxobj[i].org_id + '" class="btn btn-info btn-xs">';
-            inner_html += '<i class="fa fa-eye"></i> 查看详情 </a><br/>';
-            inner_html += '<a href="#" class="btn btn-warning btn-xs">';
-            inner_html += '<i class="fa fa-eye"></i> 申请提现 </a>';
+            if(ajaxobj[i].order_id != "00000000000000000000000000000000"){
+                inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+ajaxobj[i].order_id+'" class="btn btn-info btn-xs"><i class="fa fa-eye"></i>查看订单</a>';
+            }
             inner_html += '</td>';
             inner_html += '</tr>';
 
