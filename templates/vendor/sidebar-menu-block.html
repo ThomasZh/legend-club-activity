@@ -55,23 +55,29 @@
           <li><a href="/vendors/{{ vendor_id }}/order/vouchers"> 代金券订单 <span class="badge bg-green">{{ counter['voucher_order'] }}</span></a>
           </li>
           {% else %}
-          <li><a href="/vendors/{{ vendor_id }}/order/vouchers"> 代金券订单 </a>
+          <!-- <li><a href="/vendors/{{ vendor_id }}/order/vouchers"> 代金券订单 </a> -->
           </li>
           {% end %}
         </ul>
+        </li>
+        <li><a><i class="fa fa-calculator"></i> 联盟结算 <span class="fa fa-chevron-down"></span></a>
+          <ul class="nav child_menu" style="display: none">
+            <li><a href="/vendors/{{ vendor_id }}/supplier-balance">我是供应商</a></li>
+            <li><a href="/vendors/{{ vendor_id }}/reseller-balance">我是分销商</a></li>
+          </ul>
         </li>
         <li><a><i class="fa fa-male"></i> 会员 <span class="fa fa-chevron-down"></span></a>
           <ul class="nav child_menu" style="display: none">
             <li><a href="/vendors/{{ vendor_id }}/customers">会员</a></li>
           </ul>
         </li>
-        <li><a><i class="fa fa-rmb"></i> 代金券 <span class="fa fa-chevron-down"></span></a>
+        <!-- <li><a><i class="fa fa-rmb"></i> 代金券 <span class="fa fa-chevron-down"></span></a>
           <ul class="nav child_menu" style="display: none">
             <li><a href="/vendors/{{ vendor_id }}/vouchers?status=0">未分配</a></li>
             <li><a href="/vendors/{{ vendor_id }}/vouchers?status=1">已分配, 未使用</a></li>
             <li><a href="/vendors/{{ vendor_id }}/vouchers?status=2">已分配, 已使用</a></li>
           </ul>
-        </li>
+        </li> -->
         <li><a><i class="fa fa-gear"></i> 配置 <span class="fa fa-chevron-down"></span></a>
           <ul class="nav child_menu" style="display: none">
             <li><a href="/vendors/{{ vendor_id }}/setup/task">任务</a></li>

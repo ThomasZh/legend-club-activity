@@ -165,7 +165,7 @@
 
       function gotoPage(pageNum) {
           $.get("{{ API_DOMAIN }}/api/activities?filter=club&club_id={{ vendor_id }}&_status=5&page="+pageNum+"&limit="+limit+"",function(data,status){
-                // console.log(data);
+                console.log(data);
                 data_obj = JSON.parse(data);
                 data = data_obj.rs;
                 currentPage = pageNum;

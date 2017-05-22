@@ -216,8 +216,6 @@ class VendorOrderInfoHandler(AuthorizationHandler):
         for base_fee in order['base_fees']:
             # 价格转换成元
             order['activity_amount'] = float(base_fee['fee']) / 100
-        if not order.has_key('activity_amount'):
-            order['activity_amount'] = 0
 
         for _voucher in order['vouchers']:
             # 价格转换成元
@@ -263,3 +261,36 @@ class VendorOrderInfoHandler(AuthorizationHandler):
                 order_index=order_index,
                 order=order,
                 applies=applies)
+
+
+# 结算
+class VendorSupplierBalanceHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        ops = self.get_ops_info()
+        access_token = self.get_access_token()
+
+        counter = self.get_counter(vendor_id)
+        self.render('vendor/supplier-balance.html',
+                access_token=access_token,
+                vendor_id=vendor_id,
+                ops=ops,
+                counter=counter)
+
+
+class VendorResellerBalanceHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        ops = self.get_ops_info()
+        access_token = self.get_access_token()
+
+        counter = self.get_counter(vendor_id)
+        self.render('vendor/reseller-balance.html',
+                access_token=access_token,
+                vendor_id=vendor_id,
+                ops=ops,
+                counter=counter)

@@ -19,7 +19,6 @@ from vendor import vendor_setup
 from vendor import trip_router
 from api import api_category
 from api import api_activity
-from api import api_blog
 from api import api_setup
 from api import api_customer_profile
 from api import api_order
@@ -108,6 +107,10 @@ def map():
         (r"/vendors/([a-z0-9]*)/orders/([a-z0-9]*)", getattr(vendor_order, 'VendorOrderInfoHandler')),
         (r"/vendors/([a-z0-9]*)/applys", getattr(vendor_order, 'VendorApplyListHandler')),
         (r"/vendors/([a-z0-9]*)/order/vouchers", getattr(vendor_order, 'VendorVoucherOrderListHandler')),
+
+        # 结算
+        (r"/vendors/([a-z0-9]*)/supplier-balance", getattr(vendor_order, 'VendorSupplierBalanceHandler')),
+        (r"/vendors/([a-z0-9]*)/reseller-balance", getattr(vendor_order, 'VendorResellerBalanceHandler')),
 
         # customer profile
         (r"/vendors/([a-z0-9]*)/customers", getattr(vendor_customer, 'VendorCustomerListHandler')),
