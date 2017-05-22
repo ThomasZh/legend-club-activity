@@ -216,8 +216,8 @@
               for (var i in ajaxobj) {
                 var inner_html = '<tr class="even pointer">';
                   inner_html += '<td class="a-center">';
-                  if (pageData[i].check_status == '0')
-                    inner_html += '<input type="checkbox" class="tableflat" value="'+pageData[i]._id+'" onclick="javascript:OnReviewOrder(this);">';
+                  if (ajaxobj[i].check_status == '0')
+                    inner_html += '<input type="checkbox" class="tableflat" value="'+ajaxobj[i]._id+'" onclick="javascript:OnReviewOrder(this);">';
                   else
                     inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
                   inner_html += '</td>';
@@ -260,7 +260,7 @@
                   inner_html += '</td>';
 
                   inner_html += '<td class=" ">';
-                    inner_html += pageData[i].booking_time;
+                    inner_html += ajaxobj[i].booking_time;
                   inner_html += '</td>';
 
                   inner_html += '<td class=" ">';
