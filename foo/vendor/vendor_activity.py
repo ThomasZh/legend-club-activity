@@ -735,6 +735,7 @@ class VendorActivityDetailStep1Handler(AuthorizationHandler):
         access_token = self.get_access_token()
 
         activity = self.get_activity(activity_id)
+        logging.info("got activity %r", activity)
         # _activity = activity_dao.activity_dao().query(activity_id)
         activity['begin_time'] = timestamp_date(float(activity['begin_time'])) # timestamp -> %m/%d/%Y
         activity['end_time'] = timestamp_date(float(activity['end_time'])) # timestamp -> %m/%d/%Y

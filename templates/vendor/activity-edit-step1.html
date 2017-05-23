@@ -11,9 +11,9 @@
   <title>骑无止境</title>
 
   <!-- Bootstrap core CSS -->
-
+  <link rel="stylesheet" href="{{ static_url('jquery-weui/lib/weui.min.css') }}">
+  <link rel="stylesheet" href="{{ static_url('jquery-weui/css/jquery-weui.min.css') }}">
   <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
-
   <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
 
@@ -401,16 +401,8 @@
     </div>
 
   </div>
-
-  <div id="custom_notifications" class="custom-notifications dsp_none">
-    <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
-    </ul>
-    <div class="clearfix"></div>
-    <div id="notif-group" class="tabbed_notifications"></div>
-  </div>
-
   <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
-
+  <script src="{{ static_url('jquery-weui/js/jquery-weui.min.js') }}"></script>
   <!-- bootstrap progress js -->
   <script src="{{ static_url('admin/js/progressbar/bootstrap-progressbar.min.js') }}"></script>
   <!-- icheck -->
@@ -442,11 +434,12 @@
     function uploadHandle() {
       file = document.getElementById('file').files[0];
       var imgUrl = uploadUpyun(file);
+      $.showLoading("图片上传中...");
       document.getElementById("img").value = imgUrl;
     }
-
     document.addEventListener('uploaded',function(e) {
 			//alert('uploaded');
+      $.hideLoading();
 		});
 
 		function uuid() {
