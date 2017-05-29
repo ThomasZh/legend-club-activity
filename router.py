@@ -138,6 +138,8 @@ def map():
         (r"/vendors/([a-z0-9]*)/setup/wx", getattr(vendor_setup, 'VendorSetupWxHandler')),
         (r"/vendors/([a-z0-9]*)/setup/hha", getattr(vendor_setup, 'VendorSetupHhaHandler')),
         (r"/vendors/([a-z0-9]*)/setup/club", getattr(vendor_setup, 'VendorSetupClubHandler')),
+        (r'/vendors/([a-z0-9]*)/setup/profile', getattr(vendor_setup, 'VendorProfileEditHandler')),
+        (r'/vendors/([a-z0-9]*)/setup/binding-wx', getattr(vendor_setup, 'VendorBindingWxHandler')),
 
         # 任务
         (r'/vendors/([a-z0-9]*)/setup/task', getattr(vendor_setup, 'VendorSetupTaskHandler')),

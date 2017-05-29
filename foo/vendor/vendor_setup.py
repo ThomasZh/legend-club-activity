@@ -392,6 +392,7 @@ class VendorSetupTaskCreateHandler(AuthorizationHandler):
 
         self.redirect('/vendors/' + vendor_id + '/setup/task')
 
+
 # VendorSetupTaskAllocateHandler 已被分配过任务该任务的应该不显示在列表中
 class VendorSetupTaskAllocateHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
@@ -463,3 +464,69 @@ class VendorSetupTaskAllocateHandler(AuthorizationHandler):
 
         personal_task_dao.personal_task_dao().create(json)
         self.redirect('/vendors/' + vendor_id + '/setup/task')
+
+
+class VendorProfileEditHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, club_id):
+        logging.info(self.request)
+        access_token = self.get_secure_cookie("access_token")
+        ops = self.get_ops_info()
+        counter = self.get_counter(club_id)
+        self.render('vendor/profile-edit.html',
+                ops=ops,
+                vendor_id=club_id,
+                access_token=access_token,
+                counter=counter,
+                api_domain=API_DOMAIN,
+                upyun_domain=UPYUN_DOMAIN,
+                upyun_notify_url=UPYUN_NOTIFY_URL,
+                upyun_form_api_secret=UPYUN_FORM_API_SECRET,
+                upyun_bucket=UPYUN_BUCKET)
+
+
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def post(self, club_id):
+        logging.info(self.request)
+        access_token = self.get_secure_cookie("access_token")
+        nickname = self.get_argument("nickname", "")
+        avatar = self.get_argument("avatar", "")
+        logging.info("try update myinfo nickname:[%r] avatar:[%r]", nickname, avatar)
+
+        url = API_DOMAIN+"/api/myinfo"
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer "+access_token}
+        _json = json_encode({"nickname":nickname, "avatar":avatar})
+        response = http_client.fetch(url, method="PUT", headers=headers, body=_json)
+        logging.info("got response.body %r", response.body)
+
+        self.redirect("/vendors/"+club_id+"/setup/profile")
+
+
+class VendorBindingWxHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, club_id):
+        logging.info(self.request)
+        ops = self.get_ops_info()
+
+        wx_app_info = vendor_wx_dao.vendor_wx_dao().query(club_id)
+        wx_notify_domain = wx_app_info['wx_notify_domain']
+
+        # create wechat qrcode
+        binding_wx_url = wx_notify_domain + "/bf/wx/vendors/" + club_id + "/ops/" + ops['account_id'] +"/binding"
+        logging.info("got binding_wx_url %r", binding_wx_url)
+        data = {"url": binding_wx_url}
+        _json = json_encode(data)
+        http_client = HTTPClient()
+        response = http_client.fetch(QRCODE_CREATE_URL, method="POST", body=_json)
+        logging.info("got response %r", response.body)
+        qrcode_url = response.body
+        logging.info("got qrcode_url %r", qrcode_url)
+
+        counter = self.get_counter(club_id)
+        self.render('vendor/binding-wx.html',
+                ops=ops,
+                counter=counter,
+                vendor_id=club_id,
+                qrcode_url=qrcode_url,
+                api_domain=API_DOMAIN)

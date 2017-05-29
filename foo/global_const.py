@@ -100,3 +100,8 @@ GUEST_CLUB_ID = '00000000000000000000000000000000'
 
 
 API_DOMAIN="http://7x24hs.com"
+
+UPYUN_DOMAIN = "https://tripc2c-club-title.b0.upaiyun.com"
+UPYUN_NOTIFY_URL = "http://upyun.com"
+UPYUN_FORM_API_SECRET = "CRKAOsKHGbbCnU+yztBxUT0bYR0="
+UPYUN_BUCKET = "tripc2c-club-title"
