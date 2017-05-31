@@ -395,3 +395,42 @@ class VendorResellerApplyCashoutHandler(AuthorizationHandler):
                 vendor_id=club_id,
                 qrcode_url=qrcode_url,
                 api_domain=API_DOMAIN)
+
+
+# 我在联盟中的积分
+class VendorLeagueBalanceHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        ops = self.get_ops_info()
+        access_token = self.get_access_token()
+
+        counter = self.get_counter(vendor_id)
+        self.render('vendor/league-balance.html',
+                access_token=access_token,
+                vendor_id=vendor_id,
+                org_id=org_id,
+                ops=ops,
+                counter=counter,
+                api_domain = API_DOMAIN)
+
+
+# 积分提现记录
+class VendorApplyCashoutLogHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, league_id):
+        logging.info("got league_id %r in uri", league_id)
+
+        ops = self.get_ops_info()
+        logging.info("got ops %r", ops)
+        access_token = self.get_access_token()
+
+        counter = self.get_counter(ops['club_id'])
+        self.render('vendor/apply-cashout-log.html',
+                access_token=access_token,
+                league_id=league_id,
+                vendor_id = ops['club_id'],
+                ops=ops,
+                counter=counter,
+                api_domain = API_DOMAIN)

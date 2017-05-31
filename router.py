@@ -111,6 +111,10 @@ def map():
         # 结算
         (r"/vendors/([a-z0-9]*)/supplier-balance", getattr(vendor_order, 'VendorSupplierBalanceHandler')),
         (r"/vendors/([a-z0-9]*)/reseller-balance", getattr(vendor_order, 'VendorResellerBalanceHandler')),
+
+        (r"/vendors/([a-z0-9]*)/league-balance", getattr(vendor_order, 'VendorLeagueBalanceHandler')),
+        (r"/vendors/([a-z0-9]*)/apply-cashout-log", getattr(vendor_order, 'VendorApplyCashoutLogHandler')),
+        
         (r"/vendors/([a-z0-9]*)/supplier-details/([a-z0-9]*)", getattr(vendor_order, 'VendorSupplierBalanceDetailsHandler')),
         (r"/vendors/([a-z0-9]*)/reseller-details/([a-z0-9]*)", getattr(vendor_order, 'VendorResellerBalanceDetailsHandler')),
         # 供应商发起提现申请

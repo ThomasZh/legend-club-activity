@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Meta, title, CSS, favicons, etc. -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>骑无止境 -- 我在联盟中的积分</title>
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="{{ static_url('weui/lib/weui.css') }}">
+  <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
+  <!-- Custom styling plus plugins -->
+  <link href="{{ static_url('css/custom.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
+  <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
+
+</head>
+
+
+<body class="nav-md">
+
+  <div class="container body">
+
+
+    <div class="main_container">
+
+      <div class="col-md-3 left_col">
+        <div class="left_col scroll-view">
+
+          <!-- navigation title -->
+          {% module Template("vendor/nav-title-block.html", ops=ops) %}
+          <!-- /navigation title -->
+          <div class="clearfix"></div>
+
+          <!-- menu prile quick info -->
+          {% module Template("vendor/menu-prile-quick-info-block.html", ops=ops) %}
+          <!-- /menu prile quick info -->
+
+          <br />
+
+          <!-- sidebar menu -->
+          {% module Template("vendor/sidebar-menu-block.html", vendor_id=vendor_id, counter=counter) %}
+          <!-- /sidebar menu -->
+
+        </div>
+      </div>
+
+      <!-- top navigation -->
+      {% module Template("vendor/top-nav-block.html", ops=ops) %}
+      <!-- /top navigation -->
+
+      <!-- page content -->
+      <div class="right_col" role="main">
+
+        <div class="">
+          <div class="page-title">
+            <div class="title_left">
+              <h3>联盟结算<small>我的供应商</small></h3>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>我在各供应商下的积分</h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+
+                  <p>供应商积分列表</p>
+
+                  <!-- start project list -->
+                  <table class="table table-striped projects">
+                    <thead>
+                      <tr>
+                        <th style="width: 1%">#</th>
+                        <th style="width: 16%">供应商名称</th>
+                        <th style="width: 16%">剩余积分</th>
+                        <th style="width: 16%">累计积分</th>
+                        <th>操作</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tbody">
+
+                    </tbody>
+                  </table>
+                  <!-- end project list -->
+                  <div class="clearfix"></div>
+                  <div class="col-md-5 col-sm-12 col-xs-12 center-margin">
+                    <button class="btn btn-success" type="button" id="prev">上一页</button>
+                    <span class="pageBox"></span>
+
+                    <button class="btn btn-success" type="button" id="next">下一页</button>
+                    共<span id="total_page" style="padding:0 5px;"></span>页
+
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- footer content -->
+        {% module Template("vendor/footer-block.html") %}
+        <!-- /footer content -->
+
+      </div>
+      <!-- /page content -->
+    </div>
+
+  </div>
+  <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
+  <!-- bootstrap progress js -->
+  <script src="{{ static_url('admin/js/progressbar/bootstrap-progressbar.min.js') }}"></script>
+  <!-- icheck -->
+  <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
+
+  <script src="{{ static_url('admin/js/custom.js') }}"></script>
+  <!-- pace -->
+  <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
+  <script src="{{ static_url('weui/js/weui.js') }}"></script>
+  <!-- daterangepicker -->
+  <script type="text/javascript" src="{{ static_url('admin/js/moment/moment.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('admin/js/datepicker/daterangepicker.js') }}"></script>
+
+  <script>
+
+      var limit = 8;//每页显示数
+      var currentPage;//订单当前页
+      var total_page;//订单总页数
+
+      function gotoPage(pageNum) {
+        currentPage = pageNum;
+        $.ajax({
+          type: "GET",
+          url: "{{ api_domain }}/api/points/clubs/{{ vendor_id }}/suppliers?page="+pageNum+"&limit="+limit,
+          headers: {"Authorization": "Bearer {{ access_token }}"},
+          dataType: "json",
+          contentType: 'application/json',
+          success: function(data, status, xhr) {
+              //  console.log(data.rs);
+          var ajaxobj = data.rs.data;
+              total_page = data.rs.total_page;//总页
+              $("#total_page").html(total_page);
+          $('#tbody').html("");
+          for (var i in ajaxobj) {
+            var inner_html = '<tr><td>#</td>';
+            inner_html += '<td>'+ajaxobj[i].org_name + '</td>';
+            inner_html += '<td>'+ajaxobj[i].remaining_points+'</td>';
+            inner_html += '<td>'+ajaxobj[i].accumulated_points+'</td>';
+            inner_html += '<td>';
+            inner_html += '<a href="/vendors/{{ vendor_id }}/reseller-details/'+ajaxobj[i].org_id + '" class="btn btn-info btn-xs">';
+            inner_html += '<i class="fa fa-eye"></i> 查看详情 </a><br/>';
+            inner_html += '<a href="/vendors/{{ vendor_id }}/suppliers/'+ajaxobj[i].org_id+'/apply-cash-out" class="btn btn-warning btn-xs">';
+            inner_html += '<i class="fa fa-eye"></i> 申请提现 </a>';
+            inner_html += '</td>';
+            inner_html += '</tr>';
+
+            $('#tbody').append(inner_html);
+          };
+
+            pageNext = parseInt((currentPage-1)/5) + 1;
+            start = (pageNext-1)*5+1;
+            end = pageNext*5;
+            if(end > total_page){
+              end = total_page;
+            }
+            $(".pageBox").html("");
+            for (var k=start;k<=end;k++){
+              var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
+              $(".pageBox").append(inner_html);
+            };
+             $("#num"+currentPage).addClass("on").siblings().removeClass("on");
+          }
+        });
+      };
+
+      $(function(){
+          gotoPage("1");
+          $(document).on('click','.pageBox > button',function(){
+              var num = $(this).text();
+              gotoPage(num);
+          });
+          $("#prev").on("click",function(){
+              if(currentPage<=1){
+              }else{
+                    gotoPage(--currentPage);
+              }
+          });
+          $("#next").on("click",function(){
+              if(currentPage>=total_page){
+              }else{
+                    gotoPage(++currentPage);
+              }
+          });
+          $("#rank_btn").on("click",function(){
+            var data = {"_rank":"100"};
+            var json = JSON.stringify(data);
+            $.ajax({
+              type: "PUT",
+              url: "http://7x24hs.com/api/clubs/{{ vendor_id }}/users",
+              data: json,
+              headers: {"Authorization":"Bearer {{ access_token }}"},
+              contentType: 'application/json',
+              success:function(data){
+                var data = JSON.parse(data);
+                if(data.err_code == 200){
+                  weui.Loading.success();
+                }
+              },
+              error:function(){
+              }
+            });
+          });
+      });
+</script>
+
+</body>
+
+</html>
