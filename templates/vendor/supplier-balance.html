@@ -61,7 +61,7 @@
         <div class="">
           <div class="page-title">
             <div class="title_left">
-              <h3>我是供应商</h3>
+              <h3>联盟结算 <small>我的分销商</small></h3>
             </div>
           </div>
           <div class="clearfix"></div>
@@ -70,7 +70,7 @@
             <div class="col-md-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>我的分销商积分</h2>
+                  <h2>分销商剩余积分</h2>
                   <ul class="nav navbar-right panel_toolbox">
                     <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                     </li>
@@ -81,7 +81,7 @@
                 </div>
                 <div class="x_content">
 
-                  <p>我的分销商积分列表</p>
+                  <p>分销商积分列表</p>
 
                   <!-- start project list -->
                   <table class="table table-striped projects">
@@ -167,9 +167,7 @@
             inner_html += '<td>'+ajaxobj[i].accumulated_points+'</td>';
             inner_html += '<td>';
             inner_html += '<a href="/vendors/{{ vendor_id }}/supplier-details/'+ajaxobj[i].account_id + '" class="btn btn-info btn-xs">';
-            inner_html += '<i class="fa fa-eye"></i> 查看详情 </a><br/>';
-            inner_html += '<a href="#" class="btn btn-warning btn-xs">';
-            inner_html += '<i class="fa fa-eye"></i> 申请提现 </a>';
+            inner_html += '<i class="fa fa-eye"></i> 积分记录 </a><br/>';
             inner_html += '</td>';
             inner_html += '</tr>';
 

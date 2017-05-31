@@ -61,7 +61,7 @@
         <div class="">
           <div class="page-title">
             <div class="title_left">
-              <h3>我是分销商</h3>
+              <h3>联盟结算<small>我的供应商</small></h3>
             </div>
           </div>
           <div class="clearfix"></div>
@@ -81,7 +81,7 @@
                 </div>
                 <div class="x_content">
 
-                  <p>我在各供应商下的积分详情</p>
+                  <p>供应商积分列表</p>
 
                   <!-- start project list -->
                   <table class="table table-striped projects">
@@ -168,7 +168,7 @@
             inner_html += '<td>';
             inner_html += '<a href="/vendors/{{ vendor_id }}/reseller-details/'+ajaxobj[i].org_id + '" class="btn btn-info btn-xs">';
             inner_html += '<i class="fa fa-eye"></i> 查看详情 </a><br/>';
-            inner_html += '<a href="#" class="btn btn-warning btn-xs">';
+            inner_html += '<a href="/vendors/{{ vendor_id }}/suppliers/'+ajaxobj[i].org_id+'/apply-cash-out" class="btn btn-warning btn-xs">';
             inner_html += '<i class="fa fa-eye"></i> 申请提现 </a>';
             inner_html += '</td>';
             inner_html += '</tr>';

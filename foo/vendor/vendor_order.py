@@ -49,6 +49,7 @@ from dao import group_qrcode_dao
 from dao import insurance_template_dao
 from dao import vendor_member_dao
 from dao import voucher_order_dao
+from dao import vendor_wx_dao
 
 
 class VendorOrdersMeAllHandler(AuthorizationHandler):
@@ -334,3 +335,63 @@ class VendorResellerBalanceDetailsHandler(AuthorizationHandler):
                 ops=ops,
                 counter=counter,
                 api_domain = API_DOMAIN)
+
+
+# 供应商发起提现申请
+class VendorSupplierApplyCashoutHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, club_id, league_id):
+        logging.info(self.request)
+        ops = self.get_ops_info()
+
+        wx_app_info = vendor_wx_dao.vendor_wx_dao().query(club_id)
+        wx_notify_domain = wx_app_info['wx_notify_domain']
+
+        # create wechat qrcode
+        apply_cashout_wx_url = wx_notify_domain + "/bf/wx/vendors/" + club_id + "/ops/" + ops['account_id'] +"/apply-cash-out/leagues/" + league_id
+        logging.info("got apply_cashout_wx_url %r", apply_cashout_wx_url)
+        data = {"url": apply_cashout_wx_url}
+        _json = json_encode(data)
+        http_client = HTTPClient()
+        response = http_client.fetch(QRCODE_CREATE_URL, method="POST", body=_json)
+        logging.info("got response %r", response.body)
+        qrcode_url = response.body
+        logging.info("got qrcode_url %r", qrcode_url)
+
+        counter = self.get_counter(club_id)
+        self.render('vendor/apply-cash-out.html',
+                ops=ops,
+                counter=counter,
+                vendor_id=club_id,
+                qrcode_url=qrcode_url,
+                api_domain=API_DOMAIN)
+
+
+# 分销商发起提现申请
+class VendorResellerApplyCashoutHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, club_id, supplier_id):
+        logging.info(self.request)
+        ops = self.get_ops_info()
+
+        wx_app_info = vendor_wx_dao.vendor_wx_dao().query(club_id)
+        wx_notify_domain = wx_app_info['wx_notify_domain']
+
+        # create wechat qrcode
+        apply_cashout_wx_url = wx_notify_domain + "/bf/wx/vendors/" + club_id + "/ops/" + ops['account_id'] +"/apply-cash-out/suppliers/" + supplier_id
+        logging.info("got apply_cashout_wx_url %r", apply_cashout_wx_url)
+        data = {"url": apply_cashout_wx_url}
+        _json = json_encode(data)
+        http_client = HTTPClient()
+        response = http_client.fetch(QRCODE_CREATE_URL, method="POST", body=_json)
+        logging.info("got response %r", response.body)
+        qrcode_url = response.body
+        logging.info("got qrcode_url %r", qrcode_url)
+
+        counter = self.get_counter(club_id)
+        self.render('vendor/apply-cash-out.html',
+                ops=ops,
+                counter=counter,
+                vendor_id=club_id,
+                qrcode_url=qrcode_url,
+                api_domain=API_DOMAIN)

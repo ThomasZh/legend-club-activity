@@ -113,6 +113,11 @@ def map():
         (r"/vendors/([a-z0-9]*)/reseller-balance", getattr(vendor_order, 'VendorResellerBalanceHandler')),
         (r"/vendors/([a-z0-9]*)/supplier-details/([a-z0-9]*)", getattr(vendor_order, 'VendorSupplierBalanceDetailsHandler')),
         (r"/vendors/([a-z0-9]*)/reseller-details/([a-z0-9]*)", getattr(vendor_order, 'VendorResellerBalanceDetailsHandler')),
+        # 供应商发起提现申请
+        (r'/vendors/([a-z0-9]*)/leagues/([a-z0-9]*)/apply-cash-out', getattr(vendor_order, 'VendorSupplierApplyCashoutHandler')),
+        # 分销商发起提现申请
+        (r'/vendors/([a-z0-9]*)/suppliers/([a-z0-9]*)/apply-cash-out', getattr(vendor_order, 'VendorResellerApplyCashoutHandler')),
+
 
         # customer profile
         (r"/vendors/([a-z0-9]*)/customers", getattr(vendor_customer, 'VendorCustomerListHandler')),
