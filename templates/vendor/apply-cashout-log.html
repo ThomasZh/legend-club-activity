@@ -183,7 +183,7 @@
           for (var i in ajaxobj) {
             var inner_html = '<tr>';
             inner_html += '<td class="a-center">';
-              if (ajaxobj[i].review_status == '0')
+              if (ajaxobj[i].review_status == '0' && ajaxobj[i]._status != '0')
                 inner_html += '<input type="checkbox" class="tableflat" value="'+ajaxobj[i]._id+'" onclick="javascript:OnReviewOrder(this);">';
               else
                 inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
