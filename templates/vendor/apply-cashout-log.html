@@ -87,14 +87,15 @@
                   <table class="table table-striped projects">
                     <thead>
                       <tr>
-                        <th style="width: 12%">申请人</th>
-                        <th style="width: 12%">分销商名称</th>
-                        <th style="width: 12%">积分</th>
-                        <th style="width: 12%">申请时间</th>
-                        <th style="width: 12%">供应商名称</th>
-                        <th style="width: 12%">审批状态</th>
-                        <th style="width: 12%">审批理由</th>
-                        <th style="width: 12%">审核员</th>
+                        <th style="width: 11%">审查</th>
+                        <th style="width: 11%">申请人</th>
+                        <th style="width: 11%">分销商名称</th>
+                        <th style="width: 11%">积分</th>
+                        <th style="width: 11%">申请时间</th>
+                        <th style="width: 11%">供应商名称</th>
+                        <th style="width: 11%">审批状态</th>
+                        <th style="width: 11%">审批理由</th>
+                        <th style="width: 11%">审核员</th>
                       </tr>
                     </thead>
                     <tbody id="tbody">
@@ -145,6 +146,19 @@
 
   <script>
 
+      function OnReviewOrder(e) {
+        orderId = e.value;
+        console.log(orderId)
+        $.ajax({
+          type: "POST",
+          url: "{{ api_domain }}/api/points/leagues/{{ league_id }}/apply-cash-out/" + orderId + "/review",
+          headers: {"Authorization": "Bearer {{ access_token }}"},
+          success: function(data, status, xhr) {
+            e.disabled = "true";
+          }
+        });
+      }
+
       function getLocalTime(nS) { //时间戳转换
          return new Date(parseInt(nS) * 1000).toLocaleString().replace(/:\d{1,2}$/,' ');
       };
@@ -168,6 +182,12 @@
           $('#tbody').html("");
           for (var i in ajaxobj) {
             var inner_html = '<tr>';
+            inner_html += '<td class="a-center">';
+              if (ajaxobj[i].review_status == '0')
+                inner_html += '<input type="checkbox" class="tableflat" value="'+ajaxobj[i]._id+'" onclick="javascript:OnReviewOrder(this);">';
+              else
+                inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
+            inner_html += '</td>';
             inner_html += '<td>'
             inner_html += '<ul class="list-inline">';
               inner_html += '<li>';
