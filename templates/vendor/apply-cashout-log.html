@@ -151,7 +151,7 @@
         console.log(orderId)
         $.ajax({
           type: "POST",
-          url: "{{ api_domain }}/api/points/leagues/{{ league_id }}/apply-cash-out/" + orderId + "/review",
+          url: "/bf/api/leagues/{{ league_id }}/apply-cashout/" + orderId + "/review",
           headers: {"Authorization": "Bearer {{ access_token }}"},
           success: function(data, status, xhr) {
             e.disabled = "true";

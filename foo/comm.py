@@ -127,6 +127,18 @@ def time_span(ts):
 
 class BaseHandler(tornado.web.RequestHandler):
 
+    def get_apply_cashout(self, league_id, apply_id):
+        url = API_DOMAIN + "/api/points/leagues/"+league_id+"/apply-cash-out/" + apply_id
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="GET")
+        logging.info("got get_apply_cashout %r", response.body)
+        data = json_decode(response.body)
+        if data['err_code'] == 404:
+            return {}
+        apply_cashout = data['data']
+        return apply_cashout
+
+
     def get_activity(self, activity_id):
         headers = {"Authorization":"Bearer "+DEFAULT_USER_ID}
 

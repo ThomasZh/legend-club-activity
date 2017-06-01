@@ -114,7 +114,7 @@ def map():
 
         (r"/vendors/([a-z0-9]*)/league-balance", getattr(vendor_order, 'VendorLeagueBalanceHandler')),
         (r"/vendors/([a-z0-9]*)/apply-cashout-log", getattr(vendor_order, 'VendorApplyCashoutLogHandler')),
-        
+
         (r"/vendors/([a-z0-9]*)/supplier-details/([a-z0-9]*)", getattr(vendor_order, 'VendorSupplierBalanceDetailsHandler')),
         (r"/vendors/([a-z0-9]*)/reseller-details/([a-z0-9]*)", getattr(vendor_order, 'VendorResellerBalanceDetailsHandler')),
         # 供应商发起提现申请
@@ -202,6 +202,7 @@ def map():
         (r"/bf/api/vendors/([a-z0-9]*)/customers/([a-z0-9]*)/orders", getattr(api_customer_profile, 'ApiCustomerOrdersXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/customers/([a-z0-9]*)/points", getattr(api_customer_profile, 'ApiCustomerPointsXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/customer-profile/customers", getattr(api_customer_profile, 'ApiCustomerListXHR')),
+        (r"/bf/api/leagues/([a-z0-9]*)/apply-cashout/([a-z0-9]*)/review", getattr(api_order, 'ApiApplyCashoutReviewXHR')),
 
         # comm
         ('.*', getattr(comm, 'PageNotFoundHandler'))

@@ -237,6 +237,29 @@ class ApiApplyReviewXHR(AuthorizationHandler):
         self.finish("ok")
 
 
+class ApiApplyCashoutReviewXHR(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def post(self, league_id, apply_id):
+        logging.info("got league_id %r in uri", league_id)
+        logging.info("got apply_id %r in uri", apply_id)
+
+        access_token = self.get_secure_cookie("access_token")
+
+        headers={"Authorization":"Bearer "+access_token}
+        url = API_DOMAIN + "/api/points/leagues/"+league_id+"/apply-cash-out/"+ apply_id +"/review"
+        http_client = HTTPClient()
+        _json = json_encode(headers)
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("got apply-cash-out check_review_status %r", response.body)
+
+        apply_cashout = self.get_apply_cashout(league_id, apply_id)
+        club_id = apply_cashout['apply_org_id']
+
+        self.counter_decrease(club_id, "review_cashout")
+
+        self.finish("ok")
+
+
 # 报名报表导出excel格式文件,
 # 使用时必须先生成文件，然后再下载
 class ApiActivityExportXHR(AuthorizationHandler):

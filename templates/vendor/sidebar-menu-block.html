@@ -60,12 +60,20 @@
           {% end %}
         </ul>
         </li>
-        <li><a><i class="fa fa-calculator"></i> 联盟结算 <span class="fa fa-chevron-down"></span></a>
+        {% if counter and counter.has_key('review_cashout') and counter['review_cashout'] != "0" %}
+          <li><a><i class="fa fa-calculator"></i> 联盟结算 <span class="badge bg-green">{{ counter['review_cashout'] }}</span><span class="fa fa-chevron-down"></span></a>
+        {% else %}
+          <li><a><i class="fa fa-calculator"></i> 联盟结算 <span class="fa fa-chevron-down"></span></a>
+        {% end %}
           <ul class="nav child_menu" style="display: none">
             <li><a href="/vendors/{{ vendor_id }}/supplier-balance">我的分销商</a></li>
             <li><a href="/vendors/{{ vendor_id }}/reseller-balance">我的供应商</a></li>
             <li><a href="/vendors/{{ vendor_id }}/league-balance">我在联盟中的积分</a></li>
-            <li><a href="/vendors/{{ vendor_id }}/apply-cashout-log">积分提现记录</a></li>
+            {% if counter and counter.has_key('review_cashout') and counter['review_cashout'] != "0" %}
+              <li><a href="/vendors/{{ vendor_id }}/apply-cashout-log">积分提现记录 <span class="badge bg-green">{{ counter['review_cashout'] }}</span></a></li>
+            {% else %}
+              <li><a href="/vendors/{{ vendor_id }}/apply-cashout-log">积分提现记录</a></li>
+            {% end %}
           </ul>
         </li>
         <li><a><i class="fa fa-male"></i> 会员 <span class="fa fa-chevron-down"></span></a>
