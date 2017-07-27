@@ -1059,7 +1059,7 @@ class VendorActivityDetailStep6Handler(AuthorizationHandler):
         bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
 
-        params = {"filter":"item", "item_id":activity_id, "page":1, "limit":20}
+        params = {"filter":"item", "item_id":activity_id, "page":1, "limit":2000}
         url = url_concat(API_DOMAIN + "/api/applies", params)
         http_client = HTTPClient()
         headers = {"Authorization":"Bearer " + access_token}
