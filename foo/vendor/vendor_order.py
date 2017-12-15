@@ -410,7 +410,7 @@ class VendorLeagueBalanceHandler(AuthorizationHandler):
         self.render('vendor/league-balance.html',
                 access_token=access_token,
                 vendor_id=vendor_id,
-                org_id=org_id,
+                org_id=vendor_id,
                 ops=ops,
                 counter=counter,
                 api_domain = API_DOMAIN)
